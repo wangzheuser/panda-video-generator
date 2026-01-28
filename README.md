@@ -48,6 +48,36 @@ Upgrade Remotion:
 npx remotion upgrade
 ```
 
+### Auto Video Generation
+
+Generate a complete video from a Zhihu question URL (automatically runs spider → TTS → render):
+
+```bash
+pnpm generate <zhihu_url>
+```
+
+Or run the script directly:
+
+```bash
+./generate-video.sh <zhihu_url>
+```
+
+Example:
+
+```bash
+pnpm generate https://www.zhihu.com/question/316150890
+```
+
+This command will:
+1. Extract content from the Zhihu question using the spider
+2. Generate video script using DeepSeek AI (saved to `input/input.txt`)
+3. Generate audio and subtitles using TTS (saved to `public/audio/`)
+4. Render the final video using Remotion (saved to `out/video_<timestamp>.mp4`)
+
+**Requirements:**
+- Set `DEEPSEEK_API_KEY` in `.env.local` file
+- Python 3 with `edge-tts` and `pydub` installed (for TTS)
+
 The following script will set up your Remotion Bundle and Lambda function on AWS:
 
 ```

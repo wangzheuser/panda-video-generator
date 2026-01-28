@@ -31,7 +31,8 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "remotion/webpack-override.mjs",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "spider/caption-generator.ts.bk"
   ],
   "exclude": [
     "node_modules",

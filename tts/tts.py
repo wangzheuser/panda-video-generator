@@ -120,21 +120,122 @@ def merge_audio_files(audio_files, output_path, speed=1.0):
             print(f"❌ Failed to merge audio: {e}")
             return False
 
-def generate_vtt(lines, durations, output_path):
-    """Generate VTT subtitle file"""
+def split_text_for_vtt(text, max_length=30):
+    """Split text into segments of max_length characters for VTT subtitles
+    Only splits at sentence-ending punctuation marks to avoid cutting in the middle of sentences.
+    Supports both full-width (全角) and half-width (半角) punctuation:
+    - Full-width: 。！？ (period, exclamation, question mark)
+    - Half-width: .!? (period, exclamation, question mark)
+    Does not split at mid-sentence punctuation like commas (，,) or enumeration marks (、).
+    If no sentence-ending punctuation is found within max_length, allows exceeding max_length
+    (up to max_length * 2) to find the next sentence boundary, rather than cutting mid-sentence.
+    """
+    if len(text) <= max_length:
+        return [text]
+    
+    segments = []
+    # Only use sentence-ending punctuation marks (not mid-sentence marks like ，、；：)
+    # Support both full-width (全角) and half-width (半角) punctuation
+    sentence_endings = '。！？.!?'  # Full-width: 。！？, Half-width: .!?
+    
+    remaining = text
+    while len(remaining) > max_length:
+        split_pos = -1
+        
+        # First, try to find a sentence-ending punctuation within max_length
+        # Search backwards from max_length to find the last sentence-ending punctuation
+        for i in range(min(max_length, len(remaining)) - 1, -1, -1):
+            if remaining[i] in sentence_endings:
+                split_pos = i + 1
+                break
+        
+        # If found sentence-ending punctuation within max_length, use it
+        if split_pos > 0:
+            segment = remaining[:split_pos].strip()
+            if segment:
+                segments.append(segment)
+            remaining = remaining[split_pos:].strip()
+        else:
+            # No sentence-ending punctuation found within max_length
+            # Look ahead to find the next sentence-ending punctuation
+            # First try within max_length * 2, but if not found, search the entire remaining text
+            # This prevents cutting in the middle of sentences
+            found_sentence_end = False
+            
+            # First, try to find within max_length * 2 (preferred limit)
+            lookahead_limit = min(max_length * 2, len(remaining))
+            for i in range(max_length, lookahead_limit):
+                if remaining[i] in sentence_endings:
+                    split_pos = i + 1
+                    found_sentence_end = True
+                    break
+            
+            # If not found within max_length * 2, search the entire remaining text
+            # This ensures we find sentence endings even in very long sentences
+            if not found_sentence_end:
+                for i in range(max_length, len(remaining)):
+                    if remaining[i] in sentence_endings:
+                        split_pos = i + 1
+                        found_sentence_end = True
+                        break
+            
+            if found_sentence_end:
+                # Found sentence-ending punctuation, use it even if exceeds max_length
+                segment = remaining[:split_pos].strip()
+                if segment:
+                    segments.append(segment)
+                remaining = remaining[split_pos:].strip()
+            else:
+                # Still no sentence-ending punctuation found in the entire remaining text
+                # This should be very rare - only happens if text is extremely long without sentence endings
+                # In this case, keep the entire remaining text as one segment to avoid mid-sentence cuts
+                # This allows the segment to exceed max_length rather than cutting mid-sentence
+                segments.append(remaining.strip())
+                remaining = ''
+    
+    # Add remaining text
+    if remaining:
+        segments.append(remaining)
+    
+    return segments
+
+def generate_vtt(lines, durations, output_path, vtt_max_length=30):
+    """Generate VTT subtitle file
+    Each TTS segment (up to 2000 chars) is further split into VTT segments (max 30 chars)
+    """
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write("WEBVTT\n\n")
         
         current_time = 0.0
-        for i, (text, duration) in enumerate(zip(lines, durations), 1):
-            start_time = current_time
-            end_time = current_time + duration
+        vtt_index = 1
+        
+        for text, duration in zip(lines, durations):
+            # Split the TTS segment into smaller VTT segments (max 30 chars each)
+            vtt_segments = split_text_for_vtt(text, vtt_max_length)
             
-            f.write(f"{i}\n")
-            f.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
-            f.write(f"{text}\n\n")
+            # Calculate duration per VTT segment (proportional to text length)
+            if len(vtt_segments) == 1:
+                # Single segment, use full duration
+                segment_durations = [duration]
+            else:
+                # Multiple segments, distribute duration proportionally
+                total_chars = len(text)
+                segment_durations = []
+                for segment in vtt_segments:
+                    segment_ratio = len(segment) / total_chars
+                    segment_durations.append(duration * segment_ratio)
             
-            current_time = end_time
+            # Write each VTT segment
+            for segment_text, segment_duration in zip(vtt_segments, segment_durations):
+                start_time = current_time
+                end_time = current_time + segment_duration
+                
+                f.write(f"{vtt_index}\n")
+                f.write(f"{format_time(start_time)} --> {format_time(end_time)}\n")
+                f.write(f"{segment_text}\n\n")
+                
+                current_time = end_time
+                vtt_index += 1
 
 def split_by_punctuation(text, max_length=2000):
     """Split text by Chinese and English punctuation marks

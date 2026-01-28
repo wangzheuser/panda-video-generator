@@ -49,3 +49,10 @@ input/input.txt
 .pnpm-store/
 public/audio/*
 public/image/*
+
+# spider output files
+spider/output-*.json
+spider/output-*.md
+spider/debug-*.png
+spider/debug-*.html
+spider/script-*.txt
