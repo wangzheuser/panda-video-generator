@@ -21,6 +21,11 @@ if [ -z "$1" ]; then
     exit 1
 fi
 
+# Skip leading -- if present (often passed by pnpm/npm)
+if [ "$1" == "--" ]; then
+    shift
+fi
+
 ZHIHU_URL="$1"
 
 # Validate URL
@@ -144,9 +149,8 @@ fi
 echo -e "${YELLOW}🎬 Step 3/3: Rendering video with Remotion...${NC}"
 echo ""
 
-# Generate output filename with timestamp
-TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
-OUTPUT_FILE="out/video_${TIMESTAMP}.mp4"
+# Use fixed output filename (no timestamp for easier automation with Playwright)
+OUTPUT_FILE="out/video.mp4"
 
 # Ensure out directory exists
 mkdir -p out
@@ -161,9 +165,54 @@ echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━
 echo -e "${GREEN}✅ All steps completed successfully!${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
+
+# Step 4: Export title JSON file
+echo -e "${YELLOW}📄 Step 4/4: Exporting title JSON file...${NC}"
+
+# Find the latest spider output JSON file
+LATEST_JSON=$(ls -t spider/output-*.json 2>/dev/null | head -1)
+
+if [ -z "$LATEST_JSON" ]; then
+    echo -e "${YELLOW}⚠️  Warning: No spider JSON file found, skipping title export${NC}"
+else
+    # Extract title from JSON file
+    # Try using jq first, fallback to python if jq is not available
+    if command -v jq &> /dev/null; then
+        TITLE=$(jq -r '.title' "$LATEST_JSON" 2>/dev/null)
+    elif command -v python3 &> /dev/null; then
+        TITLE=$(python3 -c "import json; print(json.load(open('$LATEST_JSON'))['title'])" 2>/dev/null)
+    else
+        # Fallback: use grep and sed (less reliable but works)
+        TITLE=$(grep -o '"title"[[:space:]]*:[[:space:]]*"[^"]*"' "$LATEST_JSON" | sed 's/.*"title"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/' | head -1)
+    fi
+    
+    if [ -z "$TITLE" ]; then
+        echo -e "${YELLOW}⚠️  Warning: Could not extract title from JSON file${NC}"
+    else
+        # Use fixed filename (no timestamp for easier automation)
+        TITLE_JSON="out/title.json"
+        
+        # Create JSON file with title
+        if command -v jq &> /dev/null; then
+            echo "{\"title\": \"$TITLE\"}" | jq '.' > "$TITLE_JSON"
+        else
+            # Use python to create properly formatted JSON
+            python3 -c "import json; json.dump({'title': '$TITLE'}, open('$TITLE_JSON', 'w'), ensure_ascii=False, indent=2)" 2>/dev/null || \
+            echo "{\"title\": \"$TITLE\"}" > "$TITLE_JSON"
+        fi
+        
+        echo -e "${GREEN}✅ Title JSON exported: $TITLE_JSON${NC}"
+        echo "   Title: $TITLE"
+    fi
+fi
+
+echo ""
 echo -e "${BLUE}📁 Output files:${NC}"
 echo "  - Video: $OUTPUT_FILE"
 echo "  - Audio: public/audio/audio.mp3"
 echo "  - Subtitles: public/audio/audio.vtt"
 echo "  - Caption: input/input.txt"
+if [ -n "$TITLE_JSON" ] && [ -f "$TITLE_JSON" ]; then
+    echo "  - Title JSON: $TITLE_JSON"
+fi
 echo ""

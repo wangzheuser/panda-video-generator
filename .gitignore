@@ -57,3 +57,9 @@ spider/output-*.md
 spider/debug-*.png
 spider/debug-*.html
 spider/script-*.txt
+
+# playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/playwright/.auth/

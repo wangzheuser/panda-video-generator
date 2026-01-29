@@ -33,6 +33,7 @@
     "@eslint/eslintrc": "3.1.0",
     "@eslint/js": "9.38.0",
     "@next/eslint-plugin-next": "15.1.6",
+    "@playwright/test": "^1.58.0",
     "@remotion/eslint-plugin": "4.0.409",
     "@tailwindcss/postcss": "4.1.1",
     "@types/node": "20.12.14",
@@ -61,6 +62,8 @@
     "render": "remotion render",
     "deploy": "node deploy.mjs",
     "spider": "tsx spider/run.ts",
-    "generate": "./generate-video.sh"
+    "generate": "sh generate-video.sh",
+    "test:login": "playwright test tests/login-bilibili.spec.ts --project=chromium --headed",
+    "test:upload": "playwright test tests/upload-video.spec.ts --project=chromium --headed"
   }
 }
