@@ -15,12 +15,12 @@ const authFile = path.join(__dirname, 'playwright/.auth/bilibili.json');
 const storageState = existsSync(authFile) ? authFile : undefined;
 
 export default defineConfig({
-  testDir: './tests',
+  testDir: './automations',
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* No retries for upload tests */
+  /* No retries for any test cases */
   retries: 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
@@ -30,13 +30,14 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000',
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    /* Collect trace on failure (since we don't retry) */
+    trace: 'retain-on-failure',
     /* Load saved login state if it exists (optional) */
     ...(storageState && { storageState }),
   },
 
   /* Configure projects for major browsers */
+  /* Only use chromium by default to avoid running tests twice */
   projects: [
     {
       name: 'chromium',
@@ -46,16 +47,14 @@ export default defineConfig({
         ...(storageState && { storageState }),
       },
     },
-    {
-      name: 'edge',
-      use: { 
-        ...devices['Desktop Edge'],
-        /* Load saved login state if it exists */
-        ...(storageState && { storageState }),
-      },
-    },
-
-    // Uncomment below to test on multiple browsers
+    // Uncomment below to test on multiple browsers (will run tests multiple times)
+    // {
+    //   name: 'edge',
+    //   use: { 
+    //     ...devices['Desktop Edge'],
+    //     ...(storageState && { storageState }),
+    //   },
+    // },
     // {
     //   name: 'firefox',
     //   use: { ...devices['Desktop Firefox'] },

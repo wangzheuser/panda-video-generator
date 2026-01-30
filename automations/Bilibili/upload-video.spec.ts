@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import path from 'path';
 import { existsSync } from 'fs';
+import { getAuthFilePath } from '../utils/login-helper';
 
 /**
  * Auto upload video to Bilibili
@@ -78,6 +79,15 @@ function getUploadConfig(): UploadConfig {
   return config;
 }
 
+// Load saved authentication state for Bilibili if it exists
+const bilibiliAuthFile = getAuthFilePath('bilibili');
+if (existsSync(bilibiliAuthFile)) {
+  test.use({ storageState: bilibiliAuthFile });
+  console.log(`🔐 Using saved authentication state from: ${bilibiliAuthFile}`);
+} else {
+  console.log('⚠️  No saved authentication file found. You may need to login first: pnpm test:login:bilibili');
+}
+
 // Configure test suite: 5 minute timeout
 test.describe.configure({ timeout: 5 * 60 * 1000 });
 
@@ -105,7 +115,7 @@ test('upload video to bilibili', async ({ page }) => {
   if (loginRequired) {
     throw new Error(
       'Not logged in! Please run login script first:\n' +
-      '  pnpm test:login'
+      '  pnpm test:login:bilibili'
     );
   }
   
@@ -350,14 +360,90 @@ test('upload video to bilibili', async ({ page }) => {
   console.log('⏳ Waiting for video to finish uploading/processing...');
   await page.waitForTimeout(10000);
   
-  // Step 7: Pause for review (DO NOT SUBMIT)
+  // Step 7: Click submit button
   console.log('');
   console.log('📝 Video upload/form filling completed!');
-  console.log('⚠️  IMPORTANT: Do NOT click submit button');
-  console.log('💡 The page is paused - you can review and make adjustments');
-  console.log('');
+  console.log('🚀 Looking for submit button...');
+  await page.waitForTimeout(2000);
   
-  await page.pause();
+  // Scroll to bottom to ensure submit button is visible
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await page.waitForTimeout(1000);
   
-  console.log('✅ Upload process completed (without submitting)!');
+  // Try to find submit button
+  const submitSelectors = [
+    'button:has-text("提交")',
+    'button:has-text("发布")',
+    'button:has-text("确认提交")',
+    'button:has-text("确认发布")',
+    '[class*="submit-button"]',
+    '[class*="publish-button"]',
+    '[class*="SubmitButton"]',
+    '[class*="PublishButton"]',
+    'button[type="submit"]',
+    '[data-v-*][class*="submit"]',
+    '[data-v-*][class*="publish"]',
+  ];
+  
+  let submitClicked = false;
+  for (const selector of submitSelectors) {
+    try {
+      const submitButton = page.locator(selector).first();
+      const visible = await submitButton.isVisible({ timeout: 3000 });
+      if (visible) {
+        const isEnabled = await submitButton.isEnabled().catch(() => false);
+        if (isEnabled) {
+          console.log(`✅ Found submit button: ${selector}`);
+          await submitButton.click();
+          console.log('✅ Submit button clicked!');
+          submitClicked = true;
+          await page.waitForTimeout(2000);
+          break;
+        } else {
+          console.log(`⚠️  Submit button found but disabled: ${selector}`);
+        }
+      }
+    } catch (e) {
+      // Continue checking other selectors
+    }
+  }
+  
+  if (!submitClicked) {
+    console.log('⚠️  Submit button not found automatically.');
+    console.log('💡 Pausing for manual review - please click submit button manually');
+    await page.pause();
+  } else {
+    // Wait for submission to complete
+    console.log('⏳ Waiting for submission to complete...');
+    await page.waitForTimeout(5000);
+    
+    // Check for success indicators
+    const successSelectors = [
+      'text=提交成功',
+      'text=发布成功',
+      'text=上传成功',
+      '[class*="success"]',
+      '[class*="Success"]',
+    ];
+    
+    let submissionSuccess = false;
+    for (const selector of successSelectors) {
+      try {
+        const element = page.locator(selector).first();
+        if (await element.isVisible({ timeout: 5000 })) {
+          submissionSuccess = true;
+          console.log('✅ Submission successful!');
+          break;
+        }
+      } catch (e) {
+        // Continue
+      }
+    }
+    
+    if (!submissionSuccess) {
+      console.log('💡 Submission initiated. Please check the page for confirmation.');
+    }
+  }
+  
+  console.log('✅ Upload process completed!');
 });

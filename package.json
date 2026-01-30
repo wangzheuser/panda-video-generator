@@ -62,8 +62,13 @@
     "render": "remotion render",
     "deploy": "node deploy.mjs",
     "spider": "tsx spider/run.ts",
-    "generate": "sh generate-video.sh",
-    "test:login": "playwright test tests/login-bilibili.spec.ts --project=chromium --headed",
-    "test:upload": "playwright test tests/upload-video.spec.ts --project=chromium --headed"
+    "spider:zhihu": "sh scripts/spider-zhihu.sh",
+    "generate": "sh scripts/generate-video.sh",
+    "render": "sh scripts/render-video.sh",
+    "test:login:bilibili": "playwright test automations/Bilibili/login-bilibili.spec.ts --project=chromium --headed",
+    "test:login:douyin": "playwright test automations/Douyin/login-douyin.spec.ts --project=chromium --headed",
+    "test:upload:bilibili": "playwright test automations/Bilibili/upload-video.spec.ts --project=chromium --headed",
+    "test:upload:douyin": "playwright test automations/Douyin/upload-video.spec.ts --project=chromium --headed",
+    "test:upload:all": "playwright test automations/**/upload-video.spec.ts --project=chromium --headed"
   }
 }

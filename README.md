@@ -1,118 +1,91 @@
-<img src="https://github.com/remotion-dev/template-next/assets/1629785/9092db5f-7c0c-4d38-97c4-5f5a61f5cc098" />
-<br/>
-<br/>
+# Auto Video Maker
 
-This is a Next.js template for building programmatic video apps, with [`@remotion/player`](https://remotion.dev/player) and [`@remotion/lambda`](https://remotion.dev/lambda) built in.
+一键文本转视频, 一键多平台自动发布
 
-This template uses the Next.js App directory, with TailwindCSS. There is a [Non-TailwindCSS version](https://github.com/remotion-dev/template-next-app-dir), and a [Pages directory version](https://github.com/remotion-dev/template-next-pages-dir) of this template available.
+## 主要功能
 
-<img src="https://github.com/remotion-dev/template-next/assets/1629785/c9c2e5ca-2637-4ec8-8e40-a8feb5740d88" />
+### 1. 文本转视频
 
-## Getting Started
-
-[Use this template](https://github.com/new?template_name=template-next-app-dir-tailwind&template_owner=remotion-dev) to clone it into your GitHub account. Run
-
-```
-npm i
-```
-
-afterwards. Alternatively, use this command to scaffold a project:
-
-```
-npx create-video@latest --next-tailwind
-```
-
-## Commands
-
-Start the Next.js dev server:
-
-```
-npm run dev
-```
-
-Open the Remotion Studio:
-
-```
-npx remotion studio
-```
-
-Render a video locally:
-
-```
-npx remotion render
-```
-
-Upgrade Remotion:
-
-```
-npx remotion upgrade
-```
-
-### Auto Video Generation
-
-Generate a complete video from a Zhihu question URL (automatically runs spider → TTS → render):
+将文本文件自动转换为视频：
 
 ```bash
-pnpm generate <zhihu_url>
+pnpm render
 ```
 
-Or run the script directly:
+**工作流程：**
+- 读取 `input/input.txt` 文本文件
+- 生成语音和字幕（TTS）
+- 渲染最终视频
 
+**输出：** `out/video.mp4`
+
+**前置要求：**
+- 准备文本文件：`input/input.txt`
+- Python 3（用于 TTS）
+
+### 2. 自动发布视频到多平台
+
+支持自动上传视频到多个平台：
+
+**支持的平台：**
+- Bilibili（哔哩哔哩）
+- Douyin（抖音）
+
+**使用方法：**
+
+1. **登录平台**（首次使用需要）：
+   ```bash
+   pnpm test:login:bilibili  # Bilibili 登录
+   pnpm test:login:douyin     # 抖音登录
+   ```
+
+2. **上传视频**：
+   ```bash
+   pnpm test:upload:bilibili  # 上传到 Bilibili
+   pnpm test:upload:douyin   # 上传到抖音
+   pnpm test:upload:all       # 上传到所有平台
+   ```
+
+**配置：**
+- 视频文件：`out/video.mp4`
+- 标题：`out/title.json` 或环境变量 `VIDEO_TITLE`
+- 描述：环境变量 `VIDEO_DESC`
+- 标签：环境变量 `VIDEO_TAGS`（逗号分隔）
+
+**示例：**
 ```bash
-./generate-video.sh <zhihu_url>
+VIDEO_TITLE="我的视频标题" VIDEO_DESC="视频描述" VIDEO_TAGS="标签1,标签2" pnpm test:upload:douyin
 ```
 
-Example:
+## 快速开始
 
-```bash
-pnpm generate https://www.zhihu.com/question/316150890
-```
+1. **安装依赖：**
+   ```bash
+   npm install
+   ```
 
-This command will:
-1. Extract content from the Zhihu question using the spider
-2. Generate video script using DeepSeek AI (saved to `input/input.txt`)
-3. Generate audio and subtitles using TTS (saved to `public/audio/`)
-4. Render the final video using Remotion (saved to `out/video_<timestamp>.mp4`)
+2. **准备文本文件：**
+   ```bash
+   # 创建 input/input.txt 文件，写入你的文本内容
+   echo "你的视频文本内容" > input/input.txt
+   ```
 
-**Requirements:**
-- Set `DEEPSEEK_API_KEY` in `.env.local` file
-- Python 3 with `edge-tts` and `pydub` installed (for TTS)
+3. **生成视频：**
+   ```bash
+   pnpm render
+   ```
 
-The following script will set up your Remotion Bundle and Lambda function on AWS:
+4. **发布视频：**
+   ```bash
+   # 首次使用需要登录
+   pnpm test:login:douyin
+   
+   # 上传视频
+   pnpm test:upload:douyin
+   ```
 
-```
-node deploy.mjs
-```
+## 技术栈
 
-You should run this script after:
-
-- changing the video template
-- changing `config.mjs`
-- upgrading Remotion to a newer version
-
-## Set up rendering on AWS Lambda
-
-This template supports rendering the videos via [Remotion Lambda](https://remotion.dev/lambda).
-
-1. Copy the `.env.example` file to `.env` and fill in the values.
-   Complete the [Lambda setup guide](https://www.remotion.dev/docs/lambda/setup) to get your AWS credentials.
-
-1. Edit the `config.mjs` file to your desired Lambda settings.
-
-1. Run `node deploy.mjs` to deploy your Lambda function and Remotion Bundle.
-
-## Docs
-
-Get started with Remotion by reading the [fundamentals page](https://www.remotion.dev/docs/the-fundamentals).
-
-## Help
-
-We provide help on our [Discord server](https://remotion.dev/discord).
-
-## Issues
-
-Found an issue with Remotion? [File an issue here](https://remotion.dev/issue).
-
-## License
-
-Note that for some entities a company license is needed. [Read the terms here](https://github.com/remotion-dev/remotion/blob/main/LICENSE.md).
+- **视频生成：** Remotion + Next.js
+- **语音合成：** Edge TTS
+- **自动化：** Playwright
