@@ -127,6 +127,31 @@ export const Content: React.FC<ContentProps> = ({
 		caption => currentTimeMs >= caption.startMs && currentTimeMs < caption.endMs
 	) : null;
 
+	// Dancing lines animation - slow, smooth movement
+	const lineSpeed = 0.05; // Very slow movement speed
+	const lineOffset1 = frame * lineSpeed;
+	const lineOffset2 = frame * lineSpeed * 0.7; // Different speed for variety
+	const lineOffset3 = frame * lineSpeed * 1.3;
+
+	// Wave amplitude and frequency for dancing effect
+	const waveAmplitude = 50; // Increased amplitude for better visibility
+	const waveFrequency = 0.015; // Slightly lower frequency for smoother waves
+
+	// Generate dancing line paths using SVG
+	const generateWavePath = (offset: number, amplitude: number, frequency: number, yPosition: number) => {
+		const points: string[] = [];
+		const width = 1920; // Video width
+		const steps = 100;
+
+		for (let i = 0; i <= steps; i++) {
+			const x = (i / steps) * width;
+			const y = yPosition + Math.sin((x * frequency) + offset) * amplitude;
+			points.push(`${i === 0 ? 'M' : 'L'} ${x} ${y}`);
+		}
+
+		return points.join(' ');
+	};
+
 	// Calculate animation for current caption (gather effect)
 	let scale = 1;
 	let opacity = 1;
@@ -138,7 +163,7 @@ export const Content: React.FC<ContentProps> = ({
 		const captionDurationMs = currentCaption.endMs - captionStartMs;
 		const animationDurationMs = Math.min(500, captionDurationMs * 0.3); // Animation takes 500ms or 30% of caption duration
 		const timeSinceStart = currentTimeMs - captionStartMs;
-		
+
 		if (timeSinceStart >= 0 && timeSinceStart < animationDurationMs) {
 			// Calculate relative frame for this caption's animation
 			const relativeFrame = Math.floor((timeSinceStart / 1000) * fps);
@@ -190,6 +215,59 @@ export const Content: React.FC<ContentProps> = ({
 				volume={1}
 				name="TTS Audio"
 			/>
+
+			{/* Dancing lines - slow animated background decoration */}
+			<svg
+				style={{
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: '100%',
+					height: '100%',
+					pointerEvents: 'none',
+					zIndex: 1,
+				}}
+			>
+				{/* Top dancing line */}
+				<path
+					d={generateWavePath(lineOffset1, waveAmplitude, waveFrequency, 200)}
+					stroke="rgba(0, 0, 0, 0.05)"
+					strokeWidth="5"
+					fill="none"
+					strokeLinecap="round"
+				/>
+				{/* Middle dancing line */}
+				<path
+					d={generateWavePath(lineOffset2, waveAmplitude * 0.8, waveFrequency * 1.2, 540)}
+					stroke="rgba(0, 0, 0, 0.05)"
+					strokeWidth="4.5"
+					fill="none"
+					strokeLinecap="round"
+				/>
+				{/* Bottom dancing line */}
+				<path
+					d={generateWavePath(lineOffset3, waveAmplitude * 1.2, waveFrequency * 0.8, 880)}
+					stroke="rgba(0, 0, 0, 0.05)"
+					strokeWidth="4"
+					fill="none"
+					strokeLinecap="round"
+				/>
+				{/* Additional subtle lines */}
+				<path
+					d={generateWavePath(lineOffset1 * 0.5, waveAmplitude * 0.6, waveFrequency * 1.5, 350)}
+					stroke="rgba(0, 0, 0, 0.05)"
+					strokeWidth="3.5"
+					fill="none"
+					strokeLinecap="round"
+				/>
+				<path
+					d={generateWavePath(lineOffset2 * 1.5, waveAmplitude * 0.7, waveFrequency * 0.9, 730)}
+					stroke="rgba(0, 0, 0, 0.05)"
+					strokeWidth="3.5"
+					fill="none"
+					strokeLinecap="round"
+				/>
+			</svg>
 
 			{/* Current caption display */}
 			{currentCaption && (

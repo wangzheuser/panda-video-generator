@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { AbsoluteFill, Sequence, useVideoConfig, staticFile, useDelayRender } from 'remotion';
 import { Intro } from './Intro';
 import { Content } from './Content';
+import { Watermark } from './Watermark';
 
 // Parse VTT file to get duration
 async function getAudioDurationFromVtt(vttFile: string): Promise<number> {
@@ -72,6 +73,8 @@ export const Video: React.FC<{
 		// Sequence 3: Content (audio duration)
 		const seq3Start = introDuration;
 		const contentDurationFrames = Math.ceil(contentDuration * fps);
+		// Total duration: intro + content
+		const totalDurationFrames = introDuration + contentDurationFrames;
 
 		if (!loaded || contentDurationFrames === 0) {
 			return null;
@@ -79,7 +82,7 @@ export const Video: React.FC<{
 
 		return (
 			<AbsoluteFill>
-				{/* Intro sequence - includes logo, title, third title, and watermark */}
+				{/* Intro sequence - includes logo, title, third title */}
 				<Sequence durationInFrames={introDuration}>
 					<Intro title={title} />
 				</Sequence>
@@ -87,6 +90,11 @@ export const Video: React.FC<{
 				{/* Sequence 3: Content */}
 				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
 					<Content audioFile={audioFile} vttFile={vttFile} />
+				</Sequence>
+
+				{/* Watermark sequence - starts from content sequence, overlays content only */}
+				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
+					<Watermark />
 				</Sequence>
 			</AbsoluteFill>
 		);

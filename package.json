@@ -70,10 +70,12 @@
     "test:login:douyin": "playwright test automations/Douyin/login-douyin.spec.ts --project=chromium --headed",
     "test:login:weixin": "playwright test automations/Weixin/login-weixin.spec.ts --project=chromium --headed",
     "test:login:rednote": "playwright test automations/RedNote/login-rednote.spec.ts --project=chromium --headed",
+    "test:login:youtube": "playwright test automations/YouTube/login-youtube.spec.ts --project=chromium --headed",
     "test:upload:bilibili": "playwright test automations/Bilibili/upload-video.spec.ts --project=chromium --headed",
     "test:upload:douyin": "playwright test automations/Douyin/upload-video.spec.ts --project=chromium --headed",
     "test:upload:weixin": "playwright test automations/Weixin/upload-video.spec.ts --project=chromium --headed",
     "test:upload:rednote": "playwright test automations/RedNote/upload-video.spec.ts --project=chromium --headed",
+    "test:upload:youtube": "playwright test automations/YouTube/upload-video.spec.ts --project=chromium --headed",
     "test:upload:all": "playwright test automations/**/upload-video.spec.ts --project=chromium"
   }
 }

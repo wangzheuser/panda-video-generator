@@ -59,7 +59,7 @@ export default function Home() {
           熊猫视频自动化引擎
         </p>
         <p className="text-sm sm:text-base md:text-lg text-gray-500 max-w-3xl mx-auto mb-6 sm:mb-8 px-2 leading-relaxed">
-          Panda Video Generator 是一个全自动化的视频内容生成与发布平台，支持从网页内容提取、文本转视频到多平台发布的完整工作流。通过 AI 驱动的文本转语音（TTS）技术和 Remotion 视频渲染引擎，帮助内容创作者快速生成高质量视频并一键发布到多个平台。
+          Panda Video Generator 是一个全自动化的视频内容生成与发布平台，支持从网页内容提取、文本转视频到多平台发布的完整工作流。通过 AI 驱动的文本转语音 TTS 技术和程序化视频渲染引擎，帮助内容创作者快速生成高质量视频并一键发布到多个平台。
         </p>
         <div className="flex gap-3 sm:gap-4 justify-center flex-wrap px-2">
           <Link
@@ -170,7 +170,7 @@ export default function Home() {
               </li>
               <li className="flex items-start gap-2">
                 <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>平台支持：Bilibili、抖音、微信视频号等</span>
+                <span>平台支持：Bilibili、抖音、微信视频号、YouTube、小红书等</span>
               </li>
             </ul>
           </div>
