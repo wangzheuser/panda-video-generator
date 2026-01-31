@@ -345,11 +345,13 @@ async def process_file_async(input_file, output_dir='public/audio'):
     print(f"🔊 Voice: {voice_name}")
     print(f"📝 Found {len(lines)} lines of text\n")
     
-    # Generate temporary audio files
+    # Generate temporary audio files with batch processing (3 concurrent requests)
+    BATCH_SIZE = 3
     temp_audio_files = []
     durations = []
     
-    for i, text in enumerate(lines, 1):
+    async def process_sentence(i, text):
+        """Process a single sentence"""
         print(f"[{i}/{len(lines)}] Generating: {text[:30]}...")
         print(f"    Text length: {len(text)} characters")
         
@@ -360,16 +362,38 @@ async def process_file_async(input_file, output_dir='public/audio'):
             
             # Get audio duration
             duration = get_audio_duration(temp_path)
-            durations.append(duration)
-            temp_audio_files.append(temp_path)
             
             print(f"✅ Saved: {temp_path} (duration: {duration:.2f}s)\n")
+            return (i, temp_path, duration, None)
         except Exception as e:
             print(f"❌ Failed: {e}\n")
             print(f"    Error type: {type(e).__name__}")
             import traceback
             traceback.print_exc()
-            return False
+            return (i, None, None, e)
+    
+    # Process sentences in batches of 3
+    print(f"🚀 Processing {len(lines)} sentences in batches of {BATCH_SIZE}...\n")
+    
+    for batch_start in range(0, len(lines), BATCH_SIZE):
+        batch_end = min(batch_start + BATCH_SIZE, len(lines))
+        batch_lines = lines[batch_start:batch_end]
+        batch_indices = range(batch_start + 1, batch_end + 1)
+        
+        # Create tasks for this batch
+        tasks = [process_sentence(i, text) for i, text in zip(batch_indices, batch_lines)]
+        
+        # Execute batch concurrently
+        results = await asyncio.gather(*tasks)
+        
+        # Process results (sort by index to maintain order)
+        results_sorted = sorted(results, key=lambda x: x[0])
+        for i, temp_path, duration, error in results_sorted:
+            if error:
+                return False
+            if temp_path and duration is not None:
+                temp_audio_files.append(temp_path)
+                durations.append(duration)
     
     # Merge audio files and adjust speed to 1.2x
     SPEED_FACTOR = 1.2

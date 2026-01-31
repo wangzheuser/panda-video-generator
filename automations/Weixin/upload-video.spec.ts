@@ -184,6 +184,7 @@ test('upload video to weixin channel', async ({ page }) => {
   // Step 2: Click "发表视频" button first
   console.log('🔍 Looking for "发表视频" button...');
   await page.waitForTimeout(2000);
+  debugger;
   
   // Try to find and click "发表视频" button (priority selectors)
   const publishSelectors = [

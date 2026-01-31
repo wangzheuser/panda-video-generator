@@ -3,6 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Github, Zap, Globe, Video, Upload } from "lucide-react";
+import { defaultMyCompProps } from "../../types/constants";
+
+// Media files in /public/media directory
+const mediaFiles = [
+  { filename: 'douyin', path: '/media/douyin.webp' },
+  { filename: 'weichat', path: '/media/weichat.webp' },
+];
 
 export default function Home() {
   return (
@@ -19,7 +26,7 @@ export default function Home() {
               className="rounded-lg w-8 h-8 sm:w-10 sm:h-10"
             />
             <span className="text-base sm:text-xl font-bold text-gray-900 truncate max-w-[140px] sm:max-w-none">
-              Panda Video Generator
+              {defaultMyCompProps.title}
             </span>
           </div>
           <Link
@@ -167,6 +174,31 @@ export default function Home() {
               </li>
             </ul>
           </div>
+        </div>
+      </section>
+
+      {/* Platform Screenshots Section */}
+      <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
+          {mediaFiles.map((file) => (
+            <div
+              key={file.path}
+              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
+            >
+              <div className="relative w-full aspect-video overflow-hidden bg-gray-50">
+                <Image
+                  src={file.path}
+                  alt={file.filename}
+                  width={800}
+                  height={450}
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="p-4 text-center">
+                <p className="text-lg font-semibold text-gray-900">{file.filename}</p>
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 

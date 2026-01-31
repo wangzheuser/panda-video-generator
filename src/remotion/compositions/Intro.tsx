@@ -10,7 +10,7 @@ import {
   useDelayRender,
   Html5Audio,
 } from "remotion";
-import { CompositionProps } from "../../../types/constants";
+import { CompositionProps, defaultMyCompProps } from "../../../types/constants";
 import { Logo } from "./Logo";
 import { loadFont, fontFamily } from "@remotion/google-fonts/Inter";
 import { Rings } from "./Rings";
@@ -248,7 +248,7 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
       {/* Title sequence with logo - now third */}
       {/* Always use prop title for second title (do not change) */}
       <Sequence from={thirdTitleDuration} durationInFrames={sequenceDuration}>
-        <TitleSequence title={title} />
+        <TitleSequence title={defaultMyCompProps.title} />
       </Sequence>
     </AbsoluteFill>
   );
