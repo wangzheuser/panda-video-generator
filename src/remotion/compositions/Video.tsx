@@ -41,30 +41,17 @@ export const Video: React.FC<{
 }) => {
 		const { fps } = useVideoConfig();
 		const [contentDuration, setContentDuration] = useState<number>(0);
-		const [jsonTitle, setJsonTitle] = useState<string | null>(null);
 		const [loaded, setLoaded] = useState(false);
 		const { delayRender, continueRender } = useDelayRender();
 		const [handle] = useState(() => delayRender());
 
-		// Load VTT file to calculate content duration and title.json
+		// Load VTT file to calculate content duration
 		useEffect(() => {
 			const loadData = async () => {
 				try {
 					// Load content duration
 					const duration = await getAudioDurationFromVtt(vttFile);
 					setContentDuration(duration);
-
-					// Load title from title.json
-					try {
-						const response = await fetch(staticFile('out/title.json'));
-						if (response.ok) {
-							const data = await response.json();
-							setJsonTitle(data.title || null);
-						}
-					} catch (e) {
-						console.warn('title.json not found, skipping third title');
-					}
-
 					setLoaded(true);
 				} catch (e) {
 					console.error('Failed to load data:', e);
