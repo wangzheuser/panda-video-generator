@@ -9,6 +9,16 @@ import {
 	interpolate,
 	spring,
 } from 'remotion';
+import { loadFont } from '@remotion/fonts';
+import { Watermark } from './Watermark';
+
+// Load custom font for captions
+loadFont({
+	family: 'dingliesongtypeface',
+	url: staticFile('fonts/dingliesongtypeface.ttf'),
+}).catch((err) => {
+	console.error('Failed to load font:', err);
+});
 
 interface Caption {
 	text: string;
@@ -126,6 +136,19 @@ export const Content: React.FC<ContentProps> = ({
 	const currentCaption = captions.length > 0 ? captions.find(
 		caption => currentTimeMs >= caption.startMs && currentTimeMs < caption.endMs
 	) : null;
+
+	// Calculate caption font size based on text length
+	const calculateCaptionFontSize = (text: string): number => {
+		// Count characters (excluding spaces and newlines for calculation)
+		const charCount = text.replace(/\s/g, '').length;
+
+		// If more than 50 characters, use smaller font size
+		if (charCount > 50) {
+			return 60;
+		}
+
+		return 88;
+	};
 
 	// Dancing lines animation - slow, smooth movement
 	const lineSpeed = 0.05; // Very slow movement speed
@@ -279,10 +302,10 @@ export const Content: React.FC<ContentProps> = ({
 						transform: `translate(calc(-50% + ${translateX}px), -50%) scale(${scale})`,
 						transformOrigin: 'center center',
 						color: '#000000',
-						fontSize: 48,
+						fontSize: calculateCaptionFontSize(currentCaption.text),
 						fontWeight: 'bold',
 						textAlign: 'center',
-						fontFamily: 'Arial, sans-serif',
+						fontFamily: 'dingliesongtypeface',
 						backgroundColor: 'rgba(255, 255, 255, 0.9)',
 						padding: '20px 40px',
 						borderRadius: '8px',
@@ -303,6 +326,9 @@ export const Content: React.FC<ContentProps> = ({
 					</div>
 				</div>
 			)}
+
+			{/* Watermark - randomly displayed */}
+			<Watermark />
 		</AbsoluteFill>
 	);
 };

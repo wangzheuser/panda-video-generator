@@ -77,11 +77,11 @@ export const Watermark: React.FC = () => {
 						bottom: selectedPosition.bottom,
 						transform: selectedPosition.transform,
 						opacity: watermarkOpacity,
-						zIndex: 5,
+						zIndex: 9999,
 						pointerEvents: 'none',
 						fontFamily: 'Arial, sans-serif',
 						fontSize: 24,
-						color: 'rgba(0, 0, 0, 0.3)',
+						color: 'rgba(0, 0, 0, 0.2)',
 						fontWeight: 'bold',
 						whiteSpace: 'nowrap',
 					}}

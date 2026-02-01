@@ -1,175 +1,139 @@
-import React from 'react';
-import { AbsoluteFill, useVideoConfig, useCurrentFrame, spring, staticFile, interpolate } from 'remotion';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AbsoluteFill, useVideoConfig, staticFile, Img, useDelayRender } from 'remotion';
+import { loadFont } from '@remotion/fonts';
 
-interface CoverProps {
+// Load custom font
+loadFont({
+	family: 'dingliesongtypeface',
+	url: staticFile('fonts/dingliesongtypeface.ttf'),
+}).catch((err) => {
+	console.error('Failed to load font:', err);
+});
+
+export interface CoverProps {
 	title?: string;
-	backgroundColor?: string;
-	gradientColors?: string[];
-	gradientDirection?: 'horizontal' | 'vertical' | 'diagonal';
+	contentTitle?: string;
 }
 
-export const Cover: React.FC<CoverProps> = ({
-	title,
-	backgroundColor,
-	gradientColors,
-	gradientDirection = 'diagonal',
-}) => {
-	const { width, height, fps } = useVideoConfig();
-	const frame = useCurrentFrame();
+export const Cover: React.FC<CoverProps> = ({ title, contentTitle }) => {
+	const { width, height } = useVideoConfig();
+	const [jsonTitle, setJsonTitle] = useState<string | null>(null);
+	const [titleLoaded, setTitleLoaded] = useState(false);
+	const { delayRender, continueRender } = useDelayRender();
+	const [handle] = useState(() => delayRender());
 
-	// Logo zoom animation: from 0 to full screen over 3 seconds
-	const TITLE_DELAY_SECONDS = 3;
-	const TITLE_DELAY_FRAMES = TITLE_DELAY_SECONDS * fps;
-
-	const logoScale = spring({
-		fps,
-		frame,
-		config: {
-			damping: 200,
-			mass: 1,
-		},
-		durationInFrames: TITLE_DELAY_FRAMES,
-	});
-
-	// Scale from 0 to full screen (cover entire viewport)
-	// Calculate scale factor: 0 to maxDimension/baseLogoSize
-	const baseLogoSize = 200;
-	const maxDimension = Math.max(width, height);
-	const scaleFactor = interpolate(logoScale, [0, 1], [0, maxDimension / baseLogoSize], {
-		extrapolateRight: 'clamp',
-	});
-
-	// Determine background style - default to bright elegant gradient
-	let backgroundStyle: React.CSSProperties = {};
-
-	if (gradientColors && gradientColors.length > 0) {
-		// Use gradient
-		let gradientString = '';
-
-		if (gradientColors.length === 1) {
-			// Single color - use solid color
-			backgroundStyle.backgroundColor = gradientColors[0];
-		} else {
-			// Multiple colors - create gradient
-			const colors = gradientColors.join(', ');
-
-			switch (gradientDirection) {
-				case 'horizontal':
-					gradientString = `linear-gradient(to right, ${colors})`;
-					break;
-				case 'vertical':
-					gradientString = `linear-gradient(to bottom, ${colors})`;
-					break;
-				case 'diagonal':
-				default:
-					gradientString = `linear-gradient(135deg, ${colors})`;
-					break;
+	// Always load title from title.json (must be in public/out/title.json)
+	// This ensures we always use the latest title from the file system
+	const fetchTitleFromJson = useCallback(async () => {
+		try {
+			// Use staticFile to access files in public directory
+			const response = await fetch(staticFile('out/title.json'));
+			if (!response.ok) {
+				console.warn('title.json not found in public/out/, using prop contentTitle as fallback');
+				setTitleLoaded(true);
+				return;
 			}
-
-			backgroundStyle.background = gradientString;
+			const data = await response.json();
+			if (data.title) {
+				setJsonTitle(data.title);
+				console.log('Loaded title from title.json:', data.title);
+			} else {
+				console.warn('title.json exists but has no title field, using prop contentTitle as fallback');
+			}
+			setTitleLoaded(true);
+		} catch (e) {
+			console.error('Failed to load title.json:', e);
+			setTitleLoaded(true); // Still continue even if failed
 		}
-	} else if (backgroundColor) {
-		// Use provided solid color
-		backgroundStyle.backgroundColor = backgroundColor;
-	} else {
-		// Default elegant bright gradient
-		backgroundStyle.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)';
-	}
+	}, []);
+
+	useEffect(() => {
+		fetchTitleFromJson();
+	}, [fetchTitleFromJson]);
+
+	useEffect(() => {
+		if (titleLoaded) {
+			continueRender(handle);
+		}
+	}, [titleLoaded, continueRender, handle]);
+
+	// Small logo size for top-left corner
+	const logoSize = Math.min(width, height) * 0.1; // 10% of smaller dimension
 
 	return (
-		<AbsoluteFill style={backgroundStyle}>
-			{/* Logo zoom animation - from center to full screen */}
-			<AbsoluteFill
+		<AbsoluteFill
+			style={{
+				backgroundColor: '#FFFFFF',
+			}}
+		>
+			{/* Logo and title in top-left corner */}
+			<div
 				style={{
+					position: 'absolute',
+					top: '30px',
+					left: '30px',
 					display: 'flex',
-					justifyContent: 'center',
 					alignItems: 'center',
-					zIndex: 5,
+					gap: '20px',
+					zIndex: 10,
 				}}
 			>
-				{frame < TITLE_DELAY_FRAMES && (
-					<img
-						src={staticFile('logo/logo.png')}
-						alt="Logo"
+				{/* Small logo */}
+				<Img
+					src={staticFile('logo/logo.png')}
+					alt="Logo"
+					style={{
+						width: logoSize / 2,
+						height: logoSize / 2,
+						objectFit: 'contain',
+					}}
+				/>
+				{/* Title next to logo */}
+				{title && (
+					<h2
 						style={{
-							width: `${baseLogoSize}px`,
-							height: `${baseLogoSize}px`,
-							objectFit: 'contain',
-							transform: `translate(-50%, -50%) scale(${scaleFactor})`,
-							position: 'absolute',
-							top: '50%',
-							left: '50%',
-							transformOrigin: 'center center',
+							fontFamily: 'dingliesongtypeface',
+							fontSize: Math.min(width * 0.04, 48) / 2,
+							fontWeight: 'bold',
+							color: '#000000',
+							margin: 0,
+							lineHeight: 1.2,
 						}}
-					/>
+					>
+						{title}
+					</h2>
 				)}
-			</AbsoluteFill>
+			</div>
 
-			{/* Elegant decorative elements */}
-			<div
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					background: 'radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.4) 0%, transparent 50%)',
-					pointerEvents: 'none',
-					zIndex: 1,
-				}}
-			/>
-			<div
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					background: 'radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.3) 0%, transparent 50%)',
-					pointerEvents: 'none',
-					zIndex: 1,
-				}}
-			/>
-			<div
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					right: 0,
-					bottom: 0,
-					background: 'radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 70%)',
-					pointerEvents: 'none',
-					zIndex: 1,
-				}}
-			/>
-
-			{/* Title Overlay - only show if title provided */}
-			{title && (
+			{/* Main content title in center */}
+			{(jsonTitle || contentTitle) && (
 				<div
 					style={{
 						position: 'absolute',
-						bottom: '20%',
+						top: '50%',
 						left: '50%',
-						transform: 'translateX(-50%)',
-						color: '#FFFFFF',
-						fontSize: Math.min(width / 8, 120),
-						fontWeight: 800,
+						transform: 'translate(-50%, -50%)',
 						textAlign: 'center',
-						fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-						backgroundColor: 'rgba(255, 255, 255, 0.2)',
-						padding: '50px 100px',
-						borderRadius: '24px',
-						zIndex: 21,
-						textShadow: '0 4px 24px rgba(0, 0, 0, 0.4)',
+						width: '90%',
 						maxWidth: '90%',
-						backdropFilter: 'blur(20px) saturate(180%)',
-						border: '2px solid rgba(255, 255, 255, 0.4)',
-						boxShadow: '0 12px 40px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.3)',
-						letterSpacing: '1px',
-						lineHeight: '1.2',
 					}}
 				>
-					{title}
+					<h1
+						style={{
+							fontFamily: 'dingliesongtypeface',
+							fontSize: 100,
+							fontWeight: 'bold',
+							color: '#000000',
+							margin: 0,
+							padding: '0 40px',
+							wordWrap: 'break-word',
+							overflowWrap: 'break-word',
+							lineHeight: 1.2,
+							textShadow: '3px 3px 0 rgba(0, 0, 0, 0.5), -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5)',
+						}}
+					>
+						{jsonTitle || contentTitle}
+					</h1>
 				</div>
 			)}
 		</AbsoluteFill>

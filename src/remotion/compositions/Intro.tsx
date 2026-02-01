@@ -12,13 +12,22 @@ import {
 } from "remotion";
 import { CompositionProps, defaultMyCompProps } from "../../../types/constants";
 import { Logo } from "./Logo";
-import { loadFont, fontFamily } from "@remotion/google-fonts/Inter";
+import { loadFont as loadInterFont, fontFamily } from "@remotion/google-fonts/Inter";
+import { loadFont } from "@remotion/fonts";
 import { Rings } from "./Rings";
 import { useState, useEffect, useCallback } from "react";
 
-loadFont("normal", {
+loadInterFont("normal", {
   subsets: ["latin"],
   weights: ["400", "700"],
+});
+
+// Load custom font for first title
+loadFont({
+  family: "dingliesongtypeface",
+  url: staticFile("fonts/dingliesongtypeface.ttf"),
+}).catch((err) => {
+  console.error('Failed to load font:', err);
 });
 export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
   const { fps } = useVideoConfig();
@@ -64,8 +73,8 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
 
   const transitionStart = 1 * fps; // Start transition after 1 second
   const transitionDuration = 0.5 * fps; // Transition duration 0.5 seconds
-  const sequenceDuration = 2.5 * fps; // Total: 2.5 seconds (extended from 1.5s)
-  const thirdTitleDuration = 2 * fps; // First title displays for 2 seconds (reduced from 3s)
+  const sequenceDuration = 4 * fps; // Total: 4 seconds (extended for longer logo display)
+  const thirdTitleDuration = 3.5 * fps; // First title: 2s typewriter + 1s hold + 0.5s fade = 3.5s total
 
   // Watermark component
   const WatermarkText: React.FC = () => {
@@ -83,8 +92,7 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
           whiteSpace: 'nowrap',
         }}
       >
-        Powered By 熊猫视频自动化引擎 |
-        Github: Panda-Video-Generator
+        Powered By 熊猫视频自动化引擎
       </div>
     );
   };
@@ -190,14 +198,39 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
     );
   };
 
-  // First title component with fade out only
+  // First title component with typewriter effect
   const FirstTitle: React.FC<{ title: string }> = ({ title }) => {
     const sequenceFrame = useCurrentFrame();
     const { fps } = useVideoConfig();
 
-    // Fade out in the last 0.5 seconds
+    // Typewriter effect: finish within 2 seconds
+    const typewriterDuration = 2 * fps; // 2 seconds for typing
+    const typewriterSpeed = title.length / 2; // Characters per second (dynamic based on title length)
+    const charactersPerFrame = typewriterSpeed / fps;
+    const visibleCharacters = Math.min(
+      Math.floor(sequenceFrame * charactersPerFrame),
+      title.length
+    );
+    const displayText = title.slice(0, visibleCharacters);
+    const isTypingComplete = sequenceFrame >= typewriterDuration;
+
+    // Cursor blink animation (only show while typing, within first 2 seconds)
+    const cursorBlinkSpeed = 2; // Blinks per second
+    const cursorOpacity = sequenceFrame < typewriterDuration && !isTypingComplete
+      ? interpolate(
+        sequenceFrame % (fps / cursorBlinkSpeed),
+        [0, fps / cursorBlinkSpeed / 2, fps / cursorBlinkSpeed],
+        [1, 1, 0],
+        {
+          extrapolateLeft: 'clamp',
+          extrapolateRight: 'clamp',
+        }
+      )
+      : 0;
+
+    // Fade out in the last 0.5 seconds (from 3s to 3.5s)
     const fadeOutDuration = 0.5 * fps;
-    const fadeOutStart = thirdTitleDuration - fadeOutDuration;
+    const fadeOutStart = thirdTitleDuration - fadeOutDuration; // Start fade at 3 seconds
 
     const opacity = interpolate(
       sequenceFrame,
@@ -214,7 +247,7 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
         <h1
           className="text-[70px] font-bold"
           style={{
-            fontFamily,
+            fontFamily: "dingliesongtypeface",
             width: '80%',
             maxWidth: '80%',
             textAlign: 'center',
@@ -224,7 +257,18 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
             overflowWrap: 'break-word',
           }}
         >
-          {title}
+          {displayText}
+          {!isTypingComplete && (
+            <span
+              style={{
+                opacity: cursorOpacity,
+                marginLeft: '4px',
+                fontWeight: 'bold',
+              }}
+            >
+              |
+            </span>
+          )}
         </h1>
       </AbsoluteFill>
     );
@@ -243,6 +287,12 @@ export const Intro = ({ title }: z.infer<typeof CompositionProps>) => {
       {/* Third title sequence - now first */}
       {/* Use jsonTitle from file for first title, fallback to prop title */}
       <Sequence durationInFrames={thirdTitleDuration}>
+        {/* Typewriter sound effect */}
+        <Html5Audio
+          src={staticFile('audio/intro_typewriter.mp3')}
+          volume={0.6}
+          name="Typewriter Sound"
+        />
         {(jsonTitle || title) && <FirstTitle title={jsonTitle || title || ''} />}
       </Sequence>
       {/* Title sequence with logo - now third */}

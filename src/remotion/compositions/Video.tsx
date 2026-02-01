@@ -68,13 +68,11 @@ export const Video: React.FC<{
 			}
 		}, [loaded, continueRender, handle]);
 
-		// Intro duration: sequenceDuration (1.5s) + thirdTitleDuration (3s) = 4.5 seconds
-		const introDuration = Math.ceil(4.5 * fps);
+		// Intro duration: thirdTitleDuration (3.5s) + sequenceDuration (4s) = 7.5 seconds
+		const introDuration = Math.ceil(7.5 * fps);
 		// Sequence 3: Content (audio duration)
 		const seq3Start = introDuration;
 		const contentDurationFrames = Math.ceil(contentDuration * fps);
-		// Total duration: intro + content
-		const totalDurationFrames = introDuration + contentDurationFrames;
 
 		if (!loaded || contentDurationFrames === 0) {
 			return null;
