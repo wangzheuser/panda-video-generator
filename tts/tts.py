@@ -7,7 +7,7 @@ Install dependencies:
 
 Usage:
     python tts/tts.py input.txt output_dir
-    python tts/tts.py caption/test.txt public/audio
+    python tts/tts.py caption/test.txt output/tts
 
 Environment variables (optional):
     EDGE_TTS_VOICE - Voice name (default: 'zh-CN-XiaoxiaoNeural')
@@ -308,7 +308,7 @@ def split_by_punctuation(text, max_length=2000):
     
     return [s for s in sentences if s]
 
-async def process_file_async(input_file, output_dir='public/audio'):
+async def process_file_async(input_file, output_dir='output/tts'):
     """Process subtitle file (async version)"""
     # Check dependencies
     if not check_dependencies():
@@ -431,21 +431,21 @@ async def process_file_async(input_file, output_dir='public/audio'):
     
     return True
 
-def process_file(input_file, output_dir='public/audio'):
+def process_file(input_file, output_dir='output/tts'):
     """Process subtitle file (wrapper for async function)"""
     return asyncio.run(process_file_async(input_file, output_dir))
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("Usage: python tts/tts.py <input_file> [output_dir]")
-        print("Example: python tts/tts.py caption/test.txt public/audio")
+        print("Example: python tts/tts.py caption/test.txt output/tts")
         print("\nOptional environment variable:")
         print("  EDGE_TTS_VOICE - Voice name (default: 'zh-CN-XiaoxiaoNeural')")
         print("  List available voices: edge-tts --list-voices")
         sys.exit(1)
     
     input_file = sys.argv[1]
-    output_dir = sys.argv[2] if len(sys.argv) > 2 else 'public/audio'
+    output_dir = sys.argv[2] if len(sys.argv) > 2 else 'output/tts'
     
     if not os.path.exists(input_file):
         print(f"❌ Input file not found: {input_file}")

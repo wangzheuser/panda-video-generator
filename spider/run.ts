@@ -48,7 +48,7 @@ async function main() {
     // Send to Gemini for video script generation
     if (data.title && (data.content || data.answers.length > 0)) {
       try {
-        await generateVideoScript(data, 'input');
+        await generateVideoScript(data, 'output/tts');
       } catch (error) {
         // Don't exit on Gemini error, just log it
         console.error('Failed to generate video script, but extraction was successful');

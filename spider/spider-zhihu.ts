@@ -53,7 +53,7 @@ async function main() {
     // Generate video script
     if (data.title && (data.content || data.answers.length > 0)) {
       try {
-        await generateVideoScript(data, 'input');
+        await generateVideoScript(data, 'output/tts');
       } catch (error) {
         console.error('⚠️  Failed to generate video script, but extraction was successful');
         console.error(error);
@@ -78,7 +78,7 @@ async function main() {
     }
 
     console.log('\n📁 Output files:');
-    console.log(`  - Caption: input/input.txt`);
+    console.log(`  - Caption: output/tts/input.txt`);
     console.log(`  - Raw data: ${outputPath}`);
     if (data.title) {
       console.log(`  - Title JSON: out/title.json`);

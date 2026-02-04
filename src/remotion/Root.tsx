@@ -61,7 +61,7 @@ export const RemotionRoot: React.FC = () => {
         component={Video}
         calculateMetadata={async ({ props }: { props: { title?: string; audioFile?: string; vttFile?: string; orientation?: 'vertical' | 'horizontal' } }) => {
           // Get audio duration automatically from VTT file
-          const vttFile = props.vttFile || "audio/audio.vtt";
+          const vttFile = props.vttFile || "tts/audio.vtt";
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
           // Sequence 0: Cover (0.5 seconds) + Sequence 1: Intro (thirdTitleDuration 3.5s + sequenceDuration 4s = 7.5 seconds) + Sequence 3: Content (audio duration + 2 seconds tail extension)
           const COVER_DURATION_SECONDS = 0.5;
@@ -82,8 +82,8 @@ export const RemotionRoot: React.FC = () => {
         height={VIDEO_HEIGHT}
         defaultProps={{
           title: defaultMyCompProps.title,
-          audioFile: "audio/audio.mp3",
-          vttFile: "audio/audio.vtt",
+          audioFile: "tts/audio.mp3",
+          vttFile: "tts/audio.vtt",
           orientation: "horizontal",
         }}
       />
@@ -92,7 +92,7 @@ export const RemotionRoot: React.FC = () => {
         component={Content}
         calculateMetadata={async ({ props }: { props: { audioFile?: string; vttFile?: string; title?: string; coverImage?: string; coverBackgroundColor?: string; coverGradientColors?: string[]; coverGradientDirection?: 'horizontal' | 'vertical' | 'diagonal' } }) => {
           // Get audio duration automatically from VTT file
-          const vttFile = props.vttFile || "audio/audio.vtt";
+          const vttFile = props.vttFile || "tts/audio.vtt";
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
           // Add delay for Intro animation and title/cover display (2.75 seconds)
           const TITLE_DELAY_SECONDS = 2.75;
@@ -110,8 +110,8 @@ export const RemotionRoot: React.FC = () => {
         width={VIDEO_WIDTH}
         height={VIDEO_HEIGHT}
         defaultProps={{
-          audioFile: "audio/audio.mp3",
-          vttFile: "audio/audio.vtt",
+          audioFile: "tts/audio.mp3",
+          vttFile: "tts/audio.vtt",
           title: undefined,
           coverImage: undefined,
           coverBackgroundColor: undefined,
@@ -134,7 +134,7 @@ export const RemotionRoot: React.FC = () => {
         component={VideoVertical}
         calculateMetadata={async ({ props }: { props: { title?: string; audioFile?: string; vttFile?: string } }) => {
           // Get audio duration automatically from VTT file
-          const vttFile = props.vttFile || "audio/audio.vtt";
+          const vttFile = props.vttFile || "tts/audio.vtt";
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
           // Sequence 0: Cover (0.5 seconds) + Sequence 1: Intro (thirdTitleDuration 3.5s + sequenceDuration 4s = 7.5 seconds) + Sequence 3: Content (audio duration + 2 seconds tail extension)
           const COVER_DURATION_SECONDS = 0.5;
@@ -155,8 +155,8 @@ export const RemotionRoot: React.FC = () => {
         height={1920}
         defaultProps={{
           title: defaultMyCompProps.title,
-          audioFile: "audio/audio.mp3",
-          vttFile: "audio/audio.vtt",
+          audioFile: "tts/audio.mp3",
+          vttFile: "tts/audio.vtt",
         }}
       />
       <Composition
@@ -164,7 +164,7 @@ export const RemotionRoot: React.FC = () => {
         component={ContentVertical}
         calculateMetadata={async ({ props }: { props: { audioFile?: string; vttFile?: string } }) => {
           // Get audio duration automatically from VTT file
-          const vttFile = props.vttFile || "audio/audio.vtt";
+          const vttFile = props.vttFile || "tts/audio.vtt";
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
           // Add delay for Intro animation and title/cover display (2.75 seconds)
           const TITLE_DELAY_SECONDS = 2.75;
@@ -182,8 +182,8 @@ export const RemotionRoot: React.FC = () => {
         width={1080}
         height={1920}
         defaultProps={{
-          audioFile: "audio/audio.mp3",
-          vttFile: "audio/audio.vtt",
+          audioFile: "tts/audio.mp3",
+          vttFile: "tts/audio.vtt",
         }}
       />
       <Composition

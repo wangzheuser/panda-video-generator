@@ -3,7 +3,7 @@
 # Render Video Script
 # Converts text file to video (TTS + Render)
 # Usage: ./render-video.sh
-# Requires: input/input.txt
+# Requires: output/tts/input.txt
 
 set -e  # Exit on error
 
@@ -20,9 +20,9 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Check if input file exists
-if [ ! -f "input/input.txt" ]; then
-    echo -e "${RED}❌ Error: Input file not found at input/input.txt${NC}"
-    echo "Please create input/input.txt with your text content first"
+if [ ! -f "output/tts/input.txt" ]; then
+    echo -e "${RED}❌ Error: Input file not found at output/tts/input.txt${NC}"
+    echo "Please create output/tts/input.txt with your text content first"
     exit 1
 fi
 
@@ -88,7 +88,7 @@ fi
 echo ""
 
 # Run TTS using virtual environment Python
-if ! "$VENV_PYTHON" tts/tts.py input/input.txt public/audio; then
+if ! "$VENV_PYTHON" tts/tts.py output/tts/input.txt output/tts; then
     echo -e "${RED}❌ Failed to generate audio${NC}"
     exit 1
 fi
@@ -98,10 +98,18 @@ echo -e "${GREEN}✅ Step 1 completed: Audio and VTT files generated${NC}"
 echo ""
 
 # Check if audio files were created
-if [ ! -f "public/audio/audio.mp3" ] || [ ! -f "public/audio/audio.vtt" ]; then
+if [ ! -f "output/tts/audio.mp3" ] || [ ! -f "output/tts/audio.vtt" ]; then
     echo -e "${RED}❌ Error: Audio files not found${NC}"
     exit 1
 fi
+
+# Copy TTS files to public/tts/ for Remotion to access
+echo -e "${BLUE}📋 Copying TTS files to public/tts/ for Remotion access...${NC}"
+mkdir -p public/tts
+cp output/tts/audio.mp3 public/tts/audio.mp3
+cp output/tts/audio.vtt public/tts/audio.vtt
+echo -e "${GREEN}✅ TTS files copied to public/tts/${NC}"
+echo ""
 
 # Step 2: Render Video
 echo -e "${YELLOW}🎬 Step 2/2: Rendering video with Remotion...${NC}"
@@ -165,7 +173,7 @@ echo ""
 
 echo -e "${BLUE}📁 Output files:${NC}"
 echo "  - Video: $OUTPUT_FILE"
-echo "  - Audio: public/audio/audio.mp3"
-echo "  - Subtitles: public/audio/audio.vtt"
-echo "  - Caption: input/input.txt"
+echo "  - Audio: output/tts/audio.mp3"
+echo "  - Subtitles: output/tts/audio.vtt"
+echo "  - Caption: output/tts/input.txt"
 echo ""

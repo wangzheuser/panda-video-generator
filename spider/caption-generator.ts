@@ -35,12 +35,12 @@ function loadApiKey(): void {
 /**
  * Generate video script from Zhihu question data using DeepSeek
  * @param data - The extracted Zhihu question data
- * @param outputDir - Output directory for the script file (default: 'input')
+ * @param outputDir - Output directory for the script file (default: 'output/tts')
  * @returns Path to the generated script file
  */
 export async function generateVideoScript(
   data: ZhihuQuestion,
-  outputDir: string = 'input'
+  outputDir: string = 'output/tts'
 ): Promise<string | null> {
   // Load API key
   loadApiKey();
@@ -125,12 +125,12 @@ ${contentForDeepSeek}
 /**
  * Generate video script from JSON file
  * @param jsonFilePath - Path to the JSON file containing Zhihu question data
- * @param outputDir - Output directory for the script file (default: 'input')
+ * @param outputDir - Output directory for the script file (default: 'output/tts')
  * @returns Path to the generated script file
  */
 export async function generateVideoScriptFromFile(
   jsonFilePath: string,
-  outputDir: string = 'input'
+  outputDir: string = 'output/tts'
 ): Promise<string | null> {
   try {
     const fileContent = await fs.readFile(jsonFilePath, 'utf-8');

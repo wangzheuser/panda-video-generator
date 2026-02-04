@@ -90,8 +90,8 @@ interface ContentVerticalProps {
 }
 
 export const ContentVertical: React.FC<ContentVerticalProps> = ({
-	audioFile = 'audio/audio.mp3',
-	vttFile = 'audio/audio.vtt',
+	audioFile = 'tts/audio.mp3',
+	vttFile = 'tts/audio.vtt',
 }) => {
 	const frame = useCurrentFrame();
 	const { fps, width, height } = useVideoConfig();

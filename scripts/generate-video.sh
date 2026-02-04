@@ -80,9 +80,9 @@ echo ""
 
 echo -e "${BLUE}📁 Final output files:${NC}"
 echo "  - Video: out/video.mp4"
-echo "  - Audio: public/audio/audio.mp3"
-echo "  - Subtitles: public/audio/audio.vtt"
-echo "  - Caption: input/input.txt"
+echo "  - Audio: output/tts/audio.mp3"
+echo "  - Subtitles: output/tts/audio.vtt"
+echo "  - Caption: output/tts/input.txt"
 if [ -f "out/title.json" ]; then
     echo "  - Title JSON: out/title.json"
 fi

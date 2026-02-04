@@ -67,7 +67,7 @@ jobs:
 
       - name: Create necessary directories
         run: |
-          mkdir -p input public/audio out
+          mkdir -p output/tts public/tts out
 
       - name: Set up display server for headless browser
         run: |
@@ -109,8 +109,8 @@ jobs:
         with:
           name: generated-files
           path: |
-            input/input.txt
-            public/audio/audio.mp3
-            public/audio/audio.vtt
+            output/tts/input.txt
+            output/tts/audio.mp3
+            output/tts/audio.vtt
           retention-days: 7
           if-no-files-found: ignore

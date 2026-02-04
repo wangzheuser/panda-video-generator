@@ -43,10 +43,13 @@ build
 
 venv/
 tts/venv/
-public/audio/audio.mp3
-public/audio/audio.vtt
-input/input.txt
+output/tts/audio.mp3
+output/tts/audio.vtt
+output/tts/input.txt
+public/tts/audio.mp3
+public/tts/audio.vtt
 .pnpm-store/
+public/tts/*
 public/audio/*
 public/image/*
 
@@ -63,3 +66,6 @@ spider/script-*.txt
 /playwright-report/
 /playwright/.cache/
 /playwright/.auth/
+
+/tti
+/input

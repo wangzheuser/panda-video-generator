@@ -141,9 +141,9 @@ pnpm video:zhihu https://www.zhihu.com/question/316150890
 
 **输出文件：**
 - `out/video.mp4` - 最终渲染的视频
-- `public/audio/audio.mp3` - 生成的语音文件
-- `public/audio/audio.vtt` - 字幕文件
-- `input/input.txt` - 视频脚本
+- `output/tts/audio.mp3` - 生成的语音文件
+- `output/tts/audio.vtt` - 字幕文件
+- `output/tts/input.txt` - 视频脚本
 - `out/title.json` - 标题 JSON
 - `spider/output-*.json` - 原始爬取数据
 
@@ -155,50 +155,50 @@ pnpm video:zhihu https://www.zhihu.com/question/316150890
 
 #### 1. 准备文本内容
 
-将准备好的视频脚本文本保存到 `input/input.txt` 文件中：
+将准备好的视频脚本文本保存到 `output/tts/input.txt` 文件中：
 
 **输入：**
 - 准备好的视频脚本文本内容
 
 **操作步骤：**
-1. 创建 `input` 目录（如果不存在）
-2. 将视频脚本文本保存为 `input/input.txt`
+1. 创建 `output/tts` 目录（如果不存在）
+2. 将视频脚本文本保存为 `output/tts/input.txt`
 
 **输出：**
-- `input/input.txt` - 视频脚本文本文件
+- `output/tts/input.txt` - 视频脚本文本文件
 
 **示例：**
 ```bash
 # 创建目录
-mkdir -p input
+mkdir -p output/tts
 
 # 将文本内容保存到文件
-echo "你的视频脚本内容..." > input/input.txt
+echo "你的视频脚本内容..." > output/tts/input.txt
 ```
 
-> **提示**：如果你需要从知乎提取内容，可以使用 `pnpm spider:zhihu <知乎问题链接>` 命令自动提取并生成 `input/input.txt` 文件。
+> **提示**：如果你需要从知乎提取内容，可以使用 `pnpm spider:zhihu <知乎问题链接>` 命令自动提取并生成 `output/tts/input.txt` 文件。
 
 #### 2. 文本转视频
 
 将文本文件转换为视频：
 
 **输入：**
-- `input/input.txt` - 视频脚本文本文件
+- `output/tts/input.txt` - 视频脚本文本文件
 
 ```bash
 pnpm render:video
 ```
 
 **工作流程：**
-1. 读取 `input/input.txt` 文本文件
+1. 读取 `output/tts/input.txt` 文本文件
 2. 调用 Python TTS 脚本生成语音和字幕
 3. 使用 Remotion 渲染视频模板
 4. 输出最终视频文件
 
 **输出：**
 - `out/video.mp4` - 最终渲染的视频
-- `public/audio/audio.mp3` - 生成的语音文件
-- `public/audio/audio.vtt` - 字幕文件
+- `output/tts/audio.mp3` - 生成的语音文件
+- `output/tts/audio.vtt` - 字幕文件
 
 #### 3. 多平台发布
 

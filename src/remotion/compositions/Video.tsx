@@ -38,8 +38,8 @@ export const Video: React.FC<{
 	vttFile?: string;
 }> = ({
 	title = 'Default Title',
-	audioFile = 'audio/audio.mp3',
-	vttFile = 'audio/audio.vtt',
+	audioFile = 'tts/audio.mp3',
+	vttFile = 'tts/audio.vtt',
 }) => {
 		const { fps } = useVideoConfig();
 		const [contentDuration, setContentDuration] = useState<number>(0);

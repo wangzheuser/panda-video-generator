@@ -82,7 +82,7 @@ Output files are saved in the `spider/` directory with timestamps:
 
 After successfully extracting content, the tool automatically sends the data to DeepSeek AI to generate a video script. The script generation is handled by `caption-generator.ts`.
 
-The generated caption file is saved as `input/input.txt` and is ready to be used directly with the TTS tool.
+The generated caption file is saved as `output/tts/input.txt` and is ready to be used directly with the TTS tool.
 
 ### Using Caption Generator Separately
 
@@ -91,7 +91,7 @@ You can also use the caption generator independently:
 ```typescript
 import { generateVideoScript, generateVideoScriptFromFile } from './spider/caption-generator';
 
-// Generate script from data object (saves to input/input.txt by default)
+// Generate script from data object (saves to output/tts/input.txt by default)
 const scriptPath = await generateVideoScript(zhihuData);
 
 // Or specify custom output directory
@@ -104,17 +104,17 @@ const scriptPath = await generateVideoScriptFromFile('spider/output-2026-01-28T1
 ### Requirements
 
 - Set `DEEPSEEK_API_KEY` in `.env.local` file
-- The script will be saved as `input/input.txt` (fixed filename for TTS compatibility)
+- The script will be saved as `output/tts/input.txt` (fixed filename for TTS compatibility)
 
 ### Complete Workflow
 
 1. **Extract content from Zhihu**: `pnpm spider <url>`
    - Extracts question and answers
    - Automatically generates video script using DeepSeek AI
-   - Saves caption to `input/input.txt`
+   - Saves caption to `output/tts/input.txt`
 
-2. **Generate audio with TTS**: `python tts/tts.py input/input.txt public/audio`
-   - Reads from `input/input.txt`
-   - Generates `audio.mp3` and `audio.vtt` files
+2. **Generate audio with TTS**: `python tts/tts.py output/tts/input.txt output/tts`
+   - Reads from `output/tts/input.txt`
+   - Generates `audio.mp3` and `audio.vtt` files in `output/tts/`
 
 3. **Use in Remotion video**: The generated audio and VTT files can be used directly in your Remotion composition.
