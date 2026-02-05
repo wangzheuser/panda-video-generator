@@ -120,13 +120,14 @@ def merge_audio_files(audio_files, output_path, speed=1.0):
             print(f"❌ Failed to merge audio: {e}")
             return False
 
+
 def split_text_for_vtt(text, max_length=30):
     """Split text into segments of max_length characters for VTT subtitles
-    Only splits at sentence-ending punctuation marks to avoid cutting in the middle of sentences.
-    Supports both full-width (全角) and half-width (半角) punctuation:
+    Only splits at Chinese (full-width) sentence-ending punctuation marks to avoid cutting in the middle of sentences.
+    Uses only full-width (全角) punctuation to avoid splitting at decimal points in numbers:
     - Full-width: 。！？ (period, exclamation, question mark)
-    - Half-width: .!? (period, exclamation, question mark)
     Does not split at mid-sentence punctuation like commas (，,) or enumeration marks (、).
+    Does not split at half-width punctuation (.!?) to avoid splitting decimal numbers (e.g., 1.43%, 3.14).
     If no sentence-ending punctuation is found within max_length, allows exceeding max_length
     (up to max_length * 2) to find the next sentence boundary, rather than cutting mid-sentence.
     """
@@ -134,9 +135,9 @@ def split_text_for_vtt(text, max_length=30):
         return [text]
     
     segments = []
-    # Only use sentence-ending punctuation marks (not mid-sentence marks like ，、；：)
-    # Support both full-width (全角) and half-width (半角) punctuation
-    sentence_endings = '。！？.!?'  # Full-width: 。！？, Half-width: .!?
+    # Only use Chinese (full-width) sentence-ending punctuation marks
+    # Do NOT use half-width punctuation (.!?) to avoid splitting decimal numbers
+    sentence_endings = '。！？'  # Only full-width Chinese punctuation
     
     remaining = text
     while len(remaining) > max_length:

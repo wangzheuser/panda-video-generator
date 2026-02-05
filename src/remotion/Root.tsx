@@ -1,5 +1,5 @@
 import React from "react";
-import { Composition } from "remotion";
+import { Composition, Still } from "remotion";
 import { Intro } from "./compositions/Intro";
 import { IntroVertical } from "./compositions/IntroVertical";
 import {
@@ -192,6 +192,17 @@ export const RemotionRoot: React.FC = () => {
         component={Cover}
         durationInFrames={VIDEO_FPS}
         fps={VIDEO_FPS}
+        width={VIDEO_WIDTH}
+        height={VIDEO_HEIGHT}
+        defaultProps={{
+          title: defaultMyCompProps.title,
+          contentTitle: "这里是实际内容的标题",
+        } as CoverProps}
+      />
+      {/* Still version for cover image generation */}
+      <Still
+        id="Cover-Still"
+        component={Cover}
         width={VIDEO_WIDTH}
         height={VIDEO_HEIGHT}
         defaultProps={{

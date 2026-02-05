@@ -27,7 +27,7 @@ if [ ! -f "output/tts/input.txt" ]; then
 fi
 
 # Step 1: Run TTS
-echo -e "${YELLOW}🎙️  Step 1/2: Generating audio with TTS...${NC}"
+echo -e "${YELLOW}🎙️  Step 1/3: Generating audio with TTS...${NC}"
 echo ""
 
 # Check if Python is available
@@ -112,7 +112,7 @@ echo -e "${GREEN}✅ TTS files copied to public/tts/${NC}"
 echo ""
 
 # Step 2: Render Video
-echo -e "${YELLOW}🎬 Step 2/2: Rendering video with Remotion...${NC}"
+echo -e "${YELLOW}🎬 Step 2/3: Rendering video with Remotion...${NC}"
 echo ""
 
 # Use fixed output filename
@@ -135,34 +135,99 @@ else
 fi
 
 # Read title from title.json if it exists and pass it as prop
-TITLE_PROP=""
+# Use --props with file path to avoid shell parsing issues with special characters
+PROPS_FILE=""
 if [ -f "output/video/title.json" ]; then
-    # Use Node.js to safely read JSON and create props string
-    TITLE_PROP=$(node -e "
+    # Create a temporary props file with the title (in correct format for Remotion)
+    PROPS_FILE="output/video/render-props.json"
+    node -e "
         const fs = require('fs');
         try {
             const data = JSON.parse(fs.readFileSync('output/video/title.json', 'utf8'));
             if (data.title) {
-                const props = JSON.stringify({ title: data.title });
-                console.log('--props=' + props);
+                const props = JSON.stringify({ title: data.title }, null, 2);
+                fs.writeFileSync('$PROPS_FILE', props, 'utf8');
             }
         } catch (e) {
             // Silently fail if JSON is invalid
         }
-    ")
+    "
+    # Props file will be cleaned up after cover generation
 fi
 
-if [ -n "$TITLE_PROP" ]; then
+# Render video with H.264 codec (default audio is AAC for H.264)
+# Format: MP4/H.264, audio AAC, CRF 23 for quality
+RENDER_OPTS="--codec=h264 --crf=23"
+if [ -n "$PROPS_FILE" ] && [ -f "$PROPS_FILE" ]; then
     echo -e "${BLUE}📝 Using title from output/video/title.json${NC}"
-    if ! pnpm exec remotion render Video "$OUTPUT_FILE" $TITLE_PROP; then
+    echo -e "${BLUE}🎬 Rendering with H.264 codec, CRF 23...${NC}"
+    # Use --props with file path to avoid shell parsing issues
+    if ! pnpm exec remotion render Video "$OUTPUT_FILE" --props="$PROPS_FILE" $RENDER_OPTS; then
         echo -e "${RED}❌ Failed to render video${NC}"
+        rm -f "$PROPS_FILE"
         exit 1
     fi
+    # Don't delete PROPS_FILE yet - we'll need it for cover image generation
 else
-    if ! pnpm exec remotion render Video "$OUTPUT_FILE"; then
+    echo -e "${BLUE}🎬 Rendering with H.264 codec, CRF 23...${NC}"
+    if ! pnpm exec remotion render Video "$OUTPUT_FILE" $RENDER_OPTS; then
         echo -e "${RED}❌ Failed to render video${NC}"
         exit 1
     fi
+fi
+
+# Step 3: Generate cover image
+echo ""
+echo -e "${YELLOW}🖼️  Step 3/3: Generating cover image...${NC}"
+echo ""
+
+COVER_OUTPUT="output/video/cover.jpg"
+COVER_PNG_OUTPUT="output/video/cover.png"
+
+# Method 1: Use Remotion still command (recommended - renders Cover-Still component)
+COVER_GENERATED=false
+if [ -n "$PROPS_FILE" ] && [ -f "$PROPS_FILE" ]; then
+    # Try with props file first
+    if pnpm exec remotion still Cover-Still "$COVER_PNG_OUTPUT" --props="$PROPS_FILE" 2>/dev/null; then
+        echo -e "${GREEN}✅ Cover image generated using Remotion Still: $COVER_PNG_OUTPUT${NC}"
+        COVER_GENERATED=true
+    fi
+fi
+
+# If props file method failed or doesn't exist, try without props
+if [ "$COVER_GENERATED" = false ]; then
+    if pnpm exec remotion still Cover-Still "$COVER_PNG_OUTPUT" 2>/dev/null; then
+        echo -e "${GREEN}✅ Cover image generated using Remotion Still: $COVER_PNG_OUTPUT${NC}"
+        COVER_GENERATED=true
+    fi
+fi
+
+# Convert PNG to JPG if PNG was generated and ffmpeg is available
+if [ "$COVER_GENERATED" = true ] && command -v ffmpeg &> /dev/null; then
+    if ffmpeg -i "$COVER_PNG_OUTPUT" -frames:v 1 -update 1 -q:v 2 "$COVER_OUTPUT" -y -loglevel warning 2>&1; then
+        echo -e "${GREEN}✅ Cover image also saved as JPG: $COVER_OUTPUT${NC}"
+    fi
+fi
+
+# Method 2: Extract first frame from video using ffmpeg (fallback if Remotion still failed)
+if [ "$COVER_GENERATED" = false ]; then
+    echo -e "${YELLOW}⚠️  Remotion still command failed, trying ffmpeg extraction...${NC}"
+    
+    if command -v ffmpeg &> /dev/null; then
+        if ffmpeg -i "$OUTPUT_FILE" -vf "select=eq(n\,0)" -vframes 1 "$COVER_OUTPUT" -y -loglevel warning 2>&1; then
+            echo -e "${GREEN}✅ Cover image extracted from video first frame: $COVER_OUTPUT${NC}"
+            COVER_GENERATED=true
+        else
+            echo -e "${YELLOW}⚠️  Failed to extract cover image from video${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  ffmpeg not found, skipping cover image extraction${NC}"
+    fi
+fi
+
+# Clean up props file after cover generation
+if [ -n "$PROPS_FILE" ] && [ -f "$PROPS_FILE" ]; then
+    rm -f "$PROPS_FILE"
 fi
 
 echo ""
@@ -173,6 +238,12 @@ echo ""
 
 echo -e "${BLUE}📁 Output files:${NC}"
 echo "  - Video: $OUTPUT_FILE"
+if [ -f "$COVER_OUTPUT" ]; then
+    echo "  - Cover (JPG): $COVER_OUTPUT"
+fi
+if [ -f "$COVER_PNG_OUTPUT" ]; then
+    echo "  - Cover (PNG): $COVER_PNG_OUTPUT"
+fi
 echo "  - Audio: output/tts/audio.mp3"
 echo "  - Subtitles: output/tts/audio.vtt"
 echo "  - Caption: output/tts/input.txt"

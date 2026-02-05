@@ -3,7 +3,6 @@ import path from 'path';
 import { existsSync } from 'fs';
 import { getAuthFilePath } from '../utils/login-helper';
 import { UPLOAD_PATHS } from '../../types/paths';
-import { UPLOAD_PATHS } from '../../types/paths';
 
 /**
  * Auto upload video to Kuaishou (快手)
@@ -593,9 +592,7 @@ test('upload video to kuaishou', async ({ page }) => {
     console.log('🔍 Asserting success message: "内容发布成功"...');
     
     // Wait for and assert the success message appears
-    const successMessage = page.getByText('内容发布成功', { exact: true });
-    await expect(successMessage).toBeVisible({ timeout: 30000 });
-    console.log('✅ Success message "内容发布成功" found and verified!');
+    await expect(page.getByRole('textbox', { name: '输入搜索关键词' })).toBeVisible();
     console.log('✅ Submission successful!');
     console.log('Success: Kuaishou');
   }

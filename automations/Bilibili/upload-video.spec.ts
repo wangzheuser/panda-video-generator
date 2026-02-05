@@ -69,12 +69,18 @@ function getUploadConfig(): UploadConfig {
     );
   }
   
+  // Get cover path (default to generated cover.jpg)
+  const defaultCoverPath = path.join(process.cwd(), UPLOAD_PATHS.DEFAULT_COVER);
+  const coverPath = process.env.VIDEO_COVER 
+    ? path.resolve(process.env.VIDEO_COVER)
+    : (existsSync(defaultCoverPath) ? path.resolve(defaultCoverPath) : undefined);
+  
   const config: UploadConfig = {
     videoPath: path.resolve(videoPath),
     title,
     description: process.env.VIDEO_DESC || '',
     tags: process.env.VIDEO_TAGS ? process.env.VIDEO_TAGS.split(',').map(t => t.trim()) : [],
-    coverPath: process.env.VIDEO_COVER ? path.resolve(process.env.VIDEO_COVER) : undefined,
+    coverPath,
   };
   
   return config;
@@ -209,7 +215,6 @@ test('upload video to bilibili', async ({ page }) => {
     'input[maxlength]',
   ];
   
-  let titleFilled = false;
   for (const selector of titleSelectors) {
     try {
       const titleInput = page.locator(selector).first();
@@ -219,7 +224,6 @@ test('upload video to bilibili', async ({ page }) => {
         if (visible) {
           await titleInput.click({ timeout: 1000 });
           await titleInput.fill(config.title);
-          titleFilled = true;
           await page.waitForTimeout(500);
           break;
         }
@@ -243,7 +247,6 @@ test('upload video to bilibili', async ({ page }) => {
       'textarea[maxlength]',
     ];
     
-    let descFilled = false;
     for (const selector of descSelectors) {
       try {
         const descInput = page.locator(selector).first();
@@ -253,7 +256,6 @@ test('upload video to bilibili', async ({ page }) => {
           if (visible) {
             await descInput.click({ timeout: 1000 });
             await descInput.fill(config.description);
-            descFilled = true;
             await page.waitForTimeout(500);
             break;
           }
@@ -276,7 +278,6 @@ test('upload video to bilibili', async ({ page }) => {
       'input[type="text"][placeholder*="标签"]',
     ];
     
-    let tagsFilled = false;
     for (const selector of tagSelectors) {
       try {
         const tagInput = page.locator(selector).first();
@@ -286,7 +287,6 @@ test('upload video to bilibili', async ({ page }) => {
           if (visible) {
             await tagInput.click({ timeout: 1000 });
             await tagInput.fill(config.tags.join(','));
-            tagsFilled = true;
             await page.waitForTimeout(500);
             break;
           }
@@ -300,28 +300,141 @@ test('upload video to bilibili', async ({ page }) => {
   
   // Step 5: Upload cover if provided
   if (config.coverPath && existsSync(config.coverPath)) {
-    const coverSelectors = [
+    console.log(`Uploading cover: ${config.coverPath}`);
+    
+    // Click on "封面设置" to open cover editor panel
+    await page.locator('div').filter({ hasText: /^封面设置$/ }).nth(1).click();
+    await page.waitForTimeout(2000);
+    
+    // Wait for cover editor panel to appear
+    await page.waitForSelector('.cover-editor-panel-select', { timeout: 5000 }).catch(() => {
+      console.log('Cover editor panel not found, trying alternative approach');
+    });
+    
+    // Try multiple methods to upload cover
+    let coverUploaded = false;
+    
+    // Method 1: Find file input in cover upload area
+    const coverInputSelectors = [
+      '.cover-upload input[type="file"]',
+      '.bcc-upload.cover-upload input[type="file"]',
+      '.cover-editor-panel-select input[accept*="image"]',
+      'input[type="file"][accept="image/png, image/jpeg"]',
       'input[type="file"][accept*="image"]',
-      '.cover-upload input',
       '[class*="cover"] input[type="file"]',
     ];
     
-    for (const selector of coverSelectors) {
+    for (const selector of coverInputSelectors) {
       try {
         const coverInput = page.locator(selector).first();
-        if (await coverInput.isVisible({ timeout: 2000 })) {
+        const count = await coverInput.count();
+        if (count > 0) {
+          // Try to set files directly
           await coverInput.setInputFiles(config.coverPath);
+          coverUploaded = true;
           await page.waitForTimeout(2000);
+          console.log(`Cover uploaded using selector: ${selector}`);
           break;
         }
       } catch (e) {
-        // Continue
+        // Continue to next selector
       }
     }
+    
+    // Method 2: Click upload area and use file chooser
+    if (!coverUploaded) {
+      try {
+        const uploadArea = page.locator('.cover-upload .upload-area').first();
+        if (await uploadArea.isVisible({ timeout: 3000 })) {
+          const [fileChooser] = await Promise.all([
+            page.waitForEvent('filechooser', { timeout: 5000 }),
+            uploadArea.click(),
+          ]);
+          await fileChooser.setFiles(config.coverPath);
+          coverUploaded = true;
+          await page.waitForTimeout(2000);
+          console.log('Cover uploaded using file chooser');
+        }
+      } catch (e) {
+        console.log('File chooser method failed:', e);
+      }
+    }
+    
+    // Method 3: Try clicking upload area to reveal file input
+    if (!coverUploaded) {
+      try {
+        const uploadArea = page.locator('.cover-upload .upload-area, .bcc-upload.cover-upload .upload-area').first();
+        if (await uploadArea.isVisible({ timeout: 3000 })) {
+          await uploadArea.click();
+          await page.waitForTimeout(1000);
+          
+          // After clicking, try to find the file input again
+          const fileInput = page.locator('input[type="file"][accept*="image"]').first();
+          if (await fileInput.isVisible({ timeout: 2000 })) {
+            await fileInput.setInputFiles(config.coverPath);
+            coverUploaded = true;
+            await page.waitForTimeout(2000);
+            console.log('Cover uploaded after clicking upload area');
+          }
+        }
+      } catch (e) {
+        console.log('Click upload area method failed:', e);
+      }
+    }
+    
+    if (coverUploaded) {
+      console.log('✅ Cover image uploaded successfully');
+      
+      // Wait for cover to be processed and selected
+      // Check for cover preview or processing indicators
+      try {
+        // Wait for cover preview to appear (indicating upload success)
+        await page.waitForSelector('.cover-slider-image, [class*="cover"][class*="preview"], [class*="cover"][class*="image"]', { 
+          timeout: 10000 
+        }).catch(() => {
+          console.log('Cover preview not found, but continuing...');
+        });
+        
+        // Wait a bit for cover processing to complete
+        await page.waitForTimeout(3000);
+        
+        // Click "完成" button to confirm cover selection (only after cover is uploaded)
+        const completeButton = page.getByText('完成', { exact: true });
+        if (await completeButton.isVisible({ timeout: 5000 })) {
+          await completeButton.click();
+          console.log('✅ Clicked "完成" button to confirm cover selection');
+          await page.waitForTimeout(2000);
+        } else {
+          console.log('⚠️  "完成" button not found, cover may already be selected');
+        }
+      } catch (e) {
+        console.log('Error waiting for cover processing:', e);
+        // Try clicking "完成" anyway
+        try {
+          await page.getByText('完成', { exact: true }).click({ timeout: 3000 });
+        } catch (e2) {
+          console.log('Could not click "完成" button');
+        }
+      }
+    } else {
+      console.log('⚠️  Cover upload failed, continuing without cover');
+      // If cover upload failed, try to close the cover editor panel
+      try {
+        const completeButton = page.getByText('完成', { exact: true });
+        if (await completeButton.isVisible({ timeout: 2000 })) {
+          await completeButton.click();
+        }
+      } catch (e) {
+        // Ignore if button not found
+      }
+    }
+  } else {
+    console.log('No cover image found, skipping cover upload');
   }
   
   // Step 6: Wait for video processing
   await page.waitForTimeout(10000);
+
   
   // Step 7: Click submit button
   await page.waitForTimeout(2000);

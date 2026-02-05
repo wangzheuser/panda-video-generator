@@ -73,6 +73,8 @@ ${contentForDeepSeek}
 
 并且根据用户聆听和阅读的友好性，将生成的内容进行调整优化以及分段，并让它变得更流畅和自然.
 
+最终生成文稿总字数不超过4000字符
+
 `;
 
     console.log('\n📝 Sending content to DeepSeek for video script generation...');

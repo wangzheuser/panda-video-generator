@@ -38,6 +38,8 @@ export const SPIDER_PATHS = {
 export const VIDEO_PATHS = {
   VIDEO_MP4: `${OUTPUT_DIRS.VIDEO}/video.mp4`,
   TITLE_JSON: `${OUTPUT_DIRS.VIDEO}/title.json`,
+  COVER_JPG: `${OUTPUT_DIRS.VIDEO}/cover.jpg`,
+  COVER_PNG: `${OUTPUT_DIRS.VIDEO}/cover.png`,
   // Public paths for Remotion
   PUBLIC_TITLE_JSON: `${PUBLIC_DIRS.VIDEO}/title.json`,
 } as const;
@@ -55,4 +57,5 @@ export const REMOTION_PATHS = {
 export const UPLOAD_PATHS = {
   DEFAULT_VIDEO: VIDEO_PATHS.VIDEO_MP4,
   DEFAULT_TITLE_JSON: VIDEO_PATHS.TITLE_JSON,
+  DEFAULT_COVER: VIDEO_PATHS.COVER_JPG,
 } as const;

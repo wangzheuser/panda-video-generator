@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { AbsoluteFill, Sequence, useVideoConfig, staticFile, useDelayRender } from 'remotion';
+import { AbsoluteFill, Sequence, useVideoConfig, staticFile, useDelayRender, Html5Audio } from 'remotion';
 import { REMOTION_PATHS } from '../../../types/paths';
 import { Intro } from './Intro';
 import { Content } from './Content';

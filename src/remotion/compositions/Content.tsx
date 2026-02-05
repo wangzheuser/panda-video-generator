@@ -138,6 +138,32 @@ export const Content: React.FC<ContentProps> = ({
 		caption => currentTimeMs >= caption.startMs && currentTimeMs < caption.endMs
 	) : null;
 
+	// Calculate audio end time (last caption's end time)
+	const audioEndMs = captions.length > 0
+		? Math.max(...captions.map(c => c.endMs))
+		: 0;
+
+	// Calculate BGM fade out volume
+	// Fade out starts 2 seconds before audio ends
+	const fadeOutDurationMs = 2000; // 2 seconds fade out
+	const fadeOutStartMs = audioEndMs - fadeOutDurationMs;
+	const bgmBaseVolume = 0.3;
+
+	let bgmVolume = bgmBaseVolume;
+	if (audioEndMs > 0 && currentTimeMs >= fadeOutStartMs) {
+		// Fade out from bgmBaseVolume to 0 over fadeOutDurationMs
+		const fadeOutProgress = (currentTimeMs - fadeOutStartMs) / fadeOutDurationMs;
+		bgmVolume = interpolate(
+			fadeOutProgress,
+			[0, 1],
+			[bgmBaseVolume, 0],
+			{
+				extrapolateLeft: 'clamp',
+				extrapolateRight: 'clamp',
+			}
+		);
+	}
+
 	// Calculate caption font size based on text length
 	const calculateCaptionFontSize = (text: string): number => {
 		// Count characters (excluding spaces and newlines for calculation)
@@ -238,6 +264,14 @@ export const Content: React.FC<ContentProps> = ({
 				src={staticFile(audioFile)}
 				volume={1}
 				name="TTS Audio"
+			/>
+
+			{/* Background music - loops throughout content with fade out at audio end */}
+			<Html5Audio
+				src={staticFile('bgm/01.mp3')}
+				volume={bgmVolume}
+				loop
+				name="Background Music"
 			/>
 
 			{/* Dancing lines - slow animated background decoration */}

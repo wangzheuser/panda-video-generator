@@ -72,8 +72,8 @@ export const Cover: React.FC<CoverProps> = ({ title: _title, contentTitle }) => 
 			<div
 				style={{
 					position: 'absolute',
-					top: '30px',
-					left: '30px',
+					top: '90px',
+					left: '90px',
 					display: 'flex',
 					alignItems: 'center',
 					gap: '20px',
@@ -115,8 +115,8 @@ export const Cover: React.FC<CoverProps> = ({ title: _title, contentTitle }) => 
 						left: '50%',
 						transform: 'translate(-50%, -50%)',
 						textAlign: 'center',
-						width: '90%',
-						maxWidth: '90%',
+						width: '80%',
+						maxWidth: '80%',
 					}}
 				>
 					<h1
