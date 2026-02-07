@@ -3,7 +3,6 @@ import path from 'path';
 import { existsSync } from 'fs';
 import { getAuthFilePath } from '../utils/login-helper';
 import { UPLOAD_PATHS } from '../../types/paths';
-import { UPLOAD_PATHS } from '../../types/paths';
 
 /**
  * Auto upload video to YouTube

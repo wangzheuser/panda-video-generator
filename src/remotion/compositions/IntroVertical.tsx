@@ -258,6 +258,7 @@ export const IntroVertical = ({ title }: z.infer<typeof CompositionProps>) => {
             opacity,
             wordWrap: 'break-word',
             overflowWrap: 'break-word',
+            whiteSpace: 'pre-line',
             fontSize: '120px', // Responsive font size for vertical
           }}
         >

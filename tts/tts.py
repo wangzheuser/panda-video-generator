@@ -10,7 +10,7 @@ Usage:
     python tts/tts.py caption/test.txt output/tts
 
 Environment variables (optional):
-    EDGE_TTS_VOICE - Voice name (default: 'zh-CN-XiaoxiaoNeural')
+    EDGE_TTS_VOICE - Voice name (default: 'zh-CN-YunjianNeural')
     List available voices: edge-tts --list-voices
 """
 
@@ -55,7 +55,7 @@ async def tts_with_edge(text, output_path, voice_name=None, max_retries=3):
     
     # Default voice for Chinese
     if not voice_name:
-        voice_name = os.getenv('EDGE_TTS_VOICE', 'zh-CN-XiaoxiaoNeural')
+        voice_name = os.getenv('EDGE_TTS_VOICE', 'zh-CN-YunjianNeural')
     
     for attempt in range(max_retries):
         try:
@@ -325,14 +325,15 @@ async def process_file_async(input_file, output_dir='output/tts'):
     with open(input_file, 'r', encoding='utf-8') as f:
         content = f.read()
     
-    # Split by punctuation marks
+    # Split by paragraphs (each line is a paragraph)
+    # Each paragraph becomes a single TTS unit
+    # No splitting by punctuation marks - each paragraph is processed as a whole
     lines = []
     for line in content.split('\n'):
         line = line.strip()
+        # Only add non-empty lines as paragraphs
         if line:
-            # Split each line by punctuation
-            sentences = split_by_punctuation(line)
-            lines.extend(sentences)
+            lines.append(line)
     
     if not lines:
         print("❌ File is empty")
@@ -341,7 +342,7 @@ async def process_file_async(input_file, output_dir='output/tts'):
     # Create output directory
     os.makedirs(output_dir, exist_ok=True)
     
-    voice_name = os.getenv('EDGE_TTS_VOICE', 'zh-CN-XiaoxiaoNeural')
+    voice_name = os.getenv('EDGE_TTS_VOICE', 'zh-CN-YunjianNeural')
     print(f"🎙️  Using Edge-TTS to generate audio")
     print(f"🔊 Voice: {voice_name}")
     print(f"📝 Found {len(lines)} lines of text\n")
@@ -396,8 +397,8 @@ async def process_file_async(input_file, output_dir='output/tts'):
                 temp_audio_files.append(temp_path)
                 durations.append(duration)
     
-    # Merge audio files and adjust speed to 1.2x
-    SPEED_FACTOR = 1.2
+    # Merge audio files and adjust speed to 1.1x
+    SPEED_FACTOR = 1.1
     print(f"🔗 Merging audio files and adjusting speed to {SPEED_FACTOR}x...")
     merged_audio_path = os.path.join(output_dir, 'audio.mp3')
     if merge_audio_files(temp_audio_files, merged_audio_path, speed=SPEED_FACTOR):
@@ -441,7 +442,7 @@ if __name__ == '__main__':
         print("Usage: python tts/tts.py <input_file> [output_dir]")
         print("Example: python tts/tts.py caption/test.txt output/tts")
         print("\nOptional environment variable:")
-        print("  EDGE_TTS_VOICE - Voice name (default: 'zh-CN-XiaoxiaoNeural')")
+        print("  EDGE_TTS_VOICE - Voice name (default: 'zh-CN-YunjianNeural', example: 'zh-CN-XiaoxiaoNeural')")
         print("  List available voices: edge-tts --list-voices")
         sys.exit(1)
     

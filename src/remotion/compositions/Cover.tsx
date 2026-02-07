@@ -129,6 +129,7 @@ export const Cover: React.FC<CoverProps> = ({ title: _title, contentTitle }) => 
 							padding: '0 40px',
 							wordWrap: 'break-word',
 							overflowWrap: 'break-word',
+							whiteSpace: 'pre-line',
 							lineHeight: 1.2,
 							textShadow: '3px 3px 0 rgba(0, 0, 0, 0.5), -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5)',
 						}}

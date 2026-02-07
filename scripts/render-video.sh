@@ -106,6 +106,8 @@ fi
 # Copy TTS files to public/tts/ for Remotion to access
 echo -e "${BLUE}📋 Copying TTS files to public/tts/ for Remotion access...${NC}"
 mkdir -p public/tts
+# Remove existing files/symlinks first to avoid cp errors
+rm -f public/tts/audio.mp3 public/tts/audio.vtt
 cp output/tts/audio.mp3 public/tts/audio.mp3
 cp output/tts/audio.vtt public/tts/audio.vtt
 echo -e "${GREEN}✅ TTS files copied to public/tts/${NC}"
@@ -133,6 +135,16 @@ if [ -f "output/video/title.json" ]; then
 else
     echo -e "${YELLOW}⚠️  output/video/title.json not found, component will use default title${NC}"
 fi
+
+# Step 2: Render Video
+echo -e "${YELLOW}🎬 Step 2/3: Rendering video with Remotion...${NC}"
+echo ""
+
+# Use fixed output filename
+OUTPUT_FILE="output/video/video.mp4"
+
+# Ensure output directory exists
+mkdir -p output/video
 
 # Read title from title.json if it exists and pass it as prop
 # Use --props with file path to avoid shell parsing issues with special characters
