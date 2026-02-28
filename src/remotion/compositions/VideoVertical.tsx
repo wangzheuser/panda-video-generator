@@ -91,12 +91,11 @@ export const VideoVertical: React.FC<{
 			return null;
 		}
 
-		return (
-			<AbsoluteFill
-				style={{
-					filter: 'invert(1)',
-				}}
-			>
+	return (
+		<AbsoluteFill
+			style={{
+			}}
+		>
 				{/* Cover sequence - displayed first */}
 				<Sequence from={coverStart} durationInFrames={coverDuration}>
 					<Cover title={title} />

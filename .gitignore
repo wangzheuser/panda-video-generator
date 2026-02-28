@@ -69,6 +69,5 @@ spider/tmp/
 
 /tti
 /input
-output/tts/sentence1.mp3
-output/tts/sentence2.mp3
-output/tts/sentence3.mp3
+output/tts/*.mp3
+output/tts/*.vtt

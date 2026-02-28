@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { AbsoluteFill, Sequence, useVideoConfig, staticFile, useDelayRender, Html5Audio } from 'remotion';
+import { Video as RemotionVideo } from '@remotion/media';
 import { REMOTION_PATHS } from '../../../types/paths';
 import { Intro, TitleSequence } from './Intro';
 import { Content } from './Content';
@@ -90,16 +91,32 @@ export const Video: React.FC<{
 			return null;
 		}
 
-		return (
-			<AbsoluteFill
-				style={{
-					filter: 'invert(1)',
-				}}
-			>
-				{/* Cover sequence - displayed first */}
-				<Sequence from={coverStart} durationInFrames={coverDuration}>
-					<Cover title={title} />
-				</Sequence>
+	return (
+		<AbsoluteFill
+			// style={{
+			// 	filter: 'invert(1)',
+			// }}
+		>
+		{/* Background video layer */}
+		<RemotionVideo
+			src={staticFile('video/bg.mp4')}
+			style={{
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: '100%',
+				height: '100%',
+				objectFit: 'cover',
+				filter: 'brightness(0.8)',
+			}}
+			muted
+			loop
+		/>
+			
+			{/* Cover sequence - displayed first */}
+			<Sequence from={coverStart} durationInFrames={coverDuration}>
+				<Cover title={title} />
+			</Sequence>
 
 				{/* Intro sequence - only includes first title (logo moved to end) */}
 				<Sequence from={introStart} durationInFrames={introDuration}>

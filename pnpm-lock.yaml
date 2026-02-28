@@ -26,6 +26,9 @@ importers:
       '@remotion/lambda':
         specifier: 4.0.409
         version: 4.0.409(@remotion/bundler@4.0.409(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@remotion/media':
+        specifier: 4.0.409
+        version: 4.0.409(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@remotion/paths':
         specifier: 4.0.409
         version: 4.0.409
@@ -1373,6 +1376,12 @@ packages:
 
   '@remotion/media-utils@4.0.409':
     resolution: {integrity: sha512-/SPG2dOBsf+QQvLh793s9UuPFDkyjYx0V9/T3n+NHZ92khU5QIUJRpqLx9LlEea84xS41sJWSak0lP9alMmyXQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
+
+  '@remotion/media@4.0.409':
+    resolution: {integrity: sha512-lEdalyN0pBpcnjuHcL8Lxal8mpuPASBxDwmRrfMKufPnLwakWnlohH8FCIDoCvJSf1yJYgJlfuC603ZN95X1tg==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -6214,6 +6223,13 @@ snapshots:
     dependencies:
       '@remotion/media-parser': 4.0.409
       '@remotion/webcodecs': 4.0.409
+      mediabunny: 1.29.0
+      react: 19.2.3
+      react-dom: 19.2.3(react@19.2.3)
+      remotion: 4.0.409(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+
+  '@remotion/media@4.0.409(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
+    dependencies:
       mediabunny: 1.29.0
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)

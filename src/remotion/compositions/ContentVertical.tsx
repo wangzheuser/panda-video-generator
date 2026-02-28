@@ -173,28 +173,28 @@ export const ContentVertical: React.FC<ContentVerticalProps> = ({
 	};
 
 	// Dancing lines animation - slow, smooth movement
-	const lineSpeed = 0.05; // Very slow movement speed
-	const lineOffset1 = frame * lineSpeed;
-	const lineOffset2 = frame * lineSpeed * 0.7; // Different speed for variety
-	const lineOffset3 = frame * lineSpeed * 1.3;
+	// const lineSpeed = 0.05; // Very slow movement speed
+	// const lineOffset1 = frame * lineSpeed;
+	// const lineOffset2 = frame * lineSpeed * 0.7; // Different speed for variety
+	// const lineOffset3 = frame * lineSpeed * 1.3;
 
 	// Wave amplitude and frequency for dancing effect
-	const waveAmplitude = 50; // Increased amplitude for better visibility
-	const waveFrequency = 0.015; // Slightly lower frequency for smoother waves
+	// const waveAmplitude = 50; // Increased amplitude for better visibility
+	// const waveFrequency = 0.015; // Slightly lower frequency for smoother waves
 
 	// Generate dancing line paths using SVG
-	const generateWavePath = (offset: number, amplitude: number, frequency: number, yPosition: number) => {
-		const points: string[] = [];
-		const steps = 100;
+	// const generateWavePath = (offset: number, amplitude: number, frequency: number, yPosition: number) => {
+	// 	const points: string[] = [];
+	// 	const steps = 100;
 
-		for (let i = 0; i <= steps; i++) {
-			const x = (i / steps) * width;
-			const y = yPosition + Math.sin((x * frequency) + offset) * amplitude;
-			points.push(`${i === 0 ? 'M' : 'L'} ${x} ${y}`);
-		}
+	// 	for (let i = 0; i <= steps; i++) {
+	// 		const x = (i / steps) * width;
+	// 		const y = yPosition + Math.sin((x * frequency) + offset) * amplitude;
+	// 		points.push(`${i === 0 ? 'M' : 'L'} ${x} ${y}`);
+	// 	}
 
-		return points.join(' ');
-	};
+	// 	return points.join(' ');
+	// };
 
 	// Calculate animation for current caption (gather effect)
 	let scale = 1;
@@ -252,7 +252,7 @@ export const ContentVertical: React.FC<ContentVerticalProps> = ({
 	}
 
 	return (
-		<AbsoluteFill style={{ backgroundColor: '#FFFFFF' }}>
+		<AbsoluteFill style={{ backgroundColor: 'transparent' }}>
 			{/* Audio track */}
 			<Html5Audio
 				src={staticFile(audioFile)}
@@ -260,58 +260,58 @@ export const ContentVertical: React.FC<ContentVerticalProps> = ({
 				name="TTS Audio"
 			/>
 
-			{/* Dancing lines - slow animated background decoration */}
-			<svg
-				style={{
-					position: 'absolute',
-					top: 0,
-					left: 0,
-					width: '100%',
-					height: '100%',
-					pointerEvents: 'none',
-					zIndex: 1,
-				}}
-			>
-				{/* Top dancing line */}
-				<path
-					d={generateWavePath(lineOffset1, waveAmplitude, waveFrequency, height * 0.1)}
-					stroke="rgba(0, 0, 0, 0.05)"
-					strokeWidth="5"
-					fill="none"
-					strokeLinecap="round"
-				/>
-				{/* Middle dancing line */}
-				<path
-					d={generateWavePath(lineOffset2, waveAmplitude * 0.8, waveFrequency * 1.2, height * 0.3)}
-					stroke="rgba(0, 0, 0, 0.05)"
-					strokeWidth="4.5"
-					fill="none"
-					strokeLinecap="round"
-				/>
-				{/* Bottom dancing line */}
-				<path
-					d={generateWavePath(lineOffset3, waveAmplitude * 1.2, waveFrequency * 0.8, height * 0.5)}
-					stroke="rgba(0, 0, 0, 0.05)"
-					strokeWidth="4"
-					fill="none"
-					strokeLinecap="round"
-				/>
-				{/* Additional subtle lines */}
-				<path
-					d={generateWavePath(lineOffset1 * 0.5, waveAmplitude * 0.6, waveFrequency * 1.5, height * 0.2)}
-					stroke="rgba(0, 0, 0, 0.05)"
-					strokeWidth="3.5"
-					fill="none"
-					strokeLinecap="round"
-				/>
-				<path
-					d={generateWavePath(lineOffset2 * 1.5, waveAmplitude * 0.7, waveFrequency * 0.9, height * 0.4)}
-					stroke="rgba(0, 0, 0, 0.05)"
-					strokeWidth="3.5"
-					fill="none"
-					strokeLinecap="round"
-				/>
-			</svg>
+		{/* Dancing lines - slow animated background decoration */}
+		{/* <svg
+			style={{
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: '100%',
+				height: '100%',
+				pointerEvents: 'none',
+				zIndex: 1,
+			}}
+		> */}
+			{/* Top dancing line */}
+			{/* <path
+				d={generateWavePath(lineOffset1, waveAmplitude, waveFrequency, height * 0.1)}
+				stroke="rgba(0, 0, 0, 0.05)"
+				strokeWidth="5"
+				fill="none"
+				strokeLinecap="round"
+			/> */}
+			{/* Middle dancing line */}
+			{/* <path
+				d={generateWavePath(lineOffset2, waveAmplitude * 0.8, waveFrequency * 1.2, height * 0.3)}
+				stroke="rgba(0, 0, 0, 0.05)"
+				strokeWidth="4.5"
+				fill="none"
+				strokeLinecap="round"
+			/> */}
+			{/* Bottom dancing line */}
+			{/* <path
+				d={generateWavePath(lineOffset3, waveAmplitude * 1.2, waveFrequency * 0.8, height * 0.5)}
+				stroke="rgba(0, 0, 0, 0.05)"
+				strokeWidth="4"
+				fill="none"
+				strokeLinecap="round"
+			/> */}
+			{/* Additional subtle lines */}
+			{/* <path
+				d={generateWavePath(lineOffset1 * 0.5, waveAmplitude * 0.6, waveFrequency * 1.5, height * 0.2)}
+				stroke="rgba(0, 0, 0, 0.05)"
+				strokeWidth="3.5"
+				fill="none"
+				strokeLinecap="round"
+			/> */}
+			{/* <path
+				d={generateWavePath(lineOffset2 * 1.5, waveAmplitude * 0.7, waveFrequency * 0.9, height * 0.4)}
+				stroke="rgba(0, 0, 0, 0.05)"
+				strokeWidth="3.5"
+				fill="none"
+				strokeLinecap="round"
+			/> */}
+		{/* </svg> */}
 
 			{/* Current caption display - positioned dynamically based on text length */}
 			{currentCaption && (
@@ -322,14 +322,11 @@ export const ContentVertical: React.FC<ContentVerticalProps> = ({
 						left: '50%',
 						transform: `translate(calc(-50% + ${translateX}px), -50%) scale(${scale})`,
 						transformOrigin: 'center center',
-						color: '#000000',
 						fontSize: calculateCaptionFontSize(currentCaption.text),
 						fontWeight: 'bold',
 						textAlign: 'center',
 						fontFamily: 'dingliesongtypeface',
-						backgroundColor: 'rgba(255, 255, 255, 0.9)',
 						padding: '15px 30px',
-						borderRadius: '8px',
 						whiteSpace: 'pre-line',
 						width: '90%',
 						maxWidth: '90vw',
@@ -341,10 +338,33 @@ export const ContentVertical: React.FC<ContentVerticalProps> = ({
 					{/* Caption text with letter spacing animation for gather effect */}
 					<div
 						style={{
+							position: 'relative',
 							letterSpacing: `${letterSpacing}px`,
 						}}
 					>
-						{currentCaption.text}
+						{/* Background layer - black stroke for border */}
+						<div
+							style={{
+								position: 'absolute',
+								top: 0,
+								left: 0,
+								width: '100%',
+								color: 'transparent',
+								WebkitTextStroke: '6px #000000',
+								paintOrder: 'stroke fill',
+							}}
+						>
+							{currentCaption.text}
+						</div>
+						{/* Foreground layer - white text */}
+						<div
+							style={{
+								position: 'relative',
+								color: '#FFFFFF',
+							}}
+						>
+							{currentCaption.text}
+						</div>
 					</div>
 				</div>
 			)}
