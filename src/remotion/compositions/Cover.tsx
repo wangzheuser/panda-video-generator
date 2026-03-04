@@ -69,41 +69,7 @@ export const Cover: React.FC<CoverProps> = ({ title: _title, contentTitle }) => 
 			}}
 		>
 			{/* Logo and title in top-left corner */}
-			<div
-				style={{
-					position: 'absolute',
-					top: '90px',
-					left: '90px',
-					display: 'flex',
-					alignItems: 'center',
-					gap: '20px',
-					zIndex: 10,
-				}}
-			>
-				{/* Small logo */}
-				<Img
-					src={staticFile('logo/logo.png')}
-					alt="Logo"
-					style={{
-						width: logoSize / 2,
-						height: logoSize / 2,
-						objectFit: 'contain',
-					}}
-				/>
-				{/* Title next to logo */}
-				<h2
-					style={{
-						fontFamily: 'dingliesongtypeface',
-						fontSize: Math.min(width * 0.04, 48) / 2,
-						fontWeight: 'bold',
-						color: '#000000',
-						margin: 0,
-						lineHeight: 1.2,
-					}}
-				>
-					{defaultMyCompProps.title}
-				</h2>
-			</div>
+
 
 			{/* Main content title in center */}
 			{(jsonTitle || contentTitle) && (
@@ -118,23 +84,57 @@ export const Cover: React.FC<CoverProps> = ({ title: _title, contentTitle }) => 
 						maxWidth: '80%',
 					}}
 				>
+					<div
+						style={{
+							marginLeft: 40,
+							display: 'flex',
+							alignItems: 'center',
+							opacity: 0.30,
+						}}
+					>
+						{/* Small logo - grayscale */}
+						<Img
+							src={staticFile('logo/logo.png')}
+							alt="Logo"
+							style={{
+								width: logoSize / 2,
+								height: logoSize / 2,
+								objectFit: 'contain',
+								margin: 8,
+							}}
+						/>
+						{/* Title next to logo */}
+						<h2
+							style={{
+								marginTop: '40px',
+								fontFamily: 'dingliesongtypeface',
+								fontSize: 38,
+								fontWeight: 'bold',
+								margin: 0,
+								lineHeight: 1.2,
+							}}
+						>
+							{defaultMyCompProps.title}
+						</h2>
+					</div>
 					<h1
 						style={{
 							fontFamily: 'dingliesongtypeface',
 							fontSize: 100,
 							fontWeight: 'bold',
-							color: '#000000',
 							margin: 0,
 							padding: '0 40px',
 							wordWrap: 'break-word',
 							overflowWrap: 'break-word',
 							whiteSpace: 'pre-line',
 							lineHeight: 1.2,
-							textShadow: '3px 3px 0 rgba(0, 0, 0, 0.5), -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5)',
+							// textShadow: '3px 3px 0 rgba(0, 0, 0, 0.5), -1px -1px 0 rgba(0, 0, 0, 0.5), 1px -1px 0 rgba(0, 0, 0, 0.5), -1px 1px 0 rgba(0, 0, 0, 0.5)',
 						}}
 					>
 						{jsonTitle || contentTitle}
 					</h1>
+
+
 				</div>
 			)}
 		</AbsoluteFill>

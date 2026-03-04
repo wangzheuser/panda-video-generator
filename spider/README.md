@@ -1,120 +1,208 @@
-# Zhihu Spider
+# Spider & Content Generation Tools
 
-A tool to extract main content from Zhihu question pages.
+This directory contains content scraping and AI generation tools for automated video content creation.
 
-## Installation
+## Available Tools
 
-Install dependencies:
+### 1. Zhihu Question Spider (spider-zhihu.ts)
 
-```bash
-pnpm add openai puppeteer puppeteer-extra puppeteer-extra-plugin-stealth
-pnpm add -D tsx @types/node
-```
+Extract content from Zhihu question pages and generate video scripts.
 
-**Note**: The stealth plugin helps bypass anti-bot detection. The tool includes:
-- Stealth plugin to hide automation indicators
-- Random delays to simulate human behavior
-- Human-like scrolling patterns
-- Realistic browser headers
-
-## Usage
-
-### Using npm script (Recommended)
+**Usage:**
 
 ```bash
-# Extract content from a Zhihu question URL
-pnpm spider <url>
+# Using pnpm command
+pnpm spider:zhihu -- https://www.zhihu.com/question/316150890
 
-# Example
-pnpm spider https://www.zhihu.com/question/1999774552750778199
+# Or run script directly
+sh scripts/spider-zhihu.sh https://www.zhihu.com/question/316150890
 
-# Save as Markdown
-pnpm spider <url> markdown
+# Or use tsx
+tsx spider/spider-zhihu.ts https://www.zhihu.com/question/316150890
 ```
 
-### Using tsx directly
+**Features:**
+- Scrape Zhihu question titles, content, and answers
+- Generate video narration scripts using DeepSeek AI
+- Automatically create TTS input files and title.json
+- Output files saved to `output/tts/` and `output/video/`
+
+### 2. Daily News Generator (news-generator.ts)
+
+Generate daily important news summaries and video scripts using DeepSeek AI.
+
+**Usage:**
 
 ```bash
-# Extract content from a Zhihu question URL
-npx tsx spider/run.ts <url>
+# Generate today's news (recommended)
+pnpm generate:news
 
-# Example
-npx tsx spider/run.ts https://www.zhihu.com/question/1999774552750778199
+# Or use direct command
+pnpm news:generate
 
-# Save as Markdown
-npx tsx spider/run.ts <url> markdown
+# Generate news for specific date
+pnpm generate:news -- 2026-03-02
+pnpm news:generate 2026-03-02
+
+# Run script directly
+sh scripts/generate-news.sh
+sh scripts/generate-news.sh 2026-03-02
+
+# Or use tsx
+tsx spider/news-generator.ts
+tsx spider/news-generator.ts 2026-03-02
 ```
 
-### Output Formats
+**Features:**
+- Automatically fetch current date (or use specified date)
+- Generate 10 important news items using DeepSeek AI
+- Each news item includes 80-120 character description
+- Generate complete video narration script (1600-2000 characters)
+- Automatically create dated video titles
+- Output files:
+  - `output/tts/input.txt` - Video script
+  - `output/video/title.json` - Video title
+  - `output/tts/news-metadata.json` - Metadata
 
-- **JSON** (default): Structured data with question title, content, and answers
-- **Markdown**: Human-readable format with formatted question and answers
+**Output Example:**
 
-### Programmatic Usage
+Generated script format:
+```
+Hello everyone, today is Monday, March 2, 2026, bringing you today's top news.
 
-```typescript
-import { ZhihuSpider } from './spider/spider';
+1. China successfully launched a new-generation manned spacecraft test vehicle...
 
-const spider = new ZhihuSpider();
-await spider.init();
+2. The UN Security Council held an emergency meeting on the Middle East situation...
 
-const data = await spider.extractQuestion('https://www.zhihu.com/question/1999774552750778199');
+...
 
-console.log(data.title);
-console.log(data.content);
-console.log(data.answers);
-
-await spider.close();
+That's all for today's news. Thank you for watching.
 ```
 
-## Output
+## Configuration Requirements
 
-The tool extracts:
-- Question title
-- Question content/description
-- Answers (author, content, vote count)
+### Environment Variables
 
-Output files are saved in the `output/spider/` directory with timestamps:
-- JSON format: `output/spider/output-{timestamp}.json`
-- Markdown format: `output/spider/output-{timestamp}.md`
+Create a `.env.local` file in the project root:
 
-## Video Script Generation
-
-After successfully extracting content, the tool automatically sends the data to DeepSeek AI to generate a video script. The script generation is handled by `caption-generator.ts`.
-
-The generated caption file is saved as `output/tts/input.txt` and is ready to be used directly with the TTS tool.
-
-### Using Caption Generator Separately
-
-You can also use the caption generator independently:
-
-```typescript
-import { generateVideoScript, generateVideoScriptFromFile } from './spider/caption-generator';
-
-// Generate script from data object (saves to output/tts/input.txt by default)
-const scriptPath = await generateVideoScript(zhihuData);
-
-// Or specify custom output directory
-const scriptPath = await generateVideoScript(zhihuData, 'custom/dir');
-
-// Generate script from JSON file
-const scriptPath = await generateVideoScriptFromFile('output/spider/output-2026-01-28T15-35-48.json');
+```env
+DEEPSEEK_API_KEY=your_deepseek_api_key_here
 ```
 
-### Requirements
+### Install Dependencies
 
-- Set `DEEPSEEK_API_KEY` in `.env.local` file
-- The script will be saved as `output/tts/input.txt` (fixed filename for TTS compatibility)
+```bash
+pnpm install
+```
 
-### Complete Workflow
+Key dependencies:
+- `openai` - DeepSeek API client
+- `puppeteer-extra` - Browser automation (Zhihu spider)
+- `puppeteer-extra-plugin-stealth` - Anti-detection
 
-1. **Extract content from Zhihu**: `pnpm spider <url>`
-   - Extracts question and answers
-   - Automatically generates video script using DeepSeek AI
-   - Saves caption to `output/tts/input.txt`
+## Workflow
 
-2. **Generate audio with TTS**: `python tts/tts.py output/tts/input.txt output/tts`
-   - Reads from `output/tts/input.txt`
-   - Generates `audio.mp3` and `audio.vtt` files in `output/tts/`
+### Complete Video Generation Flow
 
-3. **Use in Remotion video**: The generated audio and VTT files can be used directly in your Remotion composition.
+1. **Generate Content Script**
+   ```bash
+   # Choose one:
+   pnpm generate:news              # News
+   pnpm spider:zhihu -- <url>      # Zhihu
+   ```
+
+2. **Generate Video**
+   ```bash
+   pnpm render:video
+   ```
+
+3. **Upload to Platforms** (Optional)
+   ```bash
+   pnpm test:upload:bilibili
+   pnpm test:upload:douyin
+   # etc...
+   ```
+
+## Output File Structure
+
+```
+output/
+├── tts/
+│   ├── input.txt              # Video script (for TTS)
+│   ├── audio.mp3              # Generated audio (TTS output)
+│   ├── audio.vtt              # Subtitle file (TTS output)
+│   └── news-metadata.json     # News metadata (news generator only)
+├── video/
+│   ├── title.json             # Video title
+│   ├── video.mp4              # Final video (render output)
+│   └── cover.jpg              # Video cover (render output)
+└── spider/
+    └── output-*.json          # Raw scraped data (Zhihu spider)
+```
+
+## Core Files
+
+- `spider.ts` - ZhihuSpider class definition
+- `spider-zhihu.ts` - Zhihu spider main program
+- `news-generator.ts` - Daily news generator main program
+- `caption-generator.ts` - DeepSeek video script generator (used by Zhihu)
+
+## Tech Stack
+
+- **Node.js/TypeScript** - Runtime and language
+- **Puppeteer** - Web scraping
+- **DeepSeek API** - AI content generation
+- **Remotion** - Video rendering engine
+
+## Notes
+
+1. **API Key Security**: Do not commit `.env.local` to version control
+2. **Scraping Etiquette**: Zhihu spider includes random delays to simulate human behavior
+3. **Content Review**: Generated content may require manual review
+4. **Date Format**: News generator uses YYYY-MM-DD format (e.g., 2026-03-02)
+5. **Network Requirements**: Stable internet connection required for DeepSeek API
+
+## Troubleshooting
+
+### DeepSeek API Error
+
+```bash
+❌ Error: DEEPSEEK_API_KEY is not set
+```
+
+**Solution**: Set `DEEPSEEK_API_KEY` in `.env.local`
+
+### Zhihu Spider Failure
+
+```bash
+❌ Error: Failed to extract content
+```
+
+**Possible Causes**:
+- Network connection issues
+- Zhihu page structure changes
+- Anti-scraping detection
+
+**Solutions**: 
+- Check debug files: `output/spider/debug-*.png` and `debug-*.html`
+- Increase delay times
+- Update selectors
+
+## Development & Extension
+
+### Adding New Content Sources
+
+Follow the implementation patterns in `spider-zhihu.ts` and `news-generator.ts`:
+
+1. Create new spider/generator file
+2. Use DeepSeek API to generate scripts
+3. Output to standard path (`output/tts/input.txt`)
+4. Add commands to `package.json`
+
+### Customizing Prompts
+
+Edit the `userPrompt` variable in the respective files to adjust AI-generated content style.
+
+## License
+
+See LICENSE file in project root.
