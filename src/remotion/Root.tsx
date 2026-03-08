@@ -1,5 +1,6 @@
 import React from "react";
-import { Composition, Still } from "remotion";
+import { Composition, Still, getStaticFiles, staticFile } from "remotion";
+import { getAudioDurationInSeconds } from "@remotion/media-utils";
 import { Intro } from "./compositions/Intro";
 import { IntroVertical } from "./compositions/IntroVertical";
 import {
@@ -16,7 +17,13 @@ import { ContentVertical } from "./compositions/ContentVertical";
 import { Video } from "./compositions/Video";
 import { VideoVertical } from "./compositions/VideoVertical";
 import { Cover, CoverProps } from "./compositions/Cover";
-import { staticFile } from "remotion";
+import {
+  AudioConcat,
+  filterAudioFilesFromFolder,
+  buildTrackList,
+  type AudioTrackItem,
+} from "./compositions/AudioConcat";
+import { SingleTrack } from "./compositions/SingleTrack";
 
 // Parse VTT file to get the last caption's end time (duration)
 async function getAudioDurationFromVtt(vttFile: string): Promise<number> {
@@ -209,6 +216,104 @@ export const RemotionRoot: React.FC = () => {
           title: defaultMyCompProps.title,
           contentTitle: "这里是实际内容的标题",
         } as CoverProps}
+      />
+      {/* Audio concat: all audio files from a folder, each with solid bg + track name */}
+      <Composition
+        id="AudioConcat"
+        component={AudioConcat}
+        calculateMetadata={async ({
+          props,
+        }: {
+          props: { audioFolder?: string; tracks?: AudioTrackItem[] };
+        }) => {
+          if (props.tracks && props.tracks.length > 0) {
+            const totalSeconds = props.tracks.reduce(
+              (s, t) => s + t.durationInSeconds,
+              0
+            );
+            return {
+              durationInFrames: Math.ceil(totalSeconds * VIDEO_FPS),
+              fps: VIDEO_FPS,
+              width: VIDEO_WIDTH,
+              height: VIDEO_HEIGHT,
+              props: { tracks: props.tracks },
+            };
+          }
+          const folder = props.audioFolder ?? "audio";
+          const staticFiles = getStaticFiles();
+          const audioFiles = filterAudioFilesFromFolder(staticFiles, folder);
+          const FALLBACK_DURATION_SEC = 30;
+          const durations = await Promise.all(
+            audioFiles.map((f) =>
+              getAudioDurationInSeconds(staticFile(f.name)).catch(() => {
+                console.warn(
+                  `Could not get duration for ${f.name}, using ${FALLBACK_DURATION_SEC}s`
+                );
+                return FALLBACK_DURATION_SEC;
+              })
+            )
+          );
+          const tracks = buildTrackList(audioFiles, durations);
+          const totalSeconds = tracks.reduce(
+            (s, t) => s + t.durationInSeconds,
+            0
+          );
+          return {
+            durationInFrames: Math.ceil(totalSeconds * VIDEO_FPS),
+            fps: VIDEO_FPS,
+            width: VIDEO_WIDTH,
+            height: VIDEO_HEIGHT,
+            props: { tracks },
+          };
+        }}
+        fps={VIDEO_FPS}
+        width={VIDEO_WIDTH}
+        height={VIDEO_HEIGHT}
+        defaultProps={{
+          audioFolder: "album",
+          tracks: [],
+        }}
+      />
+      {/* Single track: one video per track, path from env → sh passes via --props */}
+      <Composition
+        id="SingleTrack"
+        component={SingleTrack as React.FC<Record<string, unknown>>}
+        calculateMetadata={async ({
+          props,
+        }: {
+          props: { audioPath?: string; backgroundColor?: string };
+        }) => {
+          const path = props.audioPath ?? "";
+          const FALLBACK_DURATION_SEC = 30;
+          let durationInSeconds = FALLBACK_DURATION_SEC;
+          if (path) {
+            try {
+              durationInSeconds = await getAudioDurationInSeconds(
+                staticFile(path)
+              );
+            } catch {
+              console.warn(
+                `Could not get duration for ${path}, using ${FALLBACK_DURATION_SEC}s`
+              );
+            }
+          }
+          return {
+            durationInFrames: Math.ceil(durationInSeconds * VIDEO_FPS),
+            fps: VIDEO_FPS,
+            width: VIDEO_WIDTH,
+            height: VIDEO_HEIGHT,
+            props: {
+              audioPath: path,
+              backgroundColor: props.backgroundColor,
+            },
+          };
+        }}
+        fps={VIDEO_FPS}
+        width={VIDEO_WIDTH}
+        height={VIDEO_HEIGHT}
+        defaultProps={{
+          audioPath: "",
+        }}
       />
     </>
   );

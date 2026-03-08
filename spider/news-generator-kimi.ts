@@ -25,6 +25,8 @@ interface KimiMessage {
     function: { name: string; arguments?: string };
   }>;
   tool_call_id?: string;
+  /** Required in tool role for API to match tool_calls (e.g. $web_search) */
+  name?: string;
 }
 
 interface KimiChoice {
@@ -185,15 +187,22 @@ export async function generateDailyNewsKimi(
         content: msg.content ?? '',
         tool_calls: msg.tool_calls,
       });
-      // Append placeholder tool result for each tool_call (API may accept and continue)
+      // For $web_search: pass arguments back as-is so Moonshot server performs real search.
+      // See https://platform.moonshot.ai/docs/guide/use-web-search
       for (const tc of msg.tool_calls) {
+        const name = tc.function?.name ?? '';
+        const args = tc.function?.arguments;
+        const content =
+          name === '$web_search' && typeof args === 'string' && args.trim()
+            ? args
+            : typeof args === 'string'
+              ? args
+              : JSON.stringify(args ?? {});
         messages.push({
           role: 'tool',
-          content: JSON.stringify({
-            search_result: { search_id: 'placeholder' },
-            usage: { total_tokens: 0 },
-          }),
           tool_call_id: tc.id,
+          name,
+          content,
         });
       }
       continue;
