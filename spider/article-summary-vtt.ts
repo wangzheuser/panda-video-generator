@@ -2,8 +2,9 @@
 
 /**
  * Article Page Spider & Video Script + VTT
- * Fetches a single article page, extracts content, generates video script (like caption-generator)
- * with intro + content + ending, saves to output/tts/ for later TTS and video generation.
+ * Fetches a single article page (or reads local markdown file), extracts content,
+ * generates video script (like caption-generator) with intro + content + ending,
+ * saves to output/tts/ for later TTS and video generation.
  *
  * Outputs:
  *   - output/tts/input.txt      (video script for TTS)
@@ -12,13 +13,14 @@
  *
  * Usage:
  *   pnpm spider:article-vtt -- https://thehackernews.com/2026/03/transparent-tribe-uses-ai-to-mass.html
+ *   pnpm spider:article-vtt -- /path/to/article.md
  */
 
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import type { Page } from 'puppeteer';
 import OpenAI from 'openai';
-import { readFileSync } from 'fs';
+import { readFileSync, existsSync } from 'fs';
 import { resolve } from 'path';
 import { promises as fs } from 'fs';
 import { OUTPUT_DIRS, TTS_PATHS, VIDEO_PATHS, PUBLIC_DIRS } from '../types/paths';
@@ -93,7 +95,7 @@ async function generateVideoScript(
   title: string,
   body: string
 ): Promise<string> {
-  const userPrompt = `请根据以下英文文章内容，整理并生成一段完整的视频台词。
+  const userPrompt = `请根据以下文章内容，整理并生成一段完整的视频台词。
 
 文章标题：
 ${title}
@@ -158,6 +160,96 @@ function scriptToVtt(scriptText: string): string {
   return lines.join('\n');
 }
 
+/**
+ * Parse markdown file: first # line as title, rest as body.
+ */
+function parseMarkdownFile(filePath: string): { title: string; body: string } {
+  const content = readFileSync(resolve(filePath), 'utf-8');
+  const lines = content.split('\n');
+  let title = '';
+  const bodyLines: string[] = [];
+  let foundTitle = false;
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!foundTitle && trimmed.startsWith('# ')) {
+      title = trimmed.replace(/^#+\s*/, '').trim();
+      foundTitle = true;
+    } else {
+      bodyLines.push(line);
+    }
+  }
+  const body = bodyLines.join('\n').trim();
+  if (!title) title = filePath.split('/').pop()?.replace(/\.md$/, '') || '文章';
+  return { title, body: body || content };
+}
+
+/**
+ * Run DeepSeek summarization from local markdown file (no spider).
+ */
+async function runFromFile(filePath: string): Promise<string> {
+  loadApiKey();
+  const apiKey = process.env.DEEPSEEK_API_KEY;
+  if (!apiKey) {
+    throw new Error('DEEPSEEK_API_KEY is not set. Set it in .env.local or environment.');
+  }
+  const absPath = resolve(filePath);
+  if (!existsSync(absPath)) {
+    throw new Error(`File not found: ${absPath}`);
+  }
+  const { title, body } = parseMarkdownFile(absPath);
+  if (!body || body.length < 50) {
+    throw new Error('Could not extract enough content from file.');
+  }
+  console.log('Reading file:', absPath);
+  console.log('Title:', title.slice(0, 80) + (title.length > 80 ? '...' : ''));
+  console.log('Body length:', body.length, 'chars');
+
+  const openai = new OpenAI({
+    baseURL: 'https://api.deepseek.com',
+    apiKey,
+  });
+  console.log('Generating video script with DeepSeek (intro + content + ending)...');
+  const scriptText = await generateVideoScript(openai, title, body);
+
+  const ttsDir = resolve(process.cwd(), OUTPUT_DIRS.TTS);
+  await fs.mkdir(ttsDir, { recursive: true });
+
+  const scriptPath = resolve(process.cwd(), TTS_PATHS.INPUT);
+  await fs.writeFile(scriptPath, scriptText, 'utf-8');
+  console.log('Script saved:', scriptPath);
+
+  const vttContent = scriptToVtt(scriptText);
+  const vttPath = resolve(process.cwd(), TTS_PATHS.AUDIO_VTT);
+  await fs.writeFile(vttPath, vttContent, 'utf-8');
+  console.log('VTT saved:', vttPath);
+
+  if (title) {
+    const titleJsonPath = resolve(process.cwd(), VIDEO_PATHS.TITLE_JSON);
+    const publicTitleJsonPath = resolve(process.cwd(), VIDEO_PATHS.PUBLIC_TITLE_JSON);
+    const videoTitle = title.length > 80 ? title.slice(0, 77) + '...' : title;
+    try {
+      await fs.mkdir(resolve(process.cwd(), OUTPUT_DIRS.VIDEO), { recursive: true });
+      await fs.writeFile(
+        titleJsonPath,
+        JSON.stringify({ title: videoTitle }, null, 2),
+        'utf-8'
+      );
+      console.log('Title JSON saved:', titleJsonPath);
+      await fs.mkdir(resolve(process.cwd(), PUBLIC_DIRS.VIDEO), { recursive: true });
+      await fs.writeFile(
+        publicTitleJsonPath,
+        JSON.stringify({ title: videoTitle }, null, 2),
+        'utf-8'
+      );
+      console.log('Title JSON copied to:', publicTitleJsonPath);
+    } catch (e) {
+      console.warn('Failed to write title.json:', e);
+    }
+  }
+
+  console.log('Next: run TTS (e.g. pnpm render:video) to generate audio and final video.');
+  return vttPath;
+}
 
 export async function runArticleSummaryVtt(articleUrl: string): Promise<string> {
   loadApiKey();
@@ -248,11 +340,18 @@ export async function runArticleSummaryVtt(articleUrl: string): Promise<string> 
 
 async function main() {
   const defaultUrl = 'https://thehackernews.com/2026/03/transparent-tribe-uses-ai-to-mass.html';
-  const url = process.argv.slice(2).find((a) => a.startsWith('http')) || defaultUrl;
+  const arg = process.argv.slice(2)[0];
+  const filePath = arg && !arg.startsWith('http') && existsSync(resolve(arg)) ? resolve(arg) : null;
+  const input = filePath || process.argv.slice(2).find((a) => a.startsWith('http')) || defaultUrl;
+
   console.log('Article Summary to VTT');
-  console.log('URL:', url);
+  console.log(filePath ? 'File:' : 'URL:', input);
   try {
-    await runArticleSummaryVtt(url);
+    if (filePath) {
+      await runFromFile(filePath);
+    } else {
+      await runArticleSummaryVtt(input);
+    }
   } catch (e) {
     console.error('Error:', e);
     process.exit(1);

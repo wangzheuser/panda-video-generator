@@ -167,6 +167,14 @@ if [ -f "output/video/title.json" ]; then
     # Props file will be cleaned up after cover generation
 fi
 
+# Random BGM index (0-13) for Content composition, passed via env (public/bgm/0.mp3..13.mp3)
+BGM_INDEX=$((RANDOM % 14))
+export REMOTION_BGM_INDEX=$BGM_INDEX
+# Random background video index (0-3) for Video composition, passed via env (public/video/0.mp4..3.mp4)
+BG_VIDEO_INDEX=$((RANDOM % 4))
+export REMOTION_BG_VIDEO_INDEX=$BG_VIDEO_INDEX
+echo -e "${BLUE}🎵 BGM index: $BGM_INDEX (bgm/$BGM_INDEX.mp3) | 🎬 BG video: $BG_VIDEO_INDEX (video/$BG_VIDEO_INDEX.mp4)${NC}"
+
 # Render video with H.264 codec (default audio is AAC for H.264)
 # Format: MP4/H.264, audio AAC, CRF 23 for quality
 RENDER_OPTS="--codec=h264 --crf=23"
