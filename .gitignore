@@ -40,7 +40,9 @@ build
 
 # video output files
 output/video/
+output/tts/
 public/video/
+public/bgm/
 
 # cursor
 .cursor/skills
@@ -54,7 +56,10 @@ public/tts/audio.mp3
 public/tts/audio.vtt
 .pnpm-store/
 public/tts/*
+# Sound effects used by Remotion compositions (Intro, Video logo)
 public/audio/*
+!public/audio/intro.mp3
+!public/audio/intro_typewriter.mp3
 public/image/*
 
 # spider output files
@@ -72,3 +77,6 @@ spider/tmp/
 output/tts/*.mp3
 output/tts/*.vtt
 spider/rss-seen-guids.json
+
+# local archive (moved from working tree, not deleted)
+/del/
