@@ -62,7 +62,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "bash scripts/setup-python.sh",
+    "postinstall": "bash scripts/setup-python.sh && playwright install chromium",
     "remotion": "remotion studio",
     "render": "remotion render",
     "tts": "sh scripts/tts.sh",
@@ -78,6 +78,19 @@
     "hn:spider": "tsx spider/hn-spider/hn.ts --spider-only",
     "hn:weixin-digest": "tsx spider/hn-spider/hn.ts --digest",
     "hn:weixin-prep": "sh scripts/hn-weixin-prepare.sh",
-    "upload-all": "playwright test automations/**/upload-video.spec.ts --project=chromium"
+    "login:bilibili": "playwright test automations/Bilibili/login-bilibili.spec.ts --project=chromium --headed",
+    "login:douyin": "playwright test automations/Douyin/login-douyin.spec.ts --project=chromium --headed",
+    "login:kuaishou": "playwright test automations/Kuaishou/login-kuaishou.spec.ts --project=chromium --headed",
+    "login:rednote": "playwright test automations/RedNote/login-rednote.spec.ts --project=chromium --headed",
+    "login:weixin-mp": "playwright test automations/WeixinMp/login-weixin-mp.spec.ts --project=chromium --headed",
+    "login:weixin-video": "playwright test automations/WeixinVideo/login-weixin-video.spec.ts --project=chromium --headed",
+    "login:youtube": "playwright test automations/YouTube/login-youtube.spec.ts --project=chromium --headed",
+    "upload:bilibili": "playwright test automations/Bilibili/upload-video.spec.ts --project=chromium --headed",
+    "upload:douyin": "playwright test automations/Douyin/upload-video.spec.ts --project=chromium --headed",
+    "upload:kuaishou": "playwright test automations/Kuaishou/upload-video.spec.ts --project=chromium --headed",
+    "upload:rednote": "playwright test automations/RedNote/upload-video.spec.ts --project=chromium --headed",
+    "upload:weixin-video": "playwright test automations/WeixinVideo/upload-weixin-video.spec.ts --project=chromium --headed",
+    "upload:youtube": "playwright test automations/YouTube/upload-video.spec.ts --project=chromium --headed",
+    "upload:all": "playwright test automations/Bilibili/upload-video.spec.ts automations/Douyin/upload-video.spec.ts automations/YouTube/upload-video.spec.ts automations/RedNote/upload-video.spec.ts automations/Kuaishou/upload-video.spec.ts automations/WeixinVideo/upload-weixin-video.spec.ts --project=chromium --headed"
   }
 }
