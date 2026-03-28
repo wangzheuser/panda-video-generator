@@ -1,0 +1,11 @@
+{
+  "name": "@panda-video-generator/caption-generator",
+  "version": "1.0.0",
+  "private": true,
+  "exports": {
+    ".": "./caption-generator.ts"
+  },
+  "dependencies": {
+    "openai": "^4.104.0"
+  }
+}

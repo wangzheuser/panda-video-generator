@@ -2,7 +2,7 @@ import OpenAI from 'openai';
 import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { promises as fs } from 'fs';
-import { OUTPUT_DIRS, TTS_PATHS } from '../types/paths';
+import { OUTPUT_DIRS, TTS_PATHS } from '../../types/paths';
 
 /** Crawled or structured content for video script (Zhihu, generic article, etc.). */
 export type VideoScriptSourcePayload = {
@@ -16,7 +16,7 @@ export type VideoScriptSourcePayload = {
 };
 
 function normalizePayload(
-  data: VideoScriptSourcePayload & { sourceUrl?: string;[key: string]: unknown },
+  data: VideoScriptSourcePayload & { sourceUrl?: string },
 ): VideoScriptSourcePayload {
   return {
     title: data.title,
@@ -45,14 +45,12 @@ function loadApiKey(): void {
 }
 
 /**
- * Generate video script from crawled content using DeepSeek (any source that matches the payload shape).
- * @param data - Title, body in `content`, optional `answers` (e.g. Zhihu). Extra fields like `sourceUrl` are ignored for the prompt.
+ * Call DeepSeek and return the video script text only (no file I/O).
+ * Use when you need the string for further steps (e.g. WebVTT) before or instead of writing input.txt.
  */
-export async function generateVideoScript(
-  data: VideoScriptSourcePayload & { sourceUrl?: string;[key: string]: unknown },
-  outputDir: string = OUTPUT_DIRS.TTS
+export async function generateVideoScriptText(
+  data: VideoScriptSourcePayload & { sourceUrl?: string },
 ): Promise<string | null> {
-  // Load API key
   loadApiKey();
 
   const payload = normalizePayload(data);
@@ -103,32 +101,11 @@ ${contentForDeepSeek}
       ],
     });
 
-    const scriptText = completion.choices[0]?.message?.content;
-
+    const scriptText = completion.choices[0]?.message?.content?.trim();
     if (!scriptText) {
-      console.warn('\n⚠️  No text content in DeepSeek response');
       return null;
     }
-
-    // Use fixed filename for TTS compatibility
-    const scriptPath = outputDir === OUTPUT_DIRS.TTS
-      ? TTS_PATHS.INPUT
-      : `${outputDir}/input.txt`;
-
-    // Ensure output directory exists
-    try {
-      await fs.access(outputDir);
-    } catch {
-      await fs.mkdir(outputDir, { recursive: true });
-    }
-
-    // Save script to file
-    await fs.writeFile(scriptPath, scriptText, 'utf-8');
-    console.log(`\n✅ Video script generated and saved to: ${scriptPath}`);
-    console.log('\n--- Generated Script Preview ---');
-    console.log(scriptText.substring(0, 500) + (scriptText.length > 500 ? '...' : ''));
-
-    return scriptPath;
+    return scriptText;
   } catch (error) {
     console.error('\n❌ Error generating video script with DeepSeek:', error);
     if (error instanceof Error && (error.message.includes('API key') || error.message.includes('DEEPSEEK_API_KEY'))) {
@@ -136,6 +113,39 @@ ${contentForDeepSeek}
     }
     throw error;
   }
+}
+
+/**
+ * Generate video script from crawled content using DeepSeek (any source that matches the payload shape).
+ * @param data - Title, body in `content`, optional `answers` (e.g. Zhihu). Extra fields like `sourceUrl` are ignored for the prompt.
+ */
+export async function generateVideoScript(
+  data: VideoScriptSourcePayload & { sourceUrl?: string },
+  outputDir: string = OUTPUT_DIRS.TTS
+): Promise<string | null> {
+  const scriptText = await generateVideoScriptText(data);
+
+  if (!scriptText) {
+    console.warn('\n⚠️  No text content in DeepSeek response');
+    return null;
+  }
+
+  const scriptPath = outputDir === OUTPUT_DIRS.TTS
+    ? TTS_PATHS.INPUT
+    : `${outputDir}/input.txt`;
+
+  try {
+    await fs.access(outputDir);
+  } catch {
+    await fs.mkdir(outputDir, { recursive: true });
+  }
+
+  await fs.writeFile(scriptPath, scriptText, 'utf-8');
+  console.log(`\n✅ Video script generated and saved to: ${scriptPath}`);
+  console.log('\n--- Generated Script Preview ---');
+  console.log(scriptText.substring(0, 500) + (scriptText.length > 500 ? '...' : ''));
+
+  return scriptPath;
 }
 
 /**
@@ -149,7 +159,6 @@ export async function generateVideoScriptFromFile(
     const fileContent = await fs.readFile(jsonFilePath, 'utf-8');
     const raw = JSON.parse(fileContent) as VideoScriptSourcePayload & {
       sourceUrl?: string;
-      [key: string]: unknown;
     };
     return await generateVideoScript(raw, outputDir);
   } catch (error) {

@@ -1,16 +1,16 @@
 #!/usr/bin/env node
 
 /**
- * Zhihu Spider Runner
- * Extracts content from Zhihu question and generates video script
- * Usage: tsx spider/spider-zhihu.ts <zhihu_url>
+ * CLI: strict Zhihu question URL → crawl JSON + monorepo video inputs (TTS script, title.json, etc.).
+ * Usage: tsx packages/spider/zhihu/cli-zhihu-video-prep.ts <zhihu_url>
  */
 
-import { ZhihuSpider } from './spider';
-import { generateVideoScript } from './caption-generator';
+import { ZhihuSpider } from './zhihu-question-spider';
+import { generateVideoScript } from '@panda-video-generator/caption-generator';
+import { flattenCrawledToSpiderJson } from '../extract-json';
 import { promises as fs } from 'fs';
 import { resolve } from 'path';
-import { OUTPUT_DIRS, TTS_PATHS, VIDEO_PATHS, SPIDER_PATHS, PUBLIC_DIRS } from '../types/paths';
+import { OUTPUT_DIRS, TTS_PATHS, VIDEO_PATHS, SPIDER_PATHS, PUBLIC_DIRS } from '../../../types/paths';
 
 async function main() {
   const url = process.argv[2];
@@ -18,8 +18,8 @@ async function main() {
   // Validate URL
   if (!url) {
     console.error('❌ Error: Please provide a Zhihu question URL');
-    console.error('Usage: tsx spider/spider-zhihu.ts <zhihu_url>');
-    console.error('Example: tsx spider/spider-zhihu.ts https://www.zhihu.com/question/316150890');
+    console.error('Usage: tsx packages/spider/zhihu/cli-zhihu-video-prep.ts <zhihu_url>');
+    console.error('Example: tsx packages/spider/zhihu/cli-zhihu-video-prep.ts https://www.zhihu.com/question/316150890');
     process.exit(1);
   }
 
@@ -48,7 +48,13 @@ async function main() {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
     await fs.mkdir(SPIDER_PATHS.OUTPUT_DIR, { recursive: true });
     const outputPath = `${SPIDER_PATHS.OUTPUT_DIR}/output-${timestamp}.json`;
-    await spider.saveToFile(data, outputPath);
+    const spiderJson = flattenCrawledToSpiderJson({
+      title: data.title,
+      content: data.content,
+      answers: data.answers,
+    });
+    await fs.writeFile(outputPath, JSON.stringify(spiderJson, null, 2), 'utf-8');
+    console.log(`Content saved to: ${outputPath}`);
 
     console.log('\n✅ Extraction completed successfully!');
 

@@ -1,7 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
+node_modules/
 /.pnp
 .pnp.js
 
@@ -64,7 +64,7 @@ public/image/*
 
 # spider output files
 output/spider/
-spider/tmp/
+packages/spider/tmp/
 
 # playwright
 /test-results/
@@ -76,7 +76,6 @@ spider/tmp/
 /input
 output/tts/*.mp3
 output/tts/*.vtt
-spider/rss-seen-guids.json
 
 # local archive (moved from working tree, not deleted)
 /del/

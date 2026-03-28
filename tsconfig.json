@@ -23,7 +23,13 @@
         "name": "next"
       }
     ],
-    "incremental": true
+    "incremental": true,
+    "baseUrl": ".",
+    "paths": {
+      "@panda-video-generator/caption-generator": [
+        "./packages/caption-generator/caption-generator.ts"
+      ]
+    }
   },
   "include": [
     "next-env.d.ts",
@@ -31,8 +37,7 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "remotion/webpack-override.mjs",
-    ".next/dev/types/**/*.ts",
-    "spider/caption-generator.ts.bk"
+    ".next/dev/types/**/*.ts"
   ],
   "exclude": [
     "node_modules",

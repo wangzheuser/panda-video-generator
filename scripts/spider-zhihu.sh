@@ -35,7 +35,7 @@ echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Run spider directly with tsx
-if ! pnpm exec tsx spider/spider-zhihu.ts "$ZHIHU_URL"; then
+if ! pnpm exec tsx packages/spider/zhihu/cli-zhihu-video-prep.ts "$ZHIHU_URL"; then
     echo -e "${RED}❌ Failed to extract content from Zhihu${NC}"
     exit 1
 fi

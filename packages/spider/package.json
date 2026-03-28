@@ -1,0 +1,11 @@
+{
+  "name": "@panda-video-generator/spider",
+  "version": "1.0.0",
+  "private": true,
+  "dependencies": {
+    "@panda-video-generator/caption-generator": "workspace:*",
+    "puppeteer": "^24.36.1",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  }
+}

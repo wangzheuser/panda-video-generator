@@ -8,6 +8,7 @@
     "url": "https://github.com/szhshp"
   },
   "dependencies": {
+    "@panda-video-generator/spider": "workspace:*",
     "@google/genai": "^1.38.0",
     "@remotion/bundler": "4.0.409",
     "@remotion/cli": "4.0.409",
@@ -22,14 +23,9 @@
     "clsx": "2.1.1",
     "lucide-react": "^0.563.0",
     "next": "16.0.10",
-    "openai": "^4.104.0",
-    "puppeteer": "^24.36.1",
-    "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.409",
-    "rss-parser": "^3.13.0",
     "tailwind-merge": "3.0.1",
     "zod": "3.22.3"
   },
@@ -70,9 +66,7 @@
     "render:all": "sh scripts/render-video.sh",
     "remotion:deploy": "node deploy.mjs",
     "spider:zhihu": "sh scripts/spider-zhihu.sh",
-    "spider:generic": "tsx spider/generic-page-spider.ts",
-    "spider:rss": "tsx spider/rss-title-translator.ts",
-    "spider:article-vtt": "tsx spider/article-summary-vtt.ts",
+    "spider:extract": "tsx packages/spider/cli-extract-json.ts",
     "video:zhihu": "sh scripts/generate-video.sh",
     "login:bilibili": "playwright test automations/Bilibili/login-bilibili.spec.ts --project=chromium --headed",
     "login:douyin": "playwright test automations/Douyin/login-douyin.spec.ts --project=chromium --headed",

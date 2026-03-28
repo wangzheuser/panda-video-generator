@@ -1,21 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Generic page spider: extracts main text for any HTTP(S) URL.
- * For zhihu.com question pages, uses Zhihu-oriented DOM logic (drop-in for ZhihuSpider extract step).
- * Output shape matches caption-generator / downstream pipeline (title, content, answers).
- *
- * Usage (CLI, crawl only — no DeepSeek):
- *   tsx spider/generic-page-spider.ts <url>
- *   pnpm spider:generic -- <url>
+ * Internal browser spider: Zhihu question pages vs generic article hosts.
+ * Public spider contract is `{ title, content }` JSON via `cli-extract-json` (Zhihu + .md only).
  */
 
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import type { Browser, Page } from 'puppeteer';
 import { promises as fs } from 'fs';
-import { resolve } from 'path';
-import { SPIDER_PATHS } from '../types/paths';
+import { SPIDER_PATHS } from '../../types/paths';
 
 puppeteer.use(StealthPlugin());
 
@@ -385,41 +379,6 @@ export function toCaptionGeneratorInput(payload: CrawledPagePayload): {
 } {
   const { title, content, answers } = payload;
   return { title, content, answers };
-}
-
-async function main(): Promise<void> {
-  const args = process.argv.slice(2);
-  if (args[0] === '--') args.shift();
-  const url = args[0];
-  if (!url || url.startsWith('-')) {
-    console.error('Usage: tsx spider/generic-page-spider.ts <url>');
-    console.error('Example: pnpm spider:generic -- https://example.com/page');
-    process.exit(1);
-  }
-
-  const spider = new GenericPageSpider();
-  try {
-    await spider.init();
-    console.log(`Extracting: ${url}`);
-    const data = await spider.extractPage(url);
-    console.log(`Title: ${data.title.slice(0, 120)}${data.title.length > 120 ? '…' : ''}`);
-    console.log(`Content length: ${data.content.length}, answers: ${data.answers.length}`);
-
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-    await fs.mkdir(SPIDER_PATHS.OUTPUT_DIR, { recursive: true });
-    const outPath = resolve(process.cwd(), `${SPIDER_PATHS.OUTPUT_DIR}/generic-output-${timestamp}.json`);
-    await spider.saveToFile(data, outPath);
-    console.log('\nNext: pass JSON to caption-generator or your own pipeline.');
-  } catch (e) {
-    console.error(e);
-    process.exit(1);
-  } finally {
-    await spider.close();
-  }
-}
-
-if (require.main === module) {
-  main();
 }
 
 export default GenericPageSpider;
