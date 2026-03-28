@@ -2,6 +2,9 @@
   "name": "@panda-video-generator/spider",
   "version": "1.0.0",
   "private": true,
+  "exports": {
+    "./paths": "./paths.ts"
+  },
   "dependencies": {
     "@panda-video-generator/caption-generator": "workspace:*",
     "puppeteer": "^24.36.1",

@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Remotion render + cover only. Requires existing output/tts/audio.mp3 & audio.vtt (run scripts/tts.sh first).
+# Remotion render + cover only. Requires TTS outputs (run scripts/tts.sh first).
+# Syncs output/* → public/* via scripts/sync-outputs-to-public.sh (--require-tts).
 # Usage: ./scripts/render-video-only.sh (from repo root)
 
 set -e
@@ -11,49 +12,43 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+TTS_OUTPUT_DIR="${TTS_OUTPUT_DIR:-output/tts}"
+TTS_PUBLIC_DIR="${TTS_PUBLIC_DIR:-public/tts}"
+SPIDER_OUTPUT_DIR="${SPIDER_OUTPUT_DIR:-output/spider}"
+VIDEO_PUBLIC_DIR="${VIDEO_PUBLIC_DIR:-public/video}"
+
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "${BLUE}🎬 Remotion video + cover${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-if [ ! -f "output/tts/audio.mp3" ] || [ ! -f "output/tts/audio.vtt" ]; then
-    echo -e "${RED}❌ Missing output/tts/audio.mp3 or audio.vtt — run: pnpm tts${NC}"
-    exit 1
-fi
-
-mkdir -p public/tts
-rm -f public/tts/audio.mp3 public/tts/audio.vtt
-cp output/tts/audio.mp3 public/tts/audio.mp3
-cp output/tts/audio.vtt public/tts/audio.vtt
-echo -e "${GREEN}✅ TTS assets synced to public/tts/${NC}"
+bash "$SCRIPT_DIR/sync-outputs-to-public.sh" --require-tts
 echo ""
 
 OUTPUT_FILE="output/video/video.mp4"
 mkdir -p output/video
 
-if [ -f "output/video/title.json" ]; then
-    mkdir -p public/video
-    rm -f "public/video/title.json"
-    cp "output/video/title.json" "public/video/title.json"
-    echo -e "${BLUE}📋 Title JSON → public/video/title.json${NC}"
-    echo -e "${BLUE}   Title: $(node -e "const fs=require('fs'); const d=JSON.parse(fs.readFileSync('output/video/title.json','utf8')); console.log(d.title)")${NC}"
-else
-    echo -e "${YELLOW}⚠️  output/video/title.json not found, using default title${NC}"
-fi
-
+TITLE_PUBLIC="$VIDEO_PUBLIC_DIR/title.json"
 PROPS_FILE=""
-if [ -f "output/video/title.json" ]; then
+if [ -f "$TITLE_PUBLIC" ]; then
     PROPS_FILE="output/video/render-props.json"
-    node -e "
+    TitlePath="$TITLE_PUBLIC" node -e "
         const fs = require('fs');
+        const p = process.env.TitlePath;
         try {
-            const data = JSON.parse(fs.readFileSync('output/video/title.json', 'utf8'));
+            const data = JSON.parse(fs.readFileSync(p, 'utf8'));
             if (data.title) {
                 const props = JSON.stringify({ title: data.title }, null, 2);
-                fs.writeFileSync('$PROPS_FILE', props, 'utf8');
+                fs.writeFileSync('output/video/render-props.json', props, 'utf8');
             }
         } catch (e) {}
     "
+else
+    echo -e "${YELLOW}⚠️  No $TITLE_PUBLIC — using default title for render${NC}"
 fi
 
 BGM_INDEX=$((RANDOM % 14))

@@ -1,7 +1,13 @@
 #!/bin/bash
 
-# TTS only: output/tts/input.txt -> audio.mp3 + audio.vtt, copy to public/tts/
-# Usage: ./scripts/tts.sh (from repo root)
+# TTS: narration text → audio.mp3 + audio.vtt (Edge-TTS via Node).
+# After generation, runs scripts/sync-outputs-to-public.sh (TTS + captions + title → public).
+# Paths via env:
+#   TTS_INPUT_FILE    — default: $SPIDER_OUTPUT_DIR/input.txt (narration; same tree as output.json)
+#   SPIDER_OUTPUT_DIR — default: output/spider
+#   TTS_OUTPUT_DIR    — default: output/tts (audio.mp3 / audio.vtt)
+#   TTS_PUBLIC_DIR    — default: public/tts
+# Optional: EDGE_TTS_VOICE
 
 set -e
 
@@ -11,71 +17,49 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+cd "$PROJECT_ROOT"
+
+SPIDER_OUTPUT_DIR="${SPIDER_OUTPUT_DIR:-output/spider}"
+TTS_OUTPUT_DIR="${TTS_OUTPUT_DIR:-output/tts}"
+TTS_PUBLIC_DIR="${TTS_PUBLIC_DIR:-public/tts}"
+if [ -z "${TTS_INPUT_FILE:-}" ]; then
+  TTS_INPUT_FILE="$SPIDER_OUTPUT_DIR/input.txt"
+fi
+
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${BLUE}🎙️  TTS (Edge-TTS)${NC}"
+echo -e "${BLUE}🎙️  TTS (Edge-TTS, Node)${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-
-if [ ! -f "output/tts/input.txt" ]; then
-    echo -e "${RED}❌ Error: Input file not found at output/tts/input.txt${NC}"
-    exit 1
-fi
-
-if ! command -v python3 &> /dev/null; then
-    echo -e "${RED}❌ Error: python3 is not installed${NC}"
-    exit 1
-fi
-
-VENV_DIR="tts/venv"
-VENV_PYTHON="$VENV_DIR/bin/python"
-
-echo -e "${BLUE}Setting up TTS virtual environment...${NC}"
-
-if [ ! -d "$VENV_DIR" ]; then
-    echo -e "${YELLOW}Creating virtual environment at $VENV_DIR...${NC}"
-    python3 -m venv "$VENV_DIR"
-    echo -e "${GREEN}✅ Virtual environment created${NC}"
-fi
-
-if [ ! -f "$VENV_PYTHON" ]; then
-    echo -e "${RED}❌ Error: Virtual environment Python not found at $VENV_PYTHON${NC}"
-    exit 1
-fi
-
-MISSING_DEPS=()
-if ! "$VENV_PYTHON" -c "import edge_tts" 2>/dev/null; then
-    MISSING_DEPS+=("edge-tts")
-fi
-if ! "$VENV_PYTHON" -c "import pydub" 2>/dev/null; then
-    MISSING_DEPS+=("pydub")
-fi
-
-if [ ${#MISSING_DEPS[@]} -gt 0 ]; then
-    echo -e "${YELLOW}Installing missing dependencies: ${MISSING_DEPS[*]}...${NC}"
-    "$VENV_PYTHON" -m pip install --quiet --upgrade pip
-    "$VENV_PYTHON" -m pip install --quiet -r tts/requirements.txt
-    echo -e "${GREEN}✅ Dependencies installed${NC}"
-else
-    echo -e "${GREEN}✅ All TTS dependencies are installed${NC}"
-fi
-
+echo -e "${BLUE}Input: ${TTS_INPUT_FILE}${NC}"
+echo -e "${BLUE}Output dir: ${TTS_OUTPUT_DIR}${NC}"
+echo -e "${BLUE}After: sync-outputs-to-public → public/${NC}"
 echo ""
 
-if ! "$VENV_PYTHON" tts/tts.py output/tts/input.txt output/tts; then
+if [ ! -f "$TTS_INPUT_FILE" ]; then
+    echo -e "${RED}❌ Error: Input file not found: $TTS_INPUT_FILE${NC}"
+    exit 1
+fi
+
+if ! command -v ffmpeg &> /dev/null; then
+    echo -e "${RED}❌ Error: ffmpeg is required (merge / atempo).${NC}"
+    exit 1
+fi
+
+if ! pnpm exec tsx packages/tts-node/src/cli.ts "$TTS_INPUT_FILE" "$TTS_OUTPUT_DIR"; then
     echo -e "${RED}❌ Failed to generate audio${NC}"
     exit 1
 fi
 
-if [ ! -f "output/tts/audio.mp3" ] || [ ! -f "output/tts/audio.vtt" ]; then
-    echo -e "${RED}❌ Error: Audio files not found${NC}"
+MP3_OUT="$TTS_OUTPUT_DIR/audio.mp3"
+VTT_OUT="$TTS_OUTPUT_DIR/audio.vtt"
+if [ ! -f "$MP3_OUT" ] || [ ! -f "$VTT_OUT" ]; then
+    echo -e "${RED}❌ Error: Audio files not found in $TTS_OUTPUT_DIR${NC}"
     exit 1
 fi
 
-echo -e "${BLUE}📋 Copying TTS files to public/tts/...${NC}"
-mkdir -p public/tts
-rm -f public/tts/audio.mp3 public/tts/audio.vtt
-cp output/tts/audio.mp3 public/tts/audio.mp3
-cp output/tts/audio.vtt public/tts/audio.vtt
+bash "$SCRIPT_DIR/sync-outputs-to-public.sh"
 
 echo ""
-echo -e "${GREEN}✅ TTS done: output/tts/audio.mp3, audio.vtt → public/tts/${NC}"
+echo -e "${GREEN}✅ TTS done: $MP3_OUT, $VTT_OUT (synced under public/)${NC}"

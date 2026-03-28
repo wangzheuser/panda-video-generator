@@ -1,34 +1,35 @@
 #!/usr/bin/env node
 
 /**
- * Env-only CLI: spider JSON → DeepSeek caption → estimated WebVTT in CAPTION_OUTPUT_DIR.
- *
- * Required:
- *   CAPTION_INPUT_JSON   — path to { title, content, answers[] } JSON (e.g. spider output)
- *   CAPTION_OUTPUT_DIR   — directory for input.txt (script) and .vtt
+ * Env-only CLI: spider crawl `output.json` → DeepSeek caption → script + estimated WebVTT.
  *
  * Optional:
+ *   CAPTION_INPUT_JSON       — default `<SPIDER_OUTPUT_DIR>/output.json`
+ *   CAPTION_OUTPUT_DIR       — default output/spider
  *   CAPTION_SCRIPT_FILENAME  — default input.txt
  *   CAPTION_VTT_FILENAME     — default captions.vtt
  *   CAPTION_SEC_PER_CHAR     — default 0.12 (timing heuristic for Chinese)
  */
 
 import { resolve } from 'path';
+import { constants as fsConstants } from 'fs';
+import { access } from 'fs/promises';
+import { OUTPUT_DIRS, getSpiderOutputJsonPath } from './paths';
 import { runCaptionAndVttFromSpiderJson } from './pipeline-from-json';
 
 async function main(): Promise<void> {
-  const jsonRaw = process.env.CAPTION_INPUT_JSON?.trim();
-  const outDirRaw = process.env.CAPTION_OUTPUT_DIR?.trim();
+  const jsonRaw =
+    process.env.CAPTION_INPUT_JSON?.trim() || getSpiderOutputJsonPath();
+  const outDirRaw = process.env.CAPTION_OUTPUT_DIR?.trim() || OUTPUT_DIRS.SPIDER;
 
-  if (!jsonRaw || !outDirRaw) {
-    console.error(
-      'Required env: CAPTION_INPUT_JSON, CAPTION_OUTPUT_DIR\n' +
-        'Optional: CAPTION_SCRIPT_FILENAME (default input.txt), CAPTION_VTT_FILENAME (default captions.vtt), CAPTION_SEC_PER_CHAR',
-    );
+  const jsonPath = resolve(process.cwd(), jsonRaw);
+  try {
+    await access(jsonPath, fsConstants.R_OK);
+  } catch {
+    console.error(`CAPTION_INPUT_JSON not found: ${jsonPath}`);
     process.exit(1);
   }
 
-  const jsonPath = resolve(process.cwd(), jsonRaw);
   const outDir = resolve(process.cwd(), outDirRaw);
   const scriptName = process.env.CAPTION_SCRIPT_FILENAME?.trim();
   const vttName = process.env.CAPTION_VTT_FILENAME?.trim();

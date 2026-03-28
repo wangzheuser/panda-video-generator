@@ -48,7 +48,6 @@ public/bgm/
 .cursor/skills
 
 venv/
-tts/venv/
 output/tts/audio.mp3
 output/tts/audio.vtt
 output/tts/input.txt
@@ -56,6 +55,7 @@ public/tts/audio.mp3
 public/tts/audio.vtt
 .pnpm-store/
 public/tts/*
+public/spider/*
 # Sound effects used by Remotion compositions (Intro, Video logo)
 public/audio/*
 !public/audio/intro.mp3

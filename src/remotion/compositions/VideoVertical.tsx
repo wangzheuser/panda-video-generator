@@ -38,10 +38,12 @@ export const VideoVertical: React.FC<{
 	title?: string;
 	audioFile?: string;
 	vttFile?: string;
+	captionVttFile?: string;
 }> = ({
 	title = 'Default Title',
 	audioFile = REMOTION_PATHS.TTS_AUDIO,
 	vttFile = REMOTION_PATHS.TTS_VTT,
+	captionVttFile = REMOTION_PATHS.TTS_VTT,
 }) => {
 		const { fps } = useVideoConfig();
 		const [contentDuration, setContentDuration] = useState<number>(0);
@@ -108,7 +110,7 @@ export const VideoVertical: React.FC<{
 
 				{/* Sequence 3: Content */}
 				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
-					<ContentVertical audioFile={audioFile} vttFile={vttFile} />
+					<ContentVertical audioFile={audioFile} captionVttFile={captionVttFile} />
 				</Sequence>
 
 				{/* Watermark sequence - starts from content sequence, overlays content only */}

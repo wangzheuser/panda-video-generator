@@ -28,6 +28,12 @@
     "paths": {
       "@panda-video-generator/caption-generator": [
         "./packages/caption-generator/caption-generator.ts"
+      ],
+      "@panda-video-generator/caption-generator/paths": [
+        "./packages/caption-generator/paths.ts"
+      ],
+      "@panda-video-generator/spider/paths": [
+        "./packages/spider/paths.ts"
       ]
     }
   },

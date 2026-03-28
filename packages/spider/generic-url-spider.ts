@@ -9,7 +9,7 @@ import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import type { Browser, Page } from 'puppeteer';
 import { promises as fs } from 'fs';
-import { SPIDER_PATHS } from '../../types/paths';
+import { getSpiderOutputDir } from './paths';
 
 puppeteer.use(StealthPlugin());
 
@@ -101,14 +101,15 @@ async function gotoAndSettle(page: Page, url: string): Promise<void> {
 async function maybeSaveDebug(page: Page): Promise<void> {
   if (process.env.SPIDER_SAVE_DEBUG !== '1') return;
   const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-  await fs.mkdir(SPIDER_PATHS.DEBUG_DIR, { recursive: true });
+  const debugDir = getSpiderOutputDir();
+  await fs.mkdir(debugDir, { recursive: true });
   await page.screenshot({
-    path: `${SPIDER_PATHS.DEBUG_DIR}/generic-debug-${timestamp}.png`,
+    path: `${debugDir}/generic-debug-${timestamp}.png`,
     fullPage: true,
   });
   const html = await page.content();
-  await fs.writeFile(`${SPIDER_PATHS.DEBUG_DIR}/generic-debug-${timestamp}.html`, html, 'utf-8');
-  console.log(`Debug: ${SPIDER_PATHS.DEBUG_DIR}/generic-debug-${timestamp}.png`);
+  await fs.writeFile(`${debugDir}/generic-debug-${timestamp}.html`, html, 'utf-8');
+  console.log(`Debug: ${debugDir}/generic-debug-${timestamp}.png`);
 }
 
 async function extractZhihuPayload(page: Page): Promise<Omit<CrawledPagePayload, 'sourceUrl'>> {

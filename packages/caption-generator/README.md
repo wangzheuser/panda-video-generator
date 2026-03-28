@@ -1,6 +1,6 @@
 # @panda-video-generator/caption-generator
 
-**Video narration script** generation via the **DeepSeek** API: takes **structured text you already have** (title, body in `content`, optional Q&A `answers`), returns prose suited for subtitles/TTS, and writes **`output/tts/input.txt`** (or `<outputDir>/input.txt`).
+**Video narration script** generation via the **DeepSeek** API: takes **structured text you already have** (title, body in `content`, optional Q&A `answers`), returns prose suited for subtitles/TTS. Default write path: **`getTtsInputFile()`** → **`<SPIDER_OUTPUT_DIR>/input.txt`** (next to **`output.json`**), unless **`TTS_INPUT_FILE`** or explicit **`outputDir`** is set.
 
 **Out of scope for this package:** HTTP fetching, Puppeteer, Zhihu or article crawling. Produce a `VideoScriptSourcePayload` (or compatible JSON) with your own spider or pipeline, then call this package.
 
@@ -19,7 +19,7 @@
 ### `generateVideoScript(data, outputDir?)`
 
 - **`data`**: `VideoScriptSourcePayload` — `{ title, content, answers[] }` (optional `sourceUrl` ignored for prompting).
-- **`outputDir`**: defaults to repo `output/tts` (see `types/paths`). When using the default TTS layout, the file is `output/tts/input.txt`. Internally uses `generateVideoScriptText` then writes `input.txt`.
+- **`outputDir`**: optional. If omitted, uses `getTtsInputFile()` (`TTS_INPUT_FILE` or default `<SPIDER_OUTPUT_DIR>/input.txt`). If provided, writes `<outputDir>/input.txt`.
 
 ### `generateVideoScriptFromFile(jsonFilePath, outputDir?)`
 
@@ -38,15 +38,14 @@ Turns plain script text into WebVTT with cue timing from character count (defaul
 From monorepo root:
 
 ```bash
-CAPTION_INPUT_JSON=output/spider/output-2026-03-28.json \
-CAPTION_OUTPUT_DIR=output/spider \
 pnpm run caption:env
+# same as CAPTION_INPUT_JSON=output/spider/output.json (see package.json prefixes)
 ```
 
 | Variable | Required | Description |
 |----------|----------|-------------|
-| `CAPTION_INPUT_JSON` | yes | Path to spider JSON (`title`, `content`, `answers`) |
-| `CAPTION_OUTPUT_DIR` | yes | Directory for `input.txt` (or custom name) and `.vtt` |
+| `CAPTION_INPUT_JSON` | no | Default `<SPIDER_OUTPUT_DIR>/output.json` |
+| `CAPTION_OUTPUT_DIR` | no | Default `output/spider` |
 | `CAPTION_SCRIPT_FILENAME` | no | Default `input.txt` |
 | `CAPTION_VTT_FILENAME` | no | Default `captions.vtt` |
 | `CAPTION_SEC_PER_CHAR` | no | Seconds per character for VTT estimate |
@@ -62,14 +61,12 @@ Still requires `DEEPSEEK_API_KEY` (or `.env.local`).
 ```ts
 import { generateVideoScript } from '@panda-video-generator/caption-generator';
 
-await generateVideoScript(
-  {
-    title: 'Example',
-    content: 'Body text…',
-    answers: [],
-  },
-  'output/tts',
-);
+await generateVideoScript({
+  title: 'Example',
+  content: 'Body text…',
+  answers: [],
+});
+// writes to getTtsInputFile() e.g. output/spider/input.txt
 ```
 
 Script + WebVTT from a spider JSON file:

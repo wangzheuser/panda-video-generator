@@ -4,6 +4,7 @@
   "private": true,
   "exports": {
     ".": "./caption-generator.ts",
+    "./paths": "./paths.ts",
     "./pipeline": "./pipeline-from-json.ts",
     "./webvtt": "./webvtt-estimate.ts"
   },

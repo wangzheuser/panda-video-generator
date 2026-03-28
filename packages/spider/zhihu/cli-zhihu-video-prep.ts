@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * CLI: strict Zhihu question URL → crawl JSON + monorepo video inputs (TTS script, title.json, etc.).
+ * CLI: Zhihu URL → output/spider/output.json (+ DeepSeek script at getTtsInputFile(), title.json, public sync).
  * Usage: tsx packages/spider/zhihu/cli-zhihu-video-prep.ts <zhihu_url>
  */
 
@@ -9,7 +9,14 @@ import { ZhihuSpider } from './zhihu-question-spider';
 import { generateVideoScript } from '@panda-video-generator/caption-generator';
 import { promises as fs } from 'fs';
 import { resolve } from 'path';
-import { OUTPUT_DIRS, TTS_PATHS, VIDEO_PATHS, SPIDER_PATHS, PUBLIC_DIRS } from '../../../types/paths';
+import { getTtsInputFile } from '@panda-video-generator/caption-generator/paths';
+import {
+  getSpiderOutputDir,
+  getSpiderOutputJsonPath,
+  getSpiderTitleJsonPath,
+  PUBLIC_VIDEO_DIR,
+  PUBLIC_TITLE_JSON_FOR_REMOTION,
+} from '../paths';
 
 async function main() {
   const url = process.argv[2];
@@ -43,10 +50,10 @@ async function main() {
     console.log(`Question: ${data.content.substring(0, 100)}${data.content.length > 100 ? '...' : ''}`);
     console.log(`Answers found: ${data.answers.length}`);
 
-    // Save to JSON file
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-    await fs.mkdir(SPIDER_PATHS.OUTPUT_DIR, { recursive: true });
-    const outputPath = `${SPIDER_PATHS.OUTPUT_DIR}/output-${timestamp}.json`;
+    // Save crawl JSON (fixed name: output.json)
+    const spiderOutDir = getSpiderOutputDir();
+    await fs.mkdir(resolve(process.cwd(), spiderOutDir), { recursive: true });
+    const outputPath = resolve(process.cwd(), getSpiderOutputJsonPath());
     const onDisk = {
       title: data.title,
       content: data.content,
@@ -60,19 +67,19 @@ async function main() {
     // Generate video script
     if (data.title && (data.content || data.answers.length > 0)) {
       try {
-        await generateVideoScript(data, OUTPUT_DIRS.TTS);
+        await generateVideoScript(data);
       } catch (error) {
         console.error('⚠️  Failed to generate video script, but extraction was successful');
         console.error(error);
       }
     }
 
-    // Generate title.json
+    // Generate title.json under spider output dir
     if (data.title) {
-      const titleJsonPath = resolve(process.cwd(), VIDEO_PATHS.TITLE_JSON);
-      const publicTitleJsonPath = resolve(process.cwd(), VIDEO_PATHS.PUBLIC_TITLE_JSON);
+      const titleJsonPath = resolve(process.cwd(), getSpiderTitleJsonPath());
+      const publicTitleJsonPath = resolve(process.cwd(), PUBLIC_TITLE_JSON_FOR_REMOTION);
       try {
-        await fs.mkdir(resolve(process.cwd(), OUTPUT_DIRS.VIDEO), { recursive: true });
+        await fs.mkdir(resolve(process.cwd(), getSpiderOutputDir()), { recursive: true });
         await fs.writeFile(
           titleJsonPath,
           JSON.stringify({ title: data.title }, null, 2),
@@ -82,7 +89,7 @@ async function main() {
         console.log(`   Title: ${data.title}`);
         
         // Also copy to public/video/ for Remotion Studio access
-        await fs.mkdir(resolve(process.cwd(), PUBLIC_DIRS.VIDEO), { recursive: true });
+        await fs.mkdir(resolve(process.cwd(), PUBLIC_VIDEO_DIR), { recursive: true });
         await fs.copyFile(titleJsonPath, publicTitleJsonPath);
         console.log(`📋 Title JSON also copied to: ${publicTitleJsonPath}`);
       } catch (error) {
@@ -91,10 +98,10 @@ async function main() {
     }
 
     console.log('\n📁 Output files:');
-    console.log(`  - Caption: ${TTS_PATHS.INPUT}`);
-    console.log(`  - Raw data: ${outputPath}`);
+    console.log(`  - Caption: ${getTtsInputFile()}`);
+    console.log(`  - Crawl JSON: ${getSpiderOutputJsonPath()}`);
     if (data.title) {
-      console.log(`  - Title JSON: ${VIDEO_PATHS.TITLE_JSON}`);
+      console.log(`  - Title JSON: ${getSpiderTitleJsonPath()}`);
     }
     console.log('\n💡 Next step: Run \'pnpm render:video\' to generate video from the extracted content');
   } catch (error) {

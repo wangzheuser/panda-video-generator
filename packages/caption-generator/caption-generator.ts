@@ -1,8 +1,8 @@
 import OpenAI from 'openai';
 import { readFileSync } from 'fs';
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
 import { promises as fs } from 'fs';
-import { OUTPUT_DIRS, TTS_PATHS } from '../../types/paths';
+import { getTtsInputFile } from './paths';
 
 /** Crawled or structured content for video script (Zhihu, generic article, etc.). */
 export type VideoScriptSourcePayload = {
@@ -81,7 +81,7 @@ ${contentForDeepSeek}
 
 并且根据用户聆听和阅读的友好性，将生成的内容进行调整优化以及分段，并让它变得更流畅和自然.
 
-最终生成文稿总字数不超过1200个字. 每个段落不超过50个字, 以保证用户能够流畅地阅读和理解.
+最终生成文稿总字数不超过800个字. 每个段落不超过40个字, 以保证用户能够流畅地阅读和理解.
 
 `;
 
@@ -118,10 +118,11 @@ ${contentForDeepSeek}
 /**
  * Generate video script from crawled content using DeepSeek (any source that matches the payload shape).
  * @param data - Title, body in `content`, optional `answers` (e.g. Zhihu). Extra fields like `sourceUrl` are ignored for the prompt.
+ * @param outputDir - If set, writes `<outputDir>/input.txt`. If omitted, uses `TTS_INPUT_FILE` or `getSpiderNarrationPath()` / `<SPIDER_OUTPUT_DIR>/input.txt`.
  */
 export async function generateVideoScript(
   data: VideoScriptSourcePayload & { sourceUrl?: string },
-  outputDir: string = OUTPUT_DIRS.TTS
+  outputDir?: string,
 ): Promise<string | null> {
   const scriptText = await generateVideoScriptText(data);
 
@@ -130,14 +131,16 @@ export async function generateVideoScript(
     return null;
   }
 
-  const scriptPath = outputDir === OUTPUT_DIRS.TTS
-    ? TTS_PATHS.INPUT
-    : `${outputDir}/input.txt`;
+  const scriptPath =
+    outputDir !== undefined
+      ? `${outputDir.replace(/\/$/, '')}/input.txt`
+      : getTtsInputFile();
 
+  const parentDir = dirname(scriptPath);
   try {
-    await fs.access(outputDir);
+    await fs.access(parentDir);
   } catch {
-    await fs.mkdir(outputDir, { recursive: true });
+    await fs.mkdir(parentDir, { recursive: true });
   }
 
   await fs.writeFile(scriptPath, scriptText, 'utf-8');
@@ -153,7 +156,7 @@ export async function generateVideoScript(
  */
 export async function generateVideoScriptFromFile(
   jsonFilePath: string,
-  outputDir: string = OUTPUT_DIRS.TTS
+  outputDir?: string,
 ): Promise<string | null> {
   try {
     const fileContent = await fs.readFile(jsonFilePath, 'utf-8');

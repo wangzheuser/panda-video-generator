@@ -85,6 +85,20 @@ function parseVtt(vttText: string): Caption[] {
 	return captions;
 }
 
+async function fetchVttText(primaryPath: string, fallbackPath: string): Promise<string> {
+	for (const path of [primaryPath, fallbackPath]) {
+		try {
+			const response = await fetch(staticFile(path));
+			if (!response.ok) continue;
+			const text = await response.text();
+			if (text.trim().startsWith('WEBVTT')) return text;
+		} catch {
+			continue;
+		}
+	}
+	throw new Error(`Failed to load WebVTT from ${primaryPath} or ${fallbackPath}`);
+}
+
 // THIS IS FALLBACK BGM COUNT FOR VIDEO COMPOSITION
 const BGM_COUNT_FALLBACK = 14;
 
@@ -100,12 +114,14 @@ const BGM_INDEX = (() => {
 
 interface ContentProps {
 	audioFile?: string;
-	vttFile?: string;
+	/** On-screen captions; default TTS VTT (aligned with audio). Override e.g. SPIDER_CAPTIONS_VTT for estimate-only preview. */
+	captionVttFile?: string;
 }
 
 export const Content: React.FC<ContentProps> = ({
 	audioFile = REMOTION_PATHS.TTS_AUDIO,
-	vttFile = REMOTION_PATHS.TTS_VTT,
+	// TTS WebVTT matches audio.mp3; spider/captions.vtt is estimate-only (see types/paths.ts).
+	captionVttFile = REMOTION_PATHS.TTS_VTT,
 }) => {
 	const frame = useCurrentFrame();
 	const { fps } = useVideoConfig();
@@ -116,20 +132,19 @@ export const Content: React.FC<ContentProps> = ({
 
 	const fetchAndProcessVtt = useCallback(async () => {
 		try {
-			// Read VTT file
-			const response = await fetch(staticFile(vttFile));
-			const vttContent = await response.text();
-
-			// Parse VTT file
+			const fallback =
+				captionVttFile === REMOTION_PATHS.TTS_VTT
+					? REMOTION_PATHS.SPIDER_CAPTIONS_VTT
+					: REMOTION_PATHS.TTS_VTT;
+			const vttContent = await fetchVttText(captionVttFile, fallback);
 			const parsedCaptions = parseVtt(vttContent);
-
 			setCaptions(parsedCaptions);
 			setVttLoaded(true);
 		} catch (e) {
 			console.error('Failed to load VTT file:', e);
 			cancelRender(e);
 		}
-	}, [vttFile, cancelRender]);
+	}, [captionVttFile, cancelRender]);
 
 	useEffect(() => {
 		fetchAndProcessVtt();

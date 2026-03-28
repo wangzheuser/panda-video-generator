@@ -1,0 +1,14 @@
+{
+  "name": "@panda-video-generator/tts-node",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Edge-TTS narration pipeline in Node (paragraphs → mp3 + WebVTT)",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "music-metadata": "^11.0.0",
+    "node-edge-tts": "^1.2.10"
+  }
+}

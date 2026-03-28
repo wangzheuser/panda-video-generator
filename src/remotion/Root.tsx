@@ -58,7 +58,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="Video"
         component={Video}
-        calculateMetadata={async ({ props }: { props: { title?: string; audioFile?: string; vttFile?: string; orientation?: 'vertical' | 'horizontal' } }) => {
+        calculateMetadata={async ({ props }: { props: { title?: string; audioFile?: string; vttFile?: string; captionVttFile?: string; orientation?: 'vertical' | 'horizontal' } }) => {
           // Get audio duration automatically from VTT file
           const vttFile = props.vttFile || REMOTION_PATHS.TTS_VTT;
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
@@ -83,13 +83,14 @@ export const RemotionRoot: React.FC = () => {
           title: defaultMyCompProps.title,
           audioFile: REMOTION_PATHS.TTS_AUDIO,
           vttFile: REMOTION_PATHS.TTS_VTT,
+          captionVttFile: REMOTION_PATHS.TTS_VTT,
           orientation: "horizontal",
         }}
       />
       <Composition
         id="Content"
         component={Content}
-        calculateMetadata={async ({ props }: { props: { audioFile?: string; vttFile?: string; title?: string; coverImage?: string; coverBackgroundColor?: string; coverGradientColors?: string[]; coverGradientDirection?: 'horizontal' | 'vertical' | 'diagonal' } }) => {
+        calculateMetadata={async ({ props }: { props: { audioFile?: string; vttFile?: string; captionVttFile?: string; title?: string; coverImage?: string; coverBackgroundColor?: string; coverGradientColors?: string[]; coverGradientDirection?: 'horizontal' | 'vertical' | 'diagonal' } }) => {
           // Get audio duration automatically from VTT file
           const vttFile = props.vttFile || REMOTION_PATHS.TTS_VTT;
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
@@ -111,6 +112,7 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={{
           audioFile: REMOTION_PATHS.TTS_AUDIO,
           vttFile: REMOTION_PATHS.TTS_VTT,
+          captionVttFile: REMOTION_PATHS.TTS_VTT,
           title: undefined,
           coverImage: undefined,
           coverBackgroundColor: undefined,
@@ -131,7 +133,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="Video-Vertical"
         component={VideoVertical}
-        calculateMetadata={async ({ props }: { props: { title?: string; audioFile?: string; vttFile?: string } }) => {
+        calculateMetadata={async ({ props }: { props: { title?: string; audioFile?: string; vttFile?: string; captionVttFile?: string } }) => {
           // Get audio duration automatically from VTT file
           const vttFile = props.vttFile || REMOTION_PATHS.TTS_VTT;
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
@@ -156,14 +158,15 @@ export const RemotionRoot: React.FC = () => {
           title: defaultMyCompProps.title,
           audioFile: REMOTION_PATHS.TTS_AUDIO,
           vttFile: REMOTION_PATHS.TTS_VTT,
+          captionVttFile: REMOTION_PATHS.TTS_VTT,
         }}
       />
       <Composition
         id="Content-Vertical"
         component={ContentVertical}
-        calculateMetadata={async ({ props }: { props: { audioFile?: string; vttFile?: string } }) => {
+        calculateMetadata={async ({ props }: { props: { audioFile?: string; vttFile?: string; captionVttFile?: string } }) => {
           // Get audio duration automatically from VTT file
-          const vttFile = props.vttFile || "tts/audio.vtt";
+          const vttFile = props.vttFile || REMOTION_PATHS.TTS_VTT;
           const audioDurationInSeconds = await getAudioDurationFromVtt(vttFile);
           // Add delay for Intro animation and title/cover display (2.75 seconds)
           const TITLE_DELAY_SECONDS = 2.75;
@@ -183,6 +186,7 @@ export const RemotionRoot: React.FC = () => {
         defaultProps={{
           audioFile: REMOTION_PATHS.TTS_AUDIO,
           vttFile: REMOTION_PATHS.TTS_VTT,
+          captionVttFile: REMOTION_PATHS.TTS_VTT,
         }}
       />
       <Composition

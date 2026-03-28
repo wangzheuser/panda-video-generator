@@ -78,12 +78,17 @@ echo -e "${GREEN}✅ All steps completed successfully!${NC}"
 echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
+TTS_OUTPUT_DIR="${TTS_OUTPUT_DIR:-output/tts}"
+TTS_INPUT_FILE="${TTS_INPUT_FILE:-$TTS_OUTPUT_DIR/input.txt}"
+SPIDER_OUTPUT_DIR="${SPIDER_OUTPUT_DIR:-output/spider}"
+TITLE_JSON="$SPIDER_OUTPUT_DIR/title.json"
+
 echo -e "${BLUE}📁 Final output files:${NC}"
 echo "  - Video: output/video/video.mp4"
-echo "  - Audio: output/tts/audio.mp3"
-echo "  - Subtitles: output/tts/audio.vtt"
-echo "  - Caption: output/tts/input.txt"
-if [ -f "output/video/title.json" ]; then
-    echo "  - Title JSON: output/video/title.json"
+echo "  - Audio: $TTS_OUTPUT_DIR/audio.mp3"
+echo "  - Subtitles: $TTS_OUTPUT_DIR/audio.vtt"
+echo "  - Caption: $TTS_INPUT_FILE"
+if [ -f "$TITLE_JSON" ]; then
+    echo "  - Title JSON: $TITLE_JSON"
 fi
 echo ""

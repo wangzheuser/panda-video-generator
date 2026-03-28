@@ -26,12 +26,6 @@ jobs:
       - name: Install Node.js dependencies
         run: pnpm install
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -51,13 +45,6 @@ jobs:
             libxrandr2 \
             libgbm1 \
             libasound2t64
-
-      - name: Setup TTS virtual environment
-        run: |
-          python3 -m venv tts/venv
-          source tts/venv/bin/activate
-          pip install --upgrade pip
-          pip install -r tts/requirements.txt
 
       - name: Create .env.local file
         run: |
