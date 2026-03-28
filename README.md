@@ -187,7 +187,8 @@ pnpm pipeline:tts-render
 
 # Or step by step:
 pnpm tts              # Edge-TTS → mp3/vtt，并同步到 public（路径见环境变量说明）
-pnpm render:video     # Remotion → output/video/video.mp4 (+ cover)
+pnpm render:video     # sync → 背景/BGM 编号预处理 → Remotion → output/video/video.mp4（+ 封面）
+pnpm render:composition   # 仅 Remotion 成片：不跑 sync、不生成封面；要求 public 已就绪；渲染前仍会做背景/BGM 编号预处理
 ```
 
 可选环境变量：`SPIDER_OUTPUT_DIR`（默认 `output/spider`）、`TTS_INPUT_FILE`（默认 `$SPIDER_OUTPUT_DIR/input.txt`）、`TTS_OUTPUT_DIR`、`TTS_PUBLIC_DIR`。
@@ -195,8 +196,17 @@ pnpm render:video     # Remotion → output/video/video.mp4 (+ cover)
 **工作流程：**
 1. 读取口播稿（默认 `output/spider/input.txt`）
 2. `pnpm tts`：Node Edge-TTS 生成语音和字幕
-3. `pnpm render:video`：使用 Remotion 渲染视频模板并生成封面
+3. `pnpm render:video`：同步产出到 `public/` → 背景视频与 BGM 按规则重排编号 → Remotion 渲染并生成封面
 4. 输出最终视频文件
+
+**仅渲染成片（`pnpm render:composition`）：**  
+假定 `public/tts`（及可选 `public/video/title.json`）已正确，只执行 `scripts/render-composition-only.sh`：在完成背景视频与 BGM 的编号预处理之后调用 `remotion render Video`，输出 `output/video/video.mp4`。适合 TTS/sync 已做完、只需重新出片的场景。
+
+**背景视频与 BGM：**
+- 模板里**固定**引用 `public/video/0.mp4` 与 `public/bgm/0.mp3`（Remotion 侧不写随机下标）。
+- `render:video` 与 `render:composition` 在每次调用 Remotion 前，会通过渲染入口脚本在同目录下触发对背景视频（`0.mp4`…`3.mp4`）与配乐（默认 `0.mp3`…`13.mp3`）的**随机重排编号**，从而在始终读取 `0` 号路径的前提下，每次成片可选用不同素材；实现见 `scripts/` 内由 `render-video-only.sh`、`render-composition-only.sh` 调用的辅助脚本。
+- 若某编号文件缺失，对应步骤会被跳过并提示，不中断渲染。
+- 配乐条数可通过环境变量 `BGM_COUNT` 配置（与上述辅助脚本的约定一致）。若直接使用 `pnpm exec remotion render` 而不走 `pnpm render:video` / `pnpm render:composition`，则不会执行该预处理链路，需自行在出片前完成与完整渲染相同的前期步骤（若希望每次随机换素材）。
 
 **输出：**
 - `output/video/video.mp4` - 最终渲染的视频

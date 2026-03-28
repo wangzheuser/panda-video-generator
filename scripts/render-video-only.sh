@@ -51,11 +51,9 @@ else
     echo -e "${YELLOW}⚠️  No $TITLE_PUBLIC — using default title for render${NC}"
 fi
 
-BGM_INDEX=$((RANDOM % 14))
-export REMOTION_BGM_INDEX=$BGM_INDEX
-BG_VIDEO_INDEX=$((RANDOM % 4))
-export REMOTION_BG_VIDEO_INDEX=$BG_VIDEO_INDEX
-echo -e "${BLUE}🎵 BGM index: $BGM_INDEX | 🎬 BG video: $BG_VIDEO_INDEX${NC}"
+bash "$SCRIPT_DIR/shuffle-bg-videos.sh"
+bash "$SCRIPT_DIR/shuffle-bgm.sh"
+echo ""
 
 RENDER_OPTS="--codec=h264 --crf=23"
 if [ -n "$PROPS_FILE" ] && [ -f "$PROPS_FILE" ]; then

@@ -34,17 +34,7 @@ async function getAudioDurationFromVtt(vttFile: string): Promise<number> {
 	}
 }
 
-// Background video file count (public/video/0.mp4..3.mp4) - hardcoded
-const BG_VIDEO_COUNT = 4;
-// Background video index from env (0..BG_VIDEO_COUNT-1), or random when not set. No state - stable per process.
-const BG_VIDEO_INDEX = (() => {
-	const fromEnv = process.env.REMOTION_BG_VIDEO_INDEX;
-	if (fromEnv !== undefined && fromEnv !== '') {
-		const n = parseInt(fromEnv, 10);
-		if (!Number.isNaN(n) && n >= 0 && n < BG_VIDEO_COUNT) return n;
-	}
-	return Math.floor(Math.random() * BG_VIDEO_COUNT);
-})();
+// Background: always public/video/0.mp4. Run scripts/shuffle-bg-videos.sh before render to permute which clip sits at each index.
 
 export const Video: React.FC<{
 	title?: string;
@@ -114,7 +104,7 @@ export const Video: React.FC<{
 			>
 				{/* Background video layer */}
 				<RemotionVideo
-					src={staticFile(`video/${BG_VIDEO_INDEX}.mp4`)}
+					src={staticFile('video/0.mp4')}
 					style={{
 						position: 'absolute',
 						top: 0,

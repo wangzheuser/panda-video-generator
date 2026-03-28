@@ -99,18 +99,7 @@ async function fetchVttText(primaryPath: string, fallbackPath: string): Promise<
 	throw new Error(`Failed to load WebVTT from ${primaryPath} or ${fallbackPath}`);
 }
 
-// THIS IS FALLBACK BGM COUNT FOR VIDEO COMPOSITION
-const BGM_COUNT_FALLBACK = 14;
-
-// BGM index from env (0..BGM_COUNT-1), or random when not set. No state - stable per process.
-const BGM_INDEX = (() => {
-	const fromEnv = process.env.REMOTION_BGM_INDEX;
-	if (fromEnv !== undefined && fromEnv !== '') {
-		const n = parseInt(fromEnv, 10);
-		if (!Number.isNaN(n) && n >= 0 && n < BGM_COUNT_FALLBACK) return n;
-	}
-	return Math.floor(Math.random() * BGM_COUNT_FALLBACK);
-})();
+// Background music: always public/bgm/0.mp3. Run scripts/shuffle-bgm.sh before render to permute tracks.
 
 interface ContentProps {
 	audioFile?: string;
@@ -297,7 +286,7 @@ export const Content: React.FC<ContentProps> = ({
 
 			{/* Background music - loops throughout content with fade out at audio end */}
 			<Html5Audio
-				src={staticFile(`bgm/${BGM_INDEX}.mp3`)}
+				src={staticFile('bgm/0.mp3')}
 				volume={bgmVolume}
 				loop
 				name="Background Music"
