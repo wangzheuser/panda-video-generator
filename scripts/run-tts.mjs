@@ -41,7 +41,9 @@ if (!fs.existsSync(TTS_INPUT_FILE)) {
 }
 
 if (!hasFfmpeg()) {
-  console.log(`${RED}❌ Error: ffmpeg is required (merge / atempo).${NC}`);
+  console.log(
+    `${RED}❌ Error: ffmpeg is required (merge / atempo). Install on PATH (e.g. brew install ffmpeg).${NC}`,
+  );
   process.exit(1);
 }
 

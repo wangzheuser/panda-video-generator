@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # macOS / Linux install helper. On Windows, use `pnpm install:project` or install.ps1.
 # Usage (from repo root): bash scripts/install.sh [--install-system-ffmpeg]
-# Legacy: --skip-ffmpeg (no longer required; system ffmpeg is opt-in only)
+# Requires ffmpeg on PATH. Use --install-system-ffmpeg to try brew/apt/dnf when missing.
+# Legacy: --skip-ffmpeg (no-op)
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -57,15 +58,19 @@ ensure_pnpm() {
   echo "✅ pnpm $(pnpm -v)"
 }
 
-ensure_ffmpeg_system_optional() {
-  if [[ "$INSTALL_SYSTEM_FFMPEG" != true ]]; then
-    return
-  fi
+require_ffmpeg_path() {
   if command -v ffmpeg >/dev/null 2>&1; then
-    echo "✅ 系统 ffmpeg 已在 PATH"
+    echo "✅ ffmpeg 已在 PATH（TTS / 部分脚本需要）"
     return
   fi
-  echo "正在按系统安装 ffmpeg（可选备用，非 TTS 所必需）…"
+  if [[ "$INSTALL_SYSTEM_FFMPEG" != true ]]; then
+    echo "❌ 未检测到 PATH 中的 ffmpeg。请先安装，例如："
+    echo "   • macOS: brew install ffmpeg"
+    echo "   • Ubuntu: sudo apt install ffmpeg"
+    echo "   • 或带自动安装重试: bash scripts/install.sh --install-system-ffmpeg"
+    exit 1
+  fi
+  echo "正在按系统安装 ffmpeg…"
   case "$KERNEL" in
     Darwin)
       if command -v brew >/dev/null 2>&1; then
@@ -95,21 +100,24 @@ ensure_ffmpeg_system_optional() {
       exit 1
       ;;
   esac
-  command -v ffmpeg >/dev/null 2>&1 && echo "✅ 系统 ffmpeg 已就绪"
+  if ! command -v ffmpeg >/dev/null 2>&1; then
+    echo "❌ 自动安装后仍未找到 ffmpeg，请手动安装并加入 PATH"
+    exit 1
+  fi
+  echo "✅ 系统 ffmpeg 已就绪"
 }
 
 need_node
 ensure_pnpm
 
 echo ""
-echo "ℹ️  TTS / 封面默认使用依赖内的 **ffmpeg-static**（随 pnpm install 下载，无需 brew/apt 安装 ffmpeg）。"
-echo "   若需 PATH 中的系统 ffmpeg 作备用，可使用: bash scripts/install.sh --install-system-ffmpeg"
+echo "ℹ️  **ffmpeg** 须为系统安装并在 PATH 中（TTS 合并 / 变速等）。缺失时可加: --install-system-ffmpeg"
 echo ""
 
-ensure_ffmpeg_system_optional
+require_ffmpeg_path
 
 echo ""
-echo "正在执行 pnpm install（workspace、ffmpeg-static 构建脚本、Playwright Chromium；请保持网络畅通）…"
+echo "正在执行 pnpm install（workspace、Playwright Chromium；请保持网络畅通）…"
 pnpm install
 
 echo ""

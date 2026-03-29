@@ -1,6 +1,6 @@
 /**
  * Cross-platform install entry: Windows PowerShell (install.ps1), else bash (install.sh).
- * Optional: --install-system-ffmpeg (PATH ffmpeg as fallback; TTS uses ffmpeg-static by default)
+ * Optional: --install-system-ffmpeg (try to install PATH ffmpeg when missing; required for TTS merge)
  */
 import { spawnSync } from "node:child_process";
 import path from "node:path";

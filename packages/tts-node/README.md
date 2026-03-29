@@ -9,7 +9,7 @@ Node.js **Edge-TTS** pipeline (concatenate segments, WebVTT, ffmpeg `atempo` whe
 
 ## Requirements
 
-- **ffmpeg**: monorepo uses **`ffmpeg-static`** after `pnpm install` (falls back to `ffmpeg` on `PATH` if bundled binary is unavailable). No separate system install required for most setups.
+- **ffmpeg**: system install on **PATH** required (e.g. `brew install ffmpeg`, `apt install ffmpeg`, Windows `winget install Gyan.FFmpeg`). Or run repo install with `--install-system-ffmpeg` / `-InstallSystemFfmpeg` where supported.
 - Network access (Microsoft Edge TTS endpoint)
 
 ## CLI

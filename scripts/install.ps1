@@ -1,6 +1,6 @@
 # Windows 安装助手 (PowerShell 5+)。从仓库克隆根目录运行：
 #   powershell -ExecutionPolicy Bypass -File scripts/install.ps1
-# Optional: -InstallSystemFfmpeg（安装 PATH 中的 ffmpeg 作备用；TTS 默认用依赖内 ffmpeg-static）
+# Requires ffmpeg on PATH. Use -InstallSystemFfmpeg to try winget/choco when missing.
 param(
   [switch]$InstallSystemFfmpeg
 )
@@ -44,40 +44,49 @@ if (-not (Get-Command pnpm -ErrorAction SilentlyContinue)) {
 Write-Host "OK pnpm $(pnpm -v)" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "TTS / cover: ffmpeg-static ships with pnpm install (no winget/ffmpeg required)." -ForegroundColor Green
-Write-Host "Optional PATH ffmpeg: re-run with -InstallSystemFfmpeg if you want a system backup binary."
+Write-Host "ffmpeg must be on PATH (TTS merge / atempo). Install: winget install Gyan.FFmpeg" -ForegroundColor Cyan
+Write-Host "Or re-run with -InstallSystemFfmpeg to attempt auto-install." -ForegroundColor Cyan
 Write-Host ""
 
-if ($InstallSystemFfmpeg) {
-  if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
-    Write-Host "Installing system ffmpeg (optional)..."
-    $installed = $false
+function Ensure-FfmpegOnPath {
+  if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
+    Write-Host "OK ffmpeg on PATH" -ForegroundColor Green
+    return
+  }
 
-    $winget = Get-Command winget -ErrorAction SilentlyContinue
-    if ($winget) {
-      winget install -e --id Gyan.FFmpeg --accept-package-agreements --accept-source-agreements
+  if (-not $InstallSystemFfmpeg) {
+    Write-Host "ffmpeg not found. Install on PATH or run with -InstallSystemFfmpeg." -ForegroundColor Red
+    exit 1
+  }
+
+  Write-Host "Installing system ffmpeg..."
+  $installed = $false
+
+  $winget = Get-Command winget -ErrorAction SilentlyContinue
+  if ($winget) {
+    winget install -e --id Gyan.FFmpeg --accept-package-agreements --accept-source-agreements
+    if ($LASTEXITCODE -eq 0) { $installed = $true }
+  }
+
+  if (-not $installed) {
+    $choco = Get-Command choco -ErrorAction SilentlyContinue
+    if ($choco) {
+      choco install ffmpeg -y
       if ($LASTEXITCODE -eq 0) { $installed = $true }
     }
-
-    if (-not $installed) {
-      $choco = Get-Command choco -ErrorAction SilentlyContinue
-      if ($choco) {
-        choco install ffmpeg -y
-        if ($LASTEXITCODE -eq 0) { $installed = $true }
-      }
-    }
-
-    if (-not $installed) {
-      Write-Host "System ffmpeg install skipped or failed. ffmpeg-static from pnpm is still used when it runs." -ForegroundColor Yellow
-    }
   }
-  if (Get-Command ffmpeg -ErrorAction SilentlyContinue) {
-    Write-Host "OK system ffmpeg on PATH" -ForegroundColor Green
+
+  if (-not (Get-Command ffmpeg -ErrorAction SilentlyContinue)) {
+    Write-Host "ffmpeg still not on PATH after install attempt. Add ffmpeg manually and re-run." -ForegroundColor Red
+    exit 1
   }
+  Write-Host "OK ffmpeg on PATH" -ForegroundColor Green
 }
 
+Ensure-FfmpegOnPath
+
 Write-Host ""
-Write-Host "Running pnpm install (workspace, ffmpeg-static install script, Playwright Chromium)..."
+Write-Host "Running pnpm install (workspace, Playwright Chromium)..."
 pnpm install
 
 Write-Host ""
