@@ -101,7 +101,7 @@ async function fetchVttText(primaryPath: string, fallbackPath: string): Promise<
 
 const BGM_STATIC = 'bgm/0.mp3';
 
-// BGM is versioned at public/bgm/0.mp3. Optional: shuffle-bgm.sh to re-index before render.
+// BGM is versioned at public/bgm/0.mp3. Optional: `pnpm shuffle:bgm` before render.
 
 interface ContentProps {
 	audioFile?: string;

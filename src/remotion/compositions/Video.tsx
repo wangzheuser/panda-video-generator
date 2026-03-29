@@ -36,7 +36,7 @@ async function getAudioDurationFromVtt(vttFile: string): Promise<number> {
 
 const BG_VIDEO_RELATIVE = 'video/0.mp4';
 
-// Background clip is versioned at public/video/0.mp4. Optional: shuffle-bg-videos.sh to re-index before render.
+// Background clip is versioned at public/video/0.mp4. Optional: `pnpm shuffle:bg-video` before render.
 
 export const Video: React.FC<{
 	title?: string;

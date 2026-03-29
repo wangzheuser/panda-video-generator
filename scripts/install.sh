@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Cross-platform install helper: macOS / Linux. On Windows (Git Bash / MSYS), delegates to install.ps1.
-# Usage (from repo root): sh scripts/install.sh [--skip-ffmpeg]
+# macOS / Linux install helper. On Windows, use `pnpm install:project` or install.ps1.
+# Usage (from repo root): bash scripts/install.sh [--skip-ffmpeg]
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

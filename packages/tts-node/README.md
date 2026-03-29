@@ -14,7 +14,7 @@ Node.js **Edge-TTS** pipeline (concatenate segments, WebVTT, ffmpeg `atempo` whe
 
 ## CLI
 
-From monorepo root (same env vars as `scripts/tts.sh` for paths):
+From monorepo root (same env vars as `pnpm tts` / `scripts/run-tts.mjs` for paths):
 
 ```bash
 # Full pipeline (generate + sync to public/): from repo root
