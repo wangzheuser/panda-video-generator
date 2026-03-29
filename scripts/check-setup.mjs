@@ -5,7 +5,6 @@ import { spawnSync } from "node:child_process";
 import fs from "node:fs";
 import path from "node:path";
 import { projectRoot } from "./lib/project-root.mjs";
-import { getFfmpegPath } from "./lib/resolve-ffmpeg.mjs";
 
 let fail = 0;
 
@@ -51,24 +50,23 @@ if (hasCmd("pnpm", ["-v"])) {
   fail = 1;
 }
 
-const ffBin = getFfmpegPath();
-if (spawnSync(ffBin, ["-version"], { stdio: "pipe", shell: false }).status === 0) {
-  const line = spawnSync(ffBin, ["-version"], {
+if (hasCmd("ffmpeg", ["-version"])) {
+  const line = spawnSync("ffmpeg", ["-version"], {
     encoding: "utf8",
-    shell: false,
+    shell: true,
   }).stdout?.split("\n")[0];
-  const via =
-    ffBin === "ffmpeg"
-      ? "（PATH 系统 ffmpeg，备用）"
-      : "（ffmpeg-static，随依赖安装）";
-  console.log(`[OK] ffmpeg ${via} ${line ?? ""}`.trim());
+  console.log(`[OK] ffmpeg（系统 PATH）${line ?? ""}`.trim());
 } else {
   console.log(
-    "[--] ffmpeg 不可用 — 请先在本仓库根目录执行 pnpm install（需在 pnpm-workspace 中允许 ffmpeg-static 构建脚本）。",
+    "[!!] ffmpeg 不在 PATH 中 — TTS / 部分步骤需要系统安装的 ffmpeg。",
   );
   console.log(
-    "    若捆绑二进制无法执行，可安装系统 ffmpeg 到 PATH，或运行: pnpm install:project -- --install-system-ffmpeg",
+    "    macOS: brew install ffmpeg；Ubuntu: sudo apt install ffmpeg；Windows: winget install Gyan.FFmpeg",
   );
+  console.log(
+    "    或运行: pnpm install:project -- --install-system-ffmpeg（尝试自动安装）",
+  );
+  fail = 1;
 }
 
 const pkg = path.join(projectRoot, "package.json");

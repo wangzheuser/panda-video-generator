@@ -1,7 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { writeFileSync, unlinkSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { getFfmpegPath } from './ffmpeg-bin.js';
 
 /**
  * Concatenate MP3s (concat demuxer) and apply playback speed with atempo.
@@ -17,7 +16,7 @@ export function mergeMp3WithSpeed(inputFiles: string[], outputPath: string, spee
 
   try {
     const result = spawnSync(
-      getFfmpegPath(),
+      'ffmpeg',
       [
         '-y',
         '-f',
@@ -51,10 +50,8 @@ export function mergeMp3WithSpeed(inputFiles: string[], outputPath: string, spee
 }
 
 export function assertFfmpegAvailable(): void {
-  const r = spawnSync(getFfmpegPath(), ['-version'], { encoding: 'utf-8' });
+  const r = spawnSync('ffmpeg', ['-version'], { encoding: 'utf-8' });
   if (r.status !== 0) {
-    throw new Error(
-      'ffmpeg is required for TTS merge/speed step. Run pnpm install (ffmpeg-static) or install ffmpeg on PATH.',
-    );
+    throw new Error('ffmpeg is required for TTS merge/speed step. Install ffmpeg and ensure it is on PATH.');
   }
 }
