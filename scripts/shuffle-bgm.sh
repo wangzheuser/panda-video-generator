@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Randomly permute public/bgm/0.mp3..(N-1).mp3 so a different track lands at each index.
-# Content composition always loads bgm/0.mp3 — not run by render pipelines; use locally before render if you want variety.
-# Skips (exit 0) if any expected file is missing.
+# Pick a random .mp3 under BGM_DIR and make it 0.mp3 (the path the composition reads).
+# If 0.mp3 already exists, move it to 0-YYYYMMDD-HHMMSS-<pid>.mp3 first.
+# Any number of tracks is fine; gaps in numeric names are OK.
+# Skips (exit 0) if no .mp3 files remain.
 
 set -e
+shopt -s nullglob
 
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
@@ -14,34 +16,23 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 BGM_DIR="${BGM_DIR:-public/bgm}"
-BGM_COUNT="${BGM_COUNT:-14}"
+mkdir -p "$BGM_DIR"
 
-for ((i = 0; i < BGM_COUNT; i++)); do
-	if [[ ! -f "$BGM_DIR/$i.mp3" ]]; then
-		echo -e "${YELLOW}⚠️  shuffle-bgm: missing $BGM_DIR/$i.mp3 — skip${NC}"
-		exit 0
-	fi
-done
+if [[ -f "$BGM_DIR/0.mp3" ]]; then
+	stamp="$(date +%Y%m%d-%H%M%S)-$$"
+	mv "$BGM_DIR/0.mp3" "$BGM_DIR/0-${stamp}.mp3"
+fi
 
-for ((i = 0; i < BGM_COUNT; i++)); do
-	mv "$BGM_DIR/$i.mp3" "$BGM_DIR/.bgm-shuffle-tmp-$i.mp3"
-done
+candidates=("$BGM_DIR"/*.mp3)
+n=${#candidates[@]}
+if [[ "$n" -eq 0 ]]; then
+	printf '%b\n' "${YELLOW}⚠️  shuffle-bgm: no .mp3 in $BGM_DIR — skip${NC}"
+	exit 0
+fi
 
-indices=()
-for ((i = 0; i < BGM_COUNT; i++)); do
-	indices+=("$i")
-done
+idx=$((RANDOM % n))
+picked="${candidates[idx]}"
+base="$(basename "$picked")"
+mv "$picked" "$BGM_DIR/0.mp3"
 
-for ((i = BGM_COUNT; i > 0; i--)); do
-	j=$((RANDOM % i))
-	tmp=${indices[j]}
-	indices[j]=${indices[i - 1]}
-	indices[i - 1]=$tmp
-done
-
-for ((k = 0; k < BGM_COUNT; k++)); do
-	old=${indices[k]}
-	mv "$BGM_DIR/.bgm-shuffle-tmp-${old}.mp3" "$BGM_DIR/${k}.mp3"
-done
-
-echo -e "${BLUE}🎵 BGM shuffled (Content uses 0.mp3 = former ${indices[0]}.mp3)${NC}"
+printf '%b\n' "${BLUE}🎵 New 0.mp3 ← $base${NC}"

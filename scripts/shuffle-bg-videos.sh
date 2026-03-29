@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
-# Randomly permute public/video/0.mp4..3.mp4 so a different clip lands at each index.
-# Video composition always loads 0.mp4 — not run by render pipelines; use locally before render if you want variety.
-# Skips (exit 0) if any of the four files is missing.
+# Pick a random .mp4 under VIDEO_DIR and make it 0.mp4 (the path the composition reads).
+# If 0.mp4 already exists, move it to 0-YYYYMMDD-HHMMSS-<pid>.mp4 first.
+# Any number of clips is fine; no consecutive 0..N requirement.
+# Skips (exit 0) if no .mp4 files remain.
 
 set -e
+shopt -s nullglob
 
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
@@ -14,29 +16,23 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_ROOT"
 
 VIDEO_DIR="${VIDEO_DIR:-public/video}"
+mkdir -p "$VIDEO_DIR"
 
-for i in 0 1 2 3; do
-	if [[ ! -f "$VIDEO_DIR/$i.mp4" ]]; then
-		echo -e "${YELLOW}⚠️  shuffle-bg-videos: missing $VIDEO_DIR/$i.mp4 — skip${NC}"
-		exit 0
-	fi
-done
+if [[ -f "$VIDEO_DIR/0.mp4" ]]; then
+	stamp="$(date +%Y%m%d-%H%M%S)-$$"
+	mv "$VIDEO_DIR/0.mp4" "$VIDEO_DIR/0-${stamp}.mp4"
+fi
 
-for i in 0 1 2 3; do
-	mv "$VIDEO_DIR/$i.mp4" "$VIDEO_DIR/.bg-shuffle-tmp-$i.mp4"
-done
+candidates=("$VIDEO_DIR"/*.mp4)
+n=${#candidates[@]}
+if [[ "$n" -eq 0 ]]; then
+	printf '%b\n' "${YELLOW}⚠️  shuffle-bg-videos: no .mp4 in $VIDEO_DIR — skip${NC}"
+	exit 0
+fi
 
-indices=(0 1 2 3)
-for ((i = 4; i > 0; i--)); do
-	j=$((RANDOM % i))
-	tmp=${indices[j]}
-	indices[j]=${indices[i - 1]}
-	indices[i - 1]=$tmp
-done
+idx=$((RANDOM % n))
+picked="${candidates[idx]}"
+base="$(basename "$picked")"
+mv "$picked" "$VIDEO_DIR/0.mp4"
 
-for k in 0 1 2 3; do
-	old=${indices[k]}
-	mv "$VIDEO_DIR/.bg-shuffle-tmp-${old}.mp4" "$VIDEO_DIR/${k}.mp4"
-done
-
-echo -e "${BLUE}🎬 BG videos shuffled (Video uses 0.mp4 = former ${indices[0]}.mp4 content)${NC}"
+printf '%b\n' "${BLUE}🎬 New 0.mp4 ← $base${NC}"
