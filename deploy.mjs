@@ -11,6 +11,13 @@ import { webpackOverride } from "./src/remotion/webpack-override.mjs";
 console.log("Selected region:", REGION);
 dotenv.config();
 
+if (process.env.VERCEL) {
+  console.log(
+    "Skipping Remotion Lambda deploy during Vercel build (website only; run deploy locally or in CI when needed).",
+  );
+  process.exit(0);
+}
+
 if (!process.env.AWS_ACCESS_KEY_ID && !process.env.REMOTION_AWS_ACCESS_KEY_ID) {
   console.log(
     'The environment variable "REMOTION_AWS_ACCESS_KEY_ID" is not set.',
