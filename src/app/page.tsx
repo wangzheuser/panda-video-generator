@@ -182,10 +182,26 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Finished work showcase */}
+      <section className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 px-2">
+          成品展示
+        </h2>
+        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-black">
+          <iframe
+            title="Panda Video Generator 成品展示"
+            src="https://player.bilibili.com/player.html?isOutside=true&aid=116245168922269&bvid=BV19Rw9zwEd4&cid=36772710081&p=1"
+            className="absolute inset-0 w-full h-full border-0"
+            scrolling="no"
+            allowFullScreen
+          />
+        </div>
+      </section>
+
       {/* Demo video */}
       <section className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
         <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 px-2">
-          演示视频
+          技术演示
         </h2>
         <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-black">
           <iframe
