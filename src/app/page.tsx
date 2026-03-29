@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Github, Zap, Globe, Video, Upload } from "lucide-react";
+import { ExternalLink, Github, Zap, Globe, Video, Upload } from "lucide-react";
 import { defaultMyCompProps } from "../../types/constants";
 
 // Media files in /public/media directory
@@ -60,8 +60,11 @@ export default function Home() {
         <p className="text-lg sm:text-xl text-gray-600 mb-2 px-2">
           熊猫视频自动化引擎
         </p>
+        <p className="text-base sm:text-lg text-gray-500 italic mb-4 sm:mb-5 px-2">
+          &ldquo;Developer-first video automation.&rdquo;
+        </p>
         <p className="text-sm sm:text-base md:text-lg text-gray-500 max-w-3xl mx-auto mb-6 sm:mb-8 px-2 leading-relaxed">
-          Panda Video Generator 是一个全自动化的视频内容生成与发布平台，支持从网页内容提取、文本转视频到多平台发布的完整工作流。通过 AI 驱动的文本转语音 TTS 技术和程序化视频渲染引擎，帮助内容创作者快速生成高质量视频并一键发布到多个平台。
+          Panda Video Generator 是全自动化视频内容生成与发布引擎，覆盖从网页内容提取、文本转视频到多平台发布的完整工作流。借助 AI 驱动的文本转语音（TTS）与程序化视频渲染，帮助内容创作者快速产出高质量成片。发布阶段通过浏览器自动化，在多个平台网页端一键完成上传与发布。
         </p>
         <div className="flex gap-3 sm:gap-4 justify-center flex-wrap px-2">
           <Link
@@ -179,6 +182,22 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Demo video */}
+      <section className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 px-2">
+          演示视频
+        </h2>
+        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-black">
+          <iframe
+            title="Panda Video Generator 演示视频"
+            src="https://player.bilibili.com/player.html?isOutside=true&aid=116312193900291&bvid=BV1v5XXBMEz9&cid=37073193133&p=1&autoplay=0"
+            className="absolute inset-0 w-full h-full border-0"
+            scrolling="no"
+            allowFullScreen
+          />
+        </div>
+      </section>
+
       {/* Platform Screenshots Section */}
       <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
@@ -231,12 +250,30 @@ export default function Home() {
 
       {/* Footer */}
       <footer className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 mt-8 sm:mt-16 border-t border-gray-200">
-        <div className="text-center text-gray-600">
-          <p className="mb-2 text-sm sm:text-base">
-            Made with <span className="text-red-600">❤️</span> by 熊猫智研社
-          </p>
-          <p className="text-xs sm:text-sm">
-            © 2024 Panda Video Generator. All rights reserved.
+        <div className="text-center text-gray-600 text-sm sm:text-base space-y-4">
+          <p>Made with ❤️ by szhshp x 熊猫智研社</p>
+          <div className="flex justify-center gap-6 sm:gap-8 flex-wrap items-center">
+            <a
+              href="https://github.com/szhshp/panda-video-generator"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-gray-700 hover:text-gray-900 underline-offset-4 hover:underline"
+            >
+              <Github size={18} className="shrink-0" aria-hidden />
+              <span>GitHub 仓库</span>
+            </a>
+            <a
+              href="https://szhshp.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 text-gray-700 hover:text-gray-900 underline-offset-4 hover:underline"
+            >
+              <ExternalLink size={16} className="shrink-0" aria-hidden />
+              <span>开发者博客</span>
+            </a>
+          </div>
+          <p className="text-xs sm:text-sm text-gray-500">
+            © {new Date().getFullYear()} Panda Video Generator. All rights reserved.
           </p>
         </div>
       </footer>
