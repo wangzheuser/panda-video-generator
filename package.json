@@ -2,6 +2,10 @@
   "name": "panda-video-generator",
   "version": "1.2.0",
   "private": true,
+  "engines": {
+    "node": ">=20.9.0",
+    "pnpm": ">=8.0.0"
+  },
   "author": {
     "name": "szhshp",
     "url": "https://github.com/szhshp"
@@ -9,6 +13,7 @@
   "dependencies": {
     "@panda-video-generator/caption-generator": "workspace:*",
     "@panda-video-generator/spider": "workspace:*",
+    "@panda-video-generator/tts-node": "workspace:*",
     "@google/genai": "^1.38.0",
     "@remotion/bundler": "4.0.409",
     "@remotion/cli": "4.0.409",
@@ -59,7 +64,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "postinstall": "playwright install chromium",
+    "check:setup": "sh scripts/check-setup.sh",
+    "install:project": "sh scripts/install.sh",
+    "postinstall": "playwright install --with-deps chromium",
     "remotion": "remotion studio",
     "render": "remotion render",
     "tts": "SPIDER_OUTPUT_DIR=output/spider TTS_OUTPUT_DIR=output/tts TTS_PUBLIC_DIR=public/tts sh scripts/tts.sh",
