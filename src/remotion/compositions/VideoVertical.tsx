@@ -3,7 +3,6 @@ import { AbsoluteFill, Sequence, useVideoConfig, staticFile, useDelayRender, Htm
 import { REMOTION_PATHS } from '../../../types/paths';
 import { IntroVertical, TitleSequenceVertical } from './IntroVertical';
 import { ContentVertical } from './ContentVertical';
-import { Watermark } from './Watermark';
 import { Cover } from './Cover';
 import { defaultMyCompProps } from '../../../types/constants';
 
@@ -111,11 +110,6 @@ export const VideoVertical: React.FC<{
 				{/* Sequence 3: Content */}
 				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
 					<ContentVertical audioFile={audioFile} captionVttFile={captionVttFile} />
-				</Sequence>
-
-				{/* Watermark sequence - starts from content sequence, overlays content only */}
-				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
-					<Watermark />
 				</Sequence>
 
 				{/* Logo sequence - moved to the end */}

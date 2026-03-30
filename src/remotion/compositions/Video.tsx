@@ -4,7 +4,6 @@ import { Video as RemotionVideo } from '@remotion/media';
 import { REMOTION_PATHS } from '../../../types/paths';
 import { Intro, TitleSequence } from './Intro';
 import { Content } from './Content';
-import { Watermark } from './Watermark';
 import { Cover } from './Cover';
 
 // Parse VTT file to get duration
@@ -132,11 +131,6 @@ export const Video: React.FC<{
 				{/* Sequence 3: Content */}
 				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
 					<Content audioFile={audioFile} captionVttFile={captionVttFile} />
-				</Sequence>
-
-				{/* Watermark sequence - starts from content sequence, overlays content only */}
-				<Sequence from={seq3Start} durationInFrames={contentDurationFrames}>
-					<Watermark />
 				</Sequence>
 
 				{/* Logo sequence - moved to the end */}
