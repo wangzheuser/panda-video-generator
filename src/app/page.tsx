@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { ExternalLink, Github, Zap, Globe, Video, Upload } from "lucide-react";
+import { ExternalLink, Github, Globe, Video, Upload } from "lucide-react";
 import { defaultMyCompProps } from "../../types/constants";
 
 // Media files in /public/media directory
@@ -15,7 +15,7 @@ const mediaFiles = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-100">
       {/* Header */}
       <header className="container mx-auto px-4 sm:px-6 py-4 sm:py-8">
         <nav className="flex justify-between items-center">
@@ -27,7 +27,7 @@ export default function Home() {
               height={40}
               className="rounded-lg w-8 h-8 sm:w-10 sm:h-10"
             />
-            <span className="text-base sm:text-xl font-bold text-gray-900 truncate max-w-[140px] sm:max-w-none">
+            <span className="text-base sm:text-xl font-bold text-zinc-50 truncate max-w-[140px] sm:max-w-none">
               {defaultMyCompProps.title}
             </span>
           </div>
@@ -35,7 +35,7 @@ export default function Home() {
             href="https://github.com/szhshp/panda-video-generator"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
+            className="flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-zinc-600 bg-zinc-900/80 text-zinc-100 rounded-lg hover:bg-zinc-800 transition-colors text-sm sm:text-base"
           >
             <Github size={18} className="sm:w-5 sm:h-5" />
             <span className="hidden sm:inline">GitHub</span>
@@ -51,27 +51,30 @@ export default function Home() {
             alt="Panda Video Generator Logo"
             width={200}
             height={200}
-            className="rounded-2xl shadow-lg w-32 h-32 sm:w-48 sm:h-48 md:w-52 md:h-52"
+            className="rounded-2xl shadow-lg shadow-black/40 ring-1 ring-zinc-800 w-32 h-32 sm:w-48 sm:h-48 md:w-52 md:h-52"
           />
         </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-3 sm:mb-4 px-2">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-zinc-50 mb-3 sm:mb-4 px-2">
           Panda Video Generator
         </h1>
-        <p className="text-lg sm:text-xl text-gray-600 mb-2 px-2">
+        <p className="text-lg sm:text-xl text-zinc-300 mb-2 px-2">
           熊猫视频自动化引擎
         </p>
-        <p className="text-base sm:text-lg text-gray-500 italic mb-4 sm:mb-5 px-2">
+        <p className="text-base sm:text-lg text-zinc-400 italic mb-4 sm:mb-5 px-2">
           &ldquo;Developer-first video automation.&rdquo;
         </p>
-        <p className="text-sm sm:text-base md:text-lg text-gray-500 max-w-3xl mx-auto mb-6 sm:mb-8 px-2 leading-relaxed">
-          Panda Video Generator 是全自动化视频内容生成与发布引擎，覆盖从网页内容提取、文本转视频到多平台发布的完整工作流。借助 AI 驱动的文本转语音（TTS）与程序化视频渲染，帮助内容创作者快速产出高质量成片。发布阶段通过浏览器自动化，在多个平台网页端一键完成上传与发布。
+        <p className="text-sm sm:text-base md:text-lg text-zinc-400 max-w-3xl mx-auto mb-6 sm:mb-8 px-2 leading-relaxed">
+          Panda Video Generator
+          是全自动化视频内容生成与发布平台，支持从网页内容提取、文本转视频到多平台发布的完整工作流。通过
+          AI 驱动的文本转语音（TTS）与视频渲染引擎帮助快速生成高质量视频；发布侧通过 Playwright
+          驱动浏览器完成上传，各平台共用相近自动化流程。
         </p>
         <div className="flex gap-3 sm:gap-4 justify-center flex-wrap px-2">
           <Link
             href="https://github.com/szhshp/panda-video-generator"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors text-sm sm:text-base"
+            className="flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 border border-zinc-600 bg-zinc-900/80 text-zinc-100 rounded-lg hover:bg-zinc-800 transition-colors text-sm sm:text-base"
           >
             <Github size={18} className="sm:w-5 sm:h-5" />
             <span>View on GitHub</span>
@@ -85,109 +88,118 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features — distinct product cards (not pipeline / mono spec style) */}
       <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 sm:mb-12 text-gray-900 px-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center text-zinc-50 px-2">
           核心特性
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
-          {/* Feature 1 */}
-          <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Globe className="text-red-600 flex-shrink-0" size={28} />
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
-                <span className="text-red-600 font-bold text-xl sm:text-2xl">一键</span>
-                网页转文本
-              </h3>
+        <p className="mx-auto mt-3 max-w-lg text-center text-sm text-zinc-500 leading-relaxed">
+          抓取与成片、多平台发布既可单独使用，也可接成端到端自动化流水线。
+        </p>
+        <div className="mt-10 grid gap-5 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-zinc-900/55 to-zinc-950/90 p-6 ring-1 ring-inset ring-white/[0.06] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40 hover:ring-zinc-500/20 sm:p-7">
+            <span
+              className="pointer-events-none absolute -right-1 -top-6 text-[5.5rem] font-black leading-none tabular-nums text-white/[0.035] transition-colors duration-300 group-hover:text-white/[0.055] sm:text-[6.25rem]"
+              aria-hidden
+            >
+              1
+            </span>
+            <div
+              className="mb-5 inline-flex size-11 items-center justify-center rounded-2xl bg-zinc-800/80 text-zinc-400 ring-1 ring-zinc-700/80"
+              aria-hidden
+            >
+              <Globe className="size-5" strokeWidth={1.75} />
             </div>
-            <ul className="space-y-2 text-sm sm:text-base text-gray-600">
-              <li className="flex items-start gap-2">
-                <Zap className="text-red-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>
-                  <span className="text-red-600 font-bold">一键</span>提取：只需一个命令，自动识别并提取网页核心内容
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>多平台支持：支持知乎、Bilibili 等主流平台</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>结构化输出：自动生成标题和正文文本文件，无需手动处理</span>
-              </li>
-            </ul>
-          </div>
+            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
+              <span className="text-yellow-400 font-bold">一键</span>
+              网页转文本
+            </h3>
+            <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">
+              一键抓取正文与标题（如知乎），输出结构化文件，减少手工整理；也可按需扩展更多站点解析能力。
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                网页提取
+              </span>
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                结构化输出
+              </span>
+            </div>
+          </article>
 
-          {/* Feature 2 */}
-          <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Video className="text-red-600 flex-shrink-0" size={28} />
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
-                <span className="text-red-600 font-bold text-xl sm:text-2xl">一键</span>
-                文本转视频
-              </h3>
+          <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-zinc-900/55 to-zinc-950/90 p-6 ring-1 ring-inset ring-white/[0.06] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40 hover:ring-zinc-500/20 sm:p-7">
+            <span
+              className="pointer-events-none absolute -right-1 -top-6 text-[5.5rem] font-black leading-none tabular-nums text-white/[0.035] transition-colors duration-300 group-hover:text-white/[0.055] sm:text-[6.25rem]"
+              aria-hidden
+            >
+              2
+            </span>
+            <div
+              className="mb-5 inline-flex size-11 items-center justify-center rounded-2xl bg-zinc-800/80 text-zinc-400 ring-1 ring-zinc-700/80"
+              aria-hidden
+            >
+              <Video className="size-5" strokeWidth={1.75} />
             </div>
-            <ul className="space-y-2 text-sm sm:text-base text-gray-600">
-              <li className="flex items-start gap-2">
-                <Zap className="text-red-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>
-                  <span className="text-red-600 font-bold">一键</span>生成：从文本到视频，全程自动化，无需人工干预
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>AI 语音合成：基于 Edge TTS 的高质量语音生成</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>自动字幕生成：同步生成 VTT 字幕文件</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>专业视频模板：使用 Remotion 构建的可定制视频模板</span>
-              </li>
-            </ul>
-          </div>
+            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
+              <span className="text-yellow-400 font-bold">一键</span>
+              文本转视频
+            </h3>
+            <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">
+              一键跑通口播链路：Edge TTS 生成配音与 VTT 字幕，由 Remotion
+              模板渲染成片；当前以横屏模板为主，更多版式持续迭代中。
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                Edge TTS
+              </span>
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                Remotion
+              </span>
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                字幕 VTT
+              </span>
+            </div>
+          </article>
 
-          {/* Feature 3 */}
-          <div className="bg-white p-4 sm:p-6 md:p-8 rounded-xl shadow-lg border border-gray-100 hover:shadow-xl transition-shadow">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Upload className="text-red-600 flex-shrink-0" size={28} />
-              <h3 className="text-lg sm:text-xl font-bold text-gray-900 leading-tight">
-                <span className="text-red-600 font-bold text-xl sm:text-2xl">一键</span>
-                多平台统一发布
-              </h3>
+          <article className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-gradient-to-b from-zinc-900/55 to-zinc-950/90 p-6 ring-1 ring-inset ring-white/[0.06] transition-[transform,box-shadow] duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40 hover:ring-zinc-500/20 sm:p-7 md:col-span-2 lg:col-span-1">
+            <span
+              className="pointer-events-none absolute -right-1 -top-6 text-[5.5rem] font-black leading-none tabular-nums text-white/[0.035] transition-colors duration-300 group-hover:text-white/[0.055] sm:text-[6.25rem]"
+              aria-hidden
+            >
+              3
+            </span>
+            <div
+              className="mb-5 inline-flex size-11 items-center justify-center rounded-2xl bg-zinc-800/80 text-zinc-400 ring-1 ring-zinc-700/80"
+              aria-hidden
+            >
+              <Upload className="size-5" strokeWidth={1.75} />
             </div>
-            <ul className="space-y-2 text-sm sm:text-base text-gray-600">
-              <li className="flex items-start gap-2">
-                <Zap className="text-red-600 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>
-                  <span className="text-red-600 font-bold">一键</span>发布：一次命令，同时发布到多个平台
-                </span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>统一发布接口：一次配置，多平台同步</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>自动化上传：基于 Playwright 的浏览器自动化</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <Zap className="text-gray-400 mt-0.5 sm:mt-1 flex-shrink-0" size={16} />
-                <span>平台支持：Bilibili、抖音、微信视频号、YouTube、小红书等</span>
-              </li>
-            </ul>
-          </div>
+            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
+              <span className="text-yellow-400 font-bold">一键</span>
+              多平台发布
+            </h3>
+            <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">
+              一键驱动 Playwright 在浏览器中完成上传；B
+              站、抖音、视频号、YouTube、小红书、快手等平台流程相近，各平台使用独立上传脚本，可按需分别启用。
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                Playwright
+              </span>
+              <span className="rounded-full bg-zinc-800/90 px-3 py-1 text-xs font-medium text-zinc-400">
+                网页端上传
+              </span>
+            </div>
+          </article>
         </div>
       </section>
 
       {/* Finished work showcase */}
       <section className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 px-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-zinc-50 px-2">
           成品展示
         </h2>
-        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-black">
+        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg shadow-black/40 border border-zinc-800 bg-black">
           <iframe
             title="Panda Video Generator 成品展示"
             src="https://player.bilibili.com/player.html?isOutside=true&aid=116245168922269&bvid=BV19Rw9zwEd4&cid=36772710081&p=1"
@@ -200,10 +212,10 @@ export default function Home() {
 
       {/* Demo video */}
       <section className="container mx-auto px-4 sm:px-6 py-6 sm:py-10">
-        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-gray-900 px-2">
+        <h2 className="text-2xl sm:text-3xl font-bold text-center mb-6 sm:mb-8 text-zinc-50 px-2">
           技术演示
         </h2>
-        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg border border-gray-100 bg-black">
+        <div className="relative w-full max-w-4xl mx-auto aspect-video rounded-xl overflow-hidden shadow-lg shadow-black/40 border border-zinc-800 bg-black">
           <iframe
             title="Panda Video Generator 演示视频"
             src="https://player.bilibili.com/player.html?isOutside=true&aid=116312193900291&bvid=BV1v5XXBMEz9&cid=37073193133&p=1&autoplay=0"
@@ -214,15 +226,32 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Platform Screenshots Section */}
+      {/* Platform Screenshots */}
       <section className="container mx-auto px-4 sm:px-6 py-8 sm:py-16">
+        <div
+          className="mb-6 h-px w-full bg-zinc-700 sm:mb-8"
+          aria-hidden
+        />
+        <header className="mx-auto mb-8 max-w-2xl px-2 text-center">
+          <h2 className="text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl">
+            平台示例
+          </h2>
+          {/* <p className="mt-3 max-w-md mx-auto text-sm text-zinc-500">
+            网页端截取，展示以各平台当时界面为准。
+          </p> */}
+        </header>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8">
           {mediaFiles.map((file) => (
             <div
               key={file.id}
-              className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
+              className="bg-zinc-900/70 rounded-xl shadow-lg shadow-black/30 overflow-hidden border border-zinc-800"
             >
-              <div className="relative w-full h-[280px] sm:h-[320px] overflow-hidden bg-gray-50">
+              <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 bg-zinc-950/60 px-3 py-1.5">
+                <span className="max-w-[52%] truncate font-mono text-[9px] text-zinc-600 sm:text-[10px]">
+                  {file.id}
+                </span>
+              </div>
+              <div className="relative w-full h-[280px] sm:h-[320px] overflow-hidden bg-zinc-950">
                 <Image
                   src={file.path}
                   alt={file.label}
@@ -231,8 +260,8 @@ export default function Home() {
                   className="object-contain p-2"
                 />
               </div>
-              <div className="p-4 text-center">
-                <p className="text-lg font-semibold text-gray-900">{file.label}</p>
+              <div className="border-t border-zinc-800/80 bg-zinc-950/40 px-3 py-3 text-center sm:px-4 sm:py-4">
+                <p className="text-sm font-medium text-zinc-100">{file.label}</p>
               </div>
             </div>
           ))}
@@ -265,15 +294,15 @@ export default function Home() {
       </section> */}
 
       {/* Footer */}
-      <footer className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 mt-8 sm:mt-16 border-t border-gray-200">
-        <div className="text-center text-gray-600 text-sm sm:text-base space-y-4">
+      <footer className="container mx-auto px-4 sm:px-6 py-8 sm:py-12 mt-8 sm:mt-16 border-t border-zinc-800">
+        <div className="text-center text-zinc-400 text-sm sm:text-base space-y-4">
           <p>Made with ❤️ by szhshp x 熊猫智研社</p>
           <div className="flex justify-center gap-6 sm:gap-8 flex-wrap items-center">
             <a
               href="https://github.com/szhshp/panda-video-generator"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-gray-700 hover:text-gray-900 underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-1.5 text-zinc-300 hover:text-zinc-50 underline-offset-4 hover:underline"
             >
               <Github size={18} className="shrink-0" aria-hidden />
               <span>GitHub 仓库</span>
@@ -282,13 +311,13 @@ export default function Home() {
               href="https://szhshp.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-gray-700 hover:text-gray-900 underline-offset-4 hover:underline"
+              className="inline-flex items-center gap-1.5 text-zinc-300 hover:text-zinc-50 underline-offset-4 hover:underline"
             >
               <ExternalLink size={16} className="shrink-0" aria-hidden />
               <span>开发者博客</span>
             </a>
           </div>
-          <p className="text-xs sm:text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-zinc-500">
             © {new Date().getFullYear()} Panda Video Generator. All rights reserved.
           </p>
         </div>
