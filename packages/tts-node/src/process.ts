@@ -5,15 +5,52 @@ import { assertFfmpegAvailable, mergeMp3WithSpeed } from './ffmpeg-merge.js';
 import { getMp3DurationSeconds } from './duration.js';
 import { generateVtt } from './vtt.js';
 
-const BATCH_SIZE = 3;
 const SPEED_FACTOR = 1.1;
 const DEFAULT_VOICE = 'zh-CN-YunjianNeural';
+
+/**
+ * Single default for TTS parallelism & retry policy (both 3).
+ * Override batch with EDGE_TTS_BATCH_SIZE (capped at BATCH_SIZE_ENV_CAP).
+ */
+const TTS_DEFAULT_THREE = 3;
+const DEFAULT_BATCH_SIZE = TTS_DEFAULT_THREE;
+const DEFAULT_MAX_RETRIES = TTS_DEFAULT_THREE;
+/** Max allowed EDGE_TTS_BATCH_SIZE (raise here if you need >3 concurrent WS). */
+const BATCH_SIZE_ENV_CAP = 8;
+
+/** `node-edge-tts` defaults to 10s per paragraph, too short for long lines or slow links. */
+const DEFAULT_EDGE_TTS_TIMEOUT_MS = 120_000;
+const MIN_EDGE_TTS_TIMEOUT_MS = 15_000;
 
 export type ProcessNarrationOptions = {
   voice?: string;
   speedFactor?: number;
   batchSize?: number;
 };
+
+/**
+ * Edge read-aloud WebSocket expects SSML names like `zh-CN-YunjianNeural`.
+ * Azure-style strings (e.g. `zh-CN-Yunjian:Neural`, `en-US-Aria:DragonHDFlashLatestNeural`)
+ * are not valid in `<voice name="...">` and tend to fail or hang until timeout.
+ */
+export function normalizeVoiceForEdgeReadAloud(voiceRaw: string): string {
+  const v = voiceRaw.trim();
+  if (!v.includes(':')) return v;
+
+  const plainNeural = /^(.+):Neural$/i.exec(v);
+  if (plainNeural) {
+    const base = plainNeural[1];
+    return base.endsWith('Neural') ? base : `${base}Neural`;
+  }
+
+  const variant = /^(.+):(DragonHDFlashLatestNeural|DragonHD\w+|\w+Neural)$/i.exec(v);
+  if (variant) {
+    const base = variant[1];
+    return base.endsWith('Neural') ? base : `${base}Neural`;
+  }
+
+  return v.replace(':', '');
+}
 
 function voiceToLang(voice: string): string {
   const parts = voice.split('-');
@@ -23,11 +60,32 @@ function voiceToLang(voice: string): string {
   return 'zh-CN';
 }
 
+function parseTimeoutMs(): number {
+  const raw = process.env.EDGE_TTS_TIMEOUT_MS?.trim();
+  const n = raw ? Number.parseInt(raw, 10) : DEFAULT_EDGE_TTS_TIMEOUT_MS;
+  if (!Number.isFinite(n) || n < MIN_EDGE_TTS_TIMEOUT_MS) {
+    return DEFAULT_EDGE_TTS_TIMEOUT_MS;
+  }
+  return n;
+}
+
+function parseBatchSize(): number {
+  const raw = process.env.EDGE_TTS_BATCH_SIZE?.trim();
+  const n = raw ? Number.parseInt(raw, 10) : DEFAULT_BATCH_SIZE;
+  if (!Number.isFinite(n) || n < 1) return DEFAULT_BATCH_SIZE;
+  return Math.min(BATCH_SIZE_ENV_CAP, n);
+}
+
 function sleep(ms: number): Promise<void> {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-async function ttsWithRetry(tts: EdgeTTS, text: string, outPath: string, maxRetries = 3): Promise<void> {
+async function ttsWithRetry(
+  tts: EdgeTTS,
+  text: string,
+  outPath: string,
+  maxRetries = DEFAULT_MAX_RETRIES,
+): Promise<void> {
   let last: unknown;
   for (let attempt = 0; attempt < maxRetries; attempt++) {
     try {
@@ -35,8 +93,9 @@ async function ttsWithRetry(tts: EdgeTTS, text: string, outPath: string, maxRetr
       return;
     } catch (e) {
       last = e;
+      const msg = e instanceof Error ? e.message : String(e);
       const wait = (attempt + 1) * 2000;
-      console.warn(`  ⚠️  Retrying in ${wait}ms… (${attempt + 1}/${maxRetries})`);
+      console.warn(`  ⚠️  ${msg} — retry in ${wait}ms (${attempt + 1}/${maxRetries})`);
       await sleep(wait);
     }
   }
@@ -61,9 +120,11 @@ export async function processNarrationFile(
   outputDir: string,
   options: ProcessNarrationOptions = {},
 ): Promise<void> {
-  const voice = options.voice ?? (process.env.EDGE_TTS_VOICE?.trim() || DEFAULT_VOICE);
+  const voiceRaw = options.voice ?? (process.env.EDGE_TTS_VOICE?.trim() || DEFAULT_VOICE);
+  const voice = normalizeVoiceForEdgeReadAloud(voiceRaw);
   const speedFactor = options.speedFactor ?? SPEED_FACTOR;
-  const batchSize = options.batchSize ?? BATCH_SIZE;
+  const batchSize = options.batchSize ?? parseBatchSize();
+  const timeoutMs = parseTimeoutMs();
 
   assertFfmpegAvailable();
 
@@ -80,10 +141,17 @@ export async function processNarrationFile(
     voice,
     lang: voiceToLang(voice),
     outputFormat: 'audio-24khz-48kbitrate-mono-mp3',
+    timeout: timeoutMs,
   });
 
   console.log('🎙️  Edge-TTS (Node)');
-  console.log(`🔊 Voice: ${voice}`);
+  if (voice !== voiceRaw) {
+    console.log(`🔊 Voice (raw): ${voiceRaw}`);
+    console.log(`🔊 Voice (Edge SSML): ${voice}`);
+  } else {
+    console.log(`🔊 Voice: ${voice}`);
+  }
+  console.log(`⏱  Timeout per paragraph: ${timeoutMs}ms · parallel batch size: ${batchSize}`);
   console.log(`📝 ${lines.length} paragraph(s)\n`);
 
   type Row = { index: number; path: string; duration: number };

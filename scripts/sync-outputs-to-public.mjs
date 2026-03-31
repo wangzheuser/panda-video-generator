@@ -100,13 +100,14 @@ if (exists(TITLE_SPIDER)) {
   );
 }
 
+const destTitle = path.join(VIDEO_PUBLIC_DIR, "title.json");
+
 if (titleFile) {
   fs.mkdirSync(VIDEO_PUBLIC_DIR, { recursive: true });
-   
-  const dest = path.join(VIDEO_PUBLIC_DIR, "title.json");
-  if (exists(dest)) fs.rmSync(dest, { force: true });
-  fs.copyFileSync(titleFile, dest);
-  console.log(`${GREEN}✅ Title → ${dest}${NC}`);
+
+  if (exists(destTitle)) fs.rmSync(destTitle, { force: true });
+  fs.copyFileSync(titleFile, destTitle);
+  console.log(`${GREEN}✅ Title → ${destTitle}${NC}`);
   try {
     const t = JSON.parse(fs.readFileSync(titleFile, "utf8"));
     if (t.title) console.log(`${BLUE}   Title: ${t.title}${NC}`);
@@ -114,9 +115,16 @@ if (titleFile) {
     /* ignore */
   }
 } else {
-  console.log(
-    `${YELLOW}⚠️  Skipped title (no ${TITLE_SPIDER} or ${TITLE_LEGACY})${NC}`,
-  );
+  if (exists(destTitle)) {
+    fs.rmSync(destTitle, { force: true });
+    console.log(
+      `${YELLOW}⚠️  Removed stale ${destTitle} (no ${TITLE_SPIDER} or ${TITLE_LEGACY})${NC}`,
+    );
+  } else {
+    console.log(
+      `${YELLOW}⚠️  Skipped title (no ${TITLE_SPIDER} or ${TITLE_LEGACY})${NC}`,
+    );
+  }
 }
 
 console.log("");

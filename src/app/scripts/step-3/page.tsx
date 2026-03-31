@@ -1,0 +1,246 @@
+"use client";
+
+import Link from "next/link";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ArrowLeft, Loader2, Square } from "lucide-react";
+import { REMOTION_RENDER_OPTIONS } from "../../../lib/remotion-compositions";
+import { useRunScriptStreamLog } from "../use-run-script-stream-log";
+
+type SseLine =
+  | { type: "stdout"; text: string }
+  | { type: "stderr"; text: string }
+  | { type: "error"; message: string }
+  | { type: "exit"; code: number | null; signal: string | null };
+
+function parseSseBuffer(buffer: string): { events: SseLine[]; rest: string } {
+  const events: SseLine[] = [];
+  const parts = buffer.split("\n\n");
+  const rest = parts.pop() ?? "";
+  for (const block of parts) {
+    const line = block.trimStart();
+    if (!line.startsWith("data: ")) continue;
+    try {
+      events.push(JSON.parse(line.slice(6)) as SseLine);
+    } catch {
+      /* ignore */
+    }
+  }
+  return { events, rest };
+}
+
+const DEFAULT_COMPOSITION =
+  REMOTION_RENDER_OPTIONS.find((o) => o.id === "Video")?.id ??
+  REMOTION_RENDER_OPTIONS[0]?.id ??
+  "Video";
+
+export default function ScriptsStep3Page() {
+  const [compositionId, setCompositionId] = useState(DEFAULT_COMPOSITION);
+  const { log, setLog, appendStream, appendImmediate, flushPending } =
+    useRunScriptStreamLog();
+  const [running, setRunning] = useState(false);
+  const abortRef = useRef<AbortController | null>(null);
+  const abortByUserRef = useRef(false);
+  const logEndRef = useRef<HTMLSpanElement>(null);
+
+  useEffect(() => {
+    logEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+  }, [log]);
+
+  const stopRun = useCallback(() => {
+    abortByUserRef.current = true;
+    abortRef.current?.abort();
+    abortRef.current = null;
+  }, []);
+
+  const consumeRunScript = useCallback(
+    async (
+      payload: { script: string; args?: string[]; env?: Record<string, string> },
+      signal: AbortSignal,
+    ): Promise<number | null> => {
+      const res = await fetch("/api/dev/run-script", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal,
+      });
+      if (!res.ok) {
+        const errJson = (await res.json().catch(() => ({}))) as {
+          error?: string;
+        };
+        appendImmediate(
+          `[runner] HTTP ${res.status} ${errJson.error ?? ""}\n`,
+        );
+        return null;
+      }
+      const reader = res.body?.getReader();
+      if (!reader) {
+        appendImmediate("[runner] No response body\n");
+        return null;
+      }
+      const decoder = new TextDecoder();
+      let exitCode: number | null = null;
+      let carry = "";
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        carry += decoder.decode(value, { stream: true });
+        const { events, rest } = parseSseBuffer(carry);
+        carry = rest;
+        for (const ev of events) {
+          if (ev.type === "stdout") appendStream(ev.text);
+          else if (ev.type === "stderr") appendStream(ev.text);
+          else if (ev.type === "error")
+            appendImmediate(`[spawn error] ${ev.message}\n`);
+          else if (ev.type === "exit") {
+            exitCode = ev.code;
+            appendImmediate(
+              `\n[exit] code=${ev.code} signal=${ev.signal ?? "null"}\n`,
+            );
+          }
+        }
+      }
+      flushPending();
+      return exitCode;
+    },
+    [appendImmediate, appendStream, flushPending],
+  );
+
+  const run = useCallback(async () => {
+    if (running) return;
+    const id = compositionId.trim();
+    if (!id) {
+      appendImmediate("[提示] 请选择合成（Composition）。\n");
+      return;
+    }
+    abortByUserRef.current = false;
+    const ac = new AbortController();
+    abortRef.current = ac;
+    setRunning(true);
+    const stamp = new Date().toLocaleString();
+    appendImmediate(
+      `\n──────── ${stamp} · STEP3 · render:composition · ${id} ────────\n`,
+    );
+    try {
+      await consumeRunScript(
+        { script: "render:composition", args: [id] },
+        ac.signal,
+      );
+    } catch (e) {
+      if ((e as Error).name === "AbortError") {
+        if (abortByUserRef.current) {
+          appendImmediate(
+            "\n[已中止] 你已取消本次运行；服务端子进程会收到 SIGTERM。\n",
+          );
+        } else {
+          appendImmediate(
+            "\n[已中止] 浏览器请求被中断。渲染较耗时，请保持本页打开；也可终端执行：pnpm run render:composition -- <合成 ID>\n",
+          );
+        }
+      } else {
+        appendImmediate(
+          `\n[错误] ${e instanceof Error ? e.message : String(e)}\n`,
+        );
+      }
+    } finally {
+      setRunning(false);
+      abortRef.current = null;
+      abortByUserRef.current = false;
+    }
+  }, [appendImmediate, compositionId, consumeRunScript, running]);
+
+  const selectedHint = useMemo(
+    () => REMOTION_RENDER_OPTIONS.find((o) => o.id === compositionId)?.hintZh,
+    [compositionId],
+  );
+
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-zinc-950 via-black to-black text-zinc-100">
+      <header className="border-b border-zinc-800/80 bg-zinc-950/60 px-4 py-3 sm:px-6">
+        <Link
+          href="/scripts"
+          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200"
+        >
+          <ArrowLeft className="size-4" aria-hidden />
+          返回步骤列表
+        </Link>
+        <p className="mt-2 text-xs text-zinc-500">
+          STEP3：Remotion 渲染（需已完成 STEP2；输出在 output/video/）
+        </p>
+      </header>
+
+      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6">
+
+        <div className="space-y-2">
+          <label
+            htmlFor="step3-composition"
+            className="block text-sm font-medium text-zinc-300"
+          >
+            合成（Composition）
+          </label>
+          <select
+            id="step3-composition"
+            value={compositionId}
+            onChange={(e) => setCompositionId(e.target.value)}
+            disabled={running}
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/70 disabled:opacity-50"
+          >
+            {REMOTION_RENDER_OPTIONS.map((o) => (
+              <option key={o.id} value={o.id}>
+                {o.labelZh}（{o.id}）
+              </option>
+            ))}
+          </select>
+          {selectedHint ? (
+            <p className="text-xs text-zinc-500">{selectedHint}</p>
+          ) : null}
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={run}
+            disabled={running || !compositionId.trim()}
+            className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+          >
+            {running ? (
+              <>
+                <Loader2 className="size-4 animate-spin" aria-hidden />
+                渲染中
+              </>
+            ) : (
+              "开始渲染"
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={stopRun}
+            disabled={!running}
+            className="inline-flex items-center gap-2 rounded-xl border border-zinc-600 bg-zinc-900 px-4 py-2.5 text-sm text-zinc-200 hover:bg-zinc-800 disabled:opacity-40"
+          >
+            <Square className="size-4" aria-hidden />
+            中止
+          </button>
+          <button
+            type="button"
+            onClick={() => setLog("")}
+            disabled={running}
+            className="text-sm text-zinc-500 underline-offset-2 hover:text-zinc-300 hover:underline disabled:opacity-40"
+          >
+            清空日志
+          </button>
+        </div>
+
+        <div className="space-y-2">
+          <span className="text-sm font-medium text-zinc-400">运行日志</span>
+          <pre
+            className="max-h-[min(55vh,480px)] overflow-auto rounded-xl border border-zinc-800 bg-black/80 p-4 font-mono text-xs leading-relaxed text-zinc-300 whitespace-pre-wrap"
+            aria-live="polite"
+          >
+            {log || "（尚无输出）"}
+            <span ref={logEndRef} />
+          </pre>
+        </div>
+      </main>
+    </div>
+  );
+}

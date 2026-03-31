@@ -50,6 +50,14 @@ export async function runCaptionAndVttFromSpiderJson(
   await fs.writeFile(scriptPath, scriptText, 'utf-8');
   console.log(`Script saved: ${scriptPath}`);
 
+  const titlePath = resolve(outDir, 'title.json');
+  await fs.writeFile(
+    titlePath,
+    JSON.stringify({ title: payload.title }, null, 2),
+    'utf-8',
+  );
+  console.log(`Title JSON saved: ${titlePath}`);
+
   const vtt = scriptToEstimatedWebVtt(scriptText, options.secPerChar);
   await fs.writeFile(vttPath, vtt, 'utf-8');
   console.log(`WebVTT saved: ${vttPath}`);

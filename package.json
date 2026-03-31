@@ -64,6 +64,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "automation": "node scripts/dev-with-runner.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
