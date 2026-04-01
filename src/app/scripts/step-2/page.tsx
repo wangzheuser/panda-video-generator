@@ -16,6 +16,8 @@ import {
   formatAzureVoiceOptionLabel,
   groupAzureTtsVoicesForSelect,
 } from "../../../lib/azure-tts-voices";
+import { NextStepFab } from "../next-step-fab";
+import { usePersistedJson } from "../use-persisted-json";
 import { useRunScriptStreamLog } from "../use-run-script-stream-log";
 
 type SseLine =
@@ -50,17 +52,44 @@ type ManuscriptResponse = {
   error?: string;
 };
 
+type Step2Persisted = {
+  edgeTtsVoice: string;
+  videoTitle: string;
+};
+
+const STEP2_DEFAULT: Step2Persisted = {
+  edgeTtsVoice: DEFAULT_AZURE_TTS_VOICE_VALUE,
+  videoTitle: "",
+};
+
+function normalizeStep2Persisted(raw: unknown, d: Step2Persisted): Step2Persisted {
+  if (!raw || typeof raw !== "object") return d;
+  const o = raw as Record<string, unknown>;
+  const edgeTtsVoice =
+    typeof o.edgeTtsVoice === "string" && o.edgeTtsVoice.trim() !== ""
+      ? o.edgeTtsVoice
+      : d.edgeTtsVoice;
+  const videoTitle =
+    typeof o.videoTitle === "string" ? o.videoTitle : d.videoTitle;
+  return { edgeTtsVoice, videoTitle };
+}
+
 export default function ScriptsStep2Page() {
+  const [s2, setS2] = usePersistedJson(
+    "step2",
+    STEP2_DEFAULT,
+    normalizeStep2Persisted,
+  );
+  const videoTitle = s2.videoTitle;
+  const edgeTtsVoice = s2.edgeTtsVoice;
   const [manuscriptPath, setManuscriptPath] = useState("");
   const [manuscript, setManuscript] = useState<string | null>(null);
   const [manuscriptLoading, setManuscriptLoading] = useState(true);
   const [manuscriptError, setManuscriptError] = useState<string | null>(null);
-  const [videoTitle, setVideoTitle] = useState("");
   const [titlePathDisplay, setTitlePathDisplay] = useState("");
   const [savedTitle, setSavedTitle] = useState("");
   const [titleSaving, setTitleSaving] = useState(false);
   const [titleFeedback, setTitleFeedback] = useState<string | null>(null);
-  const [edgeTtsVoice, setEdgeTtsVoice] = useState(DEFAULT_AZURE_TTS_VOICE_VALUE);
   const { log, setLog, appendStream, appendImmediate, flushPending } =
     useRunScriptStreamLog();
   const [running, setRunning] = useState(false);
@@ -83,7 +112,9 @@ export default function ScriptsStep2Page() {
       }
       setManuscriptPath(json.path ?? "");
       const t = json.title ?? "";
-      setVideoTitle(t);
+      if (t !== "") {
+        setS2((prev) => ({ ...prev, videoTitle: t }));
+      }
       setSavedTitle(t);
       setTitlePathDisplay(json.titlePath ?? "output/spider/title.json");
       setTitleFeedback(null);
@@ -97,7 +128,7 @@ export default function ScriptsStep2Page() {
         e instanceof Error ? e.message : "无法读取文稿",
       );
       setManuscript(null);
-      setVideoTitle("");
+      setS2((prev) => ({ ...prev, videoTitle: "" }));
       setSavedTitle("");
     } finally {
       setManuscriptLoading(false);
@@ -270,10 +301,13 @@ export default function ScriptsStep2Page() {
         setTitleFeedback(json.error ?? `保存失败（${res.status}）`);
         return;
       }
-      const next = typeof json.title === "string" ? json.title : videoTitle.trim();
-      setVideoTitle(next);
+      const next =
+        typeof json.title === "string" ? json.title : videoTitle.trim();
+      setS2((prev) => ({ ...prev, videoTitle: next }));
       setSavedTitle(next);
-      setTitleFeedback("已保存；执行 TTS 时会同步到 public/video/title.json。");
+      setTitleFeedback(
+        "已保存至 output/spider/title.json 与 public/video/title.json（Remotion 读取后者）。",
+      );
     } catch (e) {
       setTitleFeedback(
         e instanceof Error ? e.message : "保存失败",
@@ -288,17 +322,17 @@ export default function ScriptsStep2Page() {
       <header className="border-b border-zinc-800/80 bg-zinc-950/60 px-4 py-3 sm:px-6">
         <Link
           href="/scripts"
-          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200"
+          className="inline-flex items-center gap-2.5 rounded-lg border border-zinc-700 bg-zinc-900/80 px-4 py-2.5 text-base font-medium text-zinc-200 hover:bg-zinc-800 hover:text-zinc-50"
         >
-          <ArrowLeft className="size-4" aria-hidden />
+          <ArrowLeft className="size-5 shrink-0" aria-hidden />
           返回步骤列表
         </Link>
-        <p className="mt-2 text-xs text-zinc-500">
-          STEP2：仅 TTS（生成 output/tts 与 public/tts；成片渲染见 STEP3）
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-400">
+          STEP2：配音和字幕
         </p>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 pb-24 sm:px-6 sm:pb-20">
         <section className="space-y-2 rounded-xl border border-zinc-800 bg-zinc-950/50 p-4">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-medium text-zinc-300">
@@ -306,7 +340,7 @@ export default function ScriptsStep2Page() {
             </h2>
             <div className="flex items-center gap-2">
               {manuscriptPath ? (
-                <code className="text-[11px] text-zinc-500">
+                <code className="text-xs text-zinc-500">
                   {manuscriptPath}
                 </code>
               ) : null}
@@ -349,7 +383,7 @@ export default function ScriptsStep2Page() {
               影片标题
             </h2>
             {titlePathDisplay ? (
-              <code className="text-[11px] text-zinc-500">{titlePathDisplay}</code>
+              <code className="text-xs text-zinc-500">{titlePathDisplay}</code>
             ) : null}
           </div>
           <p className="text-xs text-zinc-500">
@@ -364,12 +398,12 @@ export default function ScriptsStep2Page() {
             type="text"
             value={videoTitle}
             onChange={(e) => {
-              setVideoTitle(e.target.value);
+              setS2((prev) => ({ ...prev, videoTitle: e.target.value }));
               setTitleFeedback(null);
             }}
             disabled={manuscriptLoading || running}
             placeholder="未设置时渲染可能沿用旧标题或默认文案"
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 placeholder:text-zinc-600 focus:outline focus:outline-2 focus:outline-red-500/70 disabled:opacity-50"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 placeholder:text-zinc-600 focus:outline focus:outline-2 focus:outline-app-cta/65 disabled:opacity-50"
             autoComplete="off"
           />
           <div className="flex flex-wrap items-center gap-2">
@@ -416,9 +450,11 @@ export default function ScriptsStep2Page() {
           <select
             id="step2-edge-voice"
             value={edgeTtsVoice}
-            onChange={(e) => setEdgeTtsVoice(e.target.value)}
+            onChange={(e) =>
+              setS2((prev) => ({ ...prev, edgeTtsVoice: e.target.value }))
+            }
             disabled={running}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/70 disabled:opacity-50"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-app-cta/65 disabled:opacity-50"
           >
             {voiceGroups.map((g) => (
               <optgroup key={g.lang} label={g.groupLabel}>
@@ -462,7 +498,7 @@ export default function ScriptsStep2Page() {
                 manuscript === null ||
                 !!manuscriptError
               }
-              className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+              className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-app-cta px-4 py-2.5 text-sm font-medium text-app-cta-foreground hover:bg-app-cta-hover disabled:opacity-50"
             >
               {running ? (
                 <>
@@ -531,6 +567,7 @@ export default function ScriptsStep2Page() {
           </pre>
         </div>
       </main>
+      <NextStepFab href="/scripts/step-3" />
     </div>
   );
 }

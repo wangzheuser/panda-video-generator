@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Loader2, Square } from "lucide-react";
+import { NextStepFab } from "../next-step-fab";
+import { usePersistedJson } from "../use-persisted-json";
 import { useRunScriptStreamLog } from "../use-run-script-stream-log";
 
 type Step1Mode = "manual" | "zhihu" | "generic-web";
@@ -66,11 +68,60 @@ function placeholderForMode(mode: Step1Mode): string {
   }
 }
 
+const STEP1_MODES = ["manual", "zhihu", "generic-web"] as const satisfies readonly Step1Mode[];
+
+type Step1Persisted = {
+  mode: Step1Mode;
+  llmProvider: LlmProviderId;
+  deepseekApiKey: string;
+  inputByMode: Record<Step1Mode, string>;
+};
+
+const STEP1_DEFAULT: Step1Persisted = {
+  mode: "manual",
+  llmProvider: "deepseek",
+  deepseekApiKey: "",
+  inputByMode: {
+    manual: "",
+    zhihu: "",
+    "generic-web": "",
+  },
+};
+
+function normalizeStep1Persisted(raw: unknown, d: Step1Persisted): Step1Persisted {
+  if (!raw || typeof raw !== "object") return d;
+  const o = raw as Record<string, unknown>;
+  const mode = STEP1_MODES.includes(o.mode as Step1Mode)
+    ? (o.mode as Step1Mode)
+    : d.mode;
+  const llmProvider =
+    o.llmProvider === "deepseek" ? "deepseek" : d.llmProvider;
+  const deepseekApiKey =
+    typeof o.deepseekApiKey === "string" ? o.deepseekApiKey : d.deepseekApiKey;
+  const inputByMode = { ...d.inputByMode };
+  if (o.inputByMode && typeof o.inputByMode === "object") {
+    const ibm = o.inputByMode as Record<string, unknown>;
+    for (const m of STEP1_MODES) {
+      const v = ibm[m];
+      if (typeof v === "string") inputByMode[m] = v;
+    }
+  }
+  if (typeof o.input === "string" && o.inputByMode === undefined) {
+    inputByMode[mode] = o.input;
+  }
+  return { mode, llmProvider, deepseekApiKey, inputByMode };
+}
+
 export default function ScriptsStep1Page() {
-  const [mode, setMode] = useState<Step1Mode>("manual");
-  const [llmProvider, setLlmProvider] = useState<LlmProviderId>("deepseek");
-  const [deepseekApiKey, setDeepseekApiKey] = useState("");
-  const [input, setInput] = useState("");
+  const [step1, setStep1] = usePersistedJson(
+    "step1",
+    STEP1_DEFAULT,
+    normalizeStep1Persisted,
+  );
+  const mode = step1.mode;
+  const llmProvider = step1.llmProvider;
+  const deepseekApiKey = step1.deepseekApiKey;
+  const input = step1.inputByMode[step1.mode];
   const { log, setLog, appendStream, appendImmediate, flushPending } =
     useRunScriptStreamLog();
   const [running, setRunning] = useState(false);
@@ -78,10 +129,6 @@ export default function ScriptsStep1Page() {
   const logEndRef = useRef<HTMLSpanElement>(null);
 
   const placeholder = useMemo(() => placeholderForMode(mode), [mode]);
-
-  useEffect(() => {
-    setInput("");
-  }, [mode]);
 
   useEffect(() => {
     logEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
@@ -258,17 +305,17 @@ export default function ScriptsStep1Page() {
       <header className="border-b border-zinc-800/80 bg-zinc-950/60 px-4 py-3 sm:px-6">
         <Link
           href="/scripts"
-          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200"
+          className="inline-flex items-center gap-2.5 rounded-lg border border-zinc-700 bg-zinc-900/80 px-4 py-2.5 text-base font-medium text-zinc-200 hover:bg-zinc-800 hover:text-zinc-50"
         >
-          <ArrowLeft className="size-4" aria-hidden />
+          <ArrowLeft className="size-5 shrink-0" aria-hidden />
           返回步骤列表
         </Link>
-        <p className="mt-2 text-xs text-zinc-500">
-          STEP1：文稿准备与整理（与 README 分步执行一致）
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-400">
+          STEP1：文稿准备与整理
         </p>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 pb-24 sm:px-6 sm:pb-20">
         <div className="space-y-2">
           <label
             htmlFor="step1-mode"
@@ -279,9 +326,11 @@ export default function ScriptsStep1Page() {
           <select
             id="step1-mode"
             value={mode}
-            onChange={(e) => setMode(e.target.value as Step1Mode)}
+            onChange={(e) =>
+              setStep1((s) => ({ ...s, mode: e.target.value as Step1Mode }))
+            }
             disabled={running}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/70"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-app-cta/65"
           >
             {STEP_OPTIONS.map((o) => (
               <option key={o.id} value={o.id}>
@@ -302,10 +351,13 @@ export default function ScriptsStep1Page() {
             id="step1-llm"
             value={llmProvider}
             onChange={(e) =>
-              setLlmProvider(e.target.value as LlmProviderId)
+              setStep1((s) => ({
+                ...s,
+                llmProvider: e.target.value as LlmProviderId,
+              }))
             }
             disabled={running}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/70"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-app-cta/65"
           >
             {LLM_OPTIONS.map((o) => (
               <option key={o.id} value={o.id}>
@@ -335,10 +387,12 @@ export default function ScriptsStep1Page() {
               type="password"
               autoComplete="off"
               value={deepseekApiKey}
-              onChange={(e) => setDeepseekApiKey(e.target.value)}
+              onChange={(e) =>
+                setStep1((s) => ({ ...s, deepseekApiKey: e.target.value }))
+              }
               disabled={running}
               placeholder="可选：留空则使用 .env 中的 DEEPSEEK_API_KEY"
-              className="w-full rounded-xl border border-zinc-700 bg-black/60 px-3 py-2.5 font-mono text-sm text-zinc-200 placeholder:text-zinc-600 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/60 disabled:opacity-50"
+              className="w-full rounded-xl border border-zinc-700 bg-black/60 px-3 py-2.5 font-mono text-sm text-zinc-200 placeholder:text-zinc-600 outline-offset-2 focus:outline focus:outline-2 focus:outline-app-cta/55 disabled:opacity-50"
             />
           </div>
         )}
@@ -353,11 +407,19 @@ export default function ScriptsStep1Page() {
           <textarea
             id="step1-input"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) =>
+              setStep1((s) => ({
+                ...s,
+                inputByMode: {
+                  ...s.inputByMode,
+                  [s.mode]: e.target.value,
+                },
+              }))
+            }
             disabled={running}
             placeholder={placeholder}
             rows={mode === "manual" ? 10 : 4}
-            className="w-full resize-y rounded-xl border border-zinc-700 bg-black/60 px-3 py-2.5 font-mono text-sm text-zinc-200 placeholder:text-zinc-600 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/60 disabled:opacity-50"
+            className="w-full resize-y rounded-xl border border-zinc-700 bg-black/60 px-3 py-2.5 font-mono text-sm text-zinc-200 placeholder:text-zinc-600 outline-offset-2 focus:outline focus:outline-2 focus:outline-app-cta/55 disabled:opacity-50"
           />
         </div>
 
@@ -366,7 +428,7 @@ export default function ScriptsStep1Page() {
             type="button"
             onClick={run}
             disabled={running}
-            className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+            className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-app-cta px-4 py-2.5 text-sm font-medium text-app-cta-foreground hover:bg-app-cta-hover disabled:opacity-50"
           >
             {running ? (
               <>
@@ -407,6 +469,7 @@ export default function ScriptsStep1Page() {
           </pre>
         </div>
       </main>
+      <NextStepFab href="/scripts/step-2" />
     </div>
   );
 }

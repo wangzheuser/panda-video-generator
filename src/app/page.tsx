@@ -90,7 +90,7 @@ export default function Home() {
             href="https://github.com/szhshp/panda-video-generator#quick-start"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-4 sm:px-6 py-2.5 sm:py-3 bg-red-400 text-white rounded-lg hover:bg-red-700 transition-colors text-sm sm:text-base"
+            className="px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg bg-app-cta text-app-cta-foreground transition-colors hover:bg-app-cta-hover text-sm sm:text-base"
           >
             开始使用
           </Link>
@@ -290,7 +290,7 @@ export default function Home() {
               className="bg-zinc-900/70 rounded-xl shadow-lg shadow-black/30 overflow-hidden border border-zinc-800"
             >
               <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 bg-zinc-950/60 px-3 py-1.5">
-                <span className="max-w-[52%] truncate font-mono text-[9px] text-zinc-600 sm:text-[10px]">
+                <span className="max-w-[52%] truncate font-mono text-xs text-zinc-600">
                   {file.id}
                 </span>
               </div>

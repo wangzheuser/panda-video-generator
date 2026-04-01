@@ -7,6 +7,8 @@ import { isScriptRunnerEnabled } from "../../../../../lib/dev-script-runner";
 export const runtime = "nodejs";
 
 const TITLE_REL = join("output", "spider", "title.json");
+/** Remotion loads from public; keep in sync when user saves in STEP2 wizard. */
+const TITLE_PUBLIC_REL = join("public", "video", "title.json");
 const MAX_TITLE_LEN = 2000;
 
 const BodySchema = z.object({
@@ -33,29 +35,33 @@ export async function POST(request: Request) {
   }
 
   const trimmed = body.title.trim();
-  const dir = join(process.cwd(), "output", "spider");
-  const abs = join(process.cwd(), TITLE_REL);
+  const cwd = process.cwd();
+  const dir = join(cwd, "output", "spider");
+  const abs = join(cwd, TITLE_REL);
+  const absPublic = join(cwd, TITLE_PUBLIC_REL);
+  const payload = `${JSON.stringify({ title: trimmed }, null, 2)}\n`;
   mkdirSync(dir, { recursive: true });
 
   if (trimmed.length === 0) {
     if (existsSync(abs)) unlinkSync(abs);
+    if (existsSync(absPublic)) unlinkSync(absPublic);
     return NextResponse.json({
       ok: true,
       path: TITLE_REL.replace(/\\/g, "/"),
+      publicPath: TITLE_PUBLIC_REL.replace(/\\/g, "/"),
       title: "",
       removed: true,
     });
   }
 
-  writeFileSync(
-    abs,
-    `${JSON.stringify({ title: trimmed }, null, 2)}\n`,
-    "utf8",
-  );
+  writeFileSync(abs, payload, "utf8");
+  mkdirSync(join(cwd, "public", "video"), { recursive: true });
+  writeFileSync(absPublic, payload, "utf8");
 
   return NextResponse.json({
     ok: true,
     path: TITLE_REL.replace(/\\/g, "/"),
+    publicPath: TITLE_PUBLIC_REL.replace(/\\/g, "/"),
     title: trimmed,
   });
 }

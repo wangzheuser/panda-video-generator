@@ -7,6 +7,8 @@ import {
   outputVideoBasenameForComposition,
   REMOTION_RENDER_OPTIONS,
 } from "../../../lib/remotion-compositions";
+import { NextStepFab } from "../next-step-fab";
+import { usePersistedJson } from "../use-persisted-json";
 import { useRunScriptStreamLog } from "../use-run-script-stream-log";
 
 type SseLine =
@@ -36,8 +38,35 @@ const DEFAULT_COMPOSITION =
   REMOTION_RENDER_OPTIONS[0]?.id ??
   "Video";
 
+const ALLOWED_COMPOSITION_IDS = new Set(
+  REMOTION_RENDER_OPTIONS.map((o) => o.id),
+);
+
+type Step3Persisted = { compositionId: string };
+
+const STEP3_DEFAULT: Step3Persisted = {
+  compositionId: DEFAULT_COMPOSITION,
+};
+
+function normalizeStep3Persisted(
+  raw: unknown,
+  d: Step3Persisted,
+): Step3Persisted {
+  if (!raw || typeof raw !== "object") return d;
+  const c = (raw as { compositionId?: unknown }).compositionId;
+  if (typeof c === "string" && ALLOWED_COMPOSITION_IDS.has(c)) {
+    return { compositionId: c };
+  }
+  return d;
+}
+
 export default function ScriptsStep3Page() {
-  const [compositionId, setCompositionId] = useState(DEFAULT_COMPOSITION);
+  const [s3, setS3] = usePersistedJson(
+    "step3",
+    STEP3_DEFAULT,
+    normalizeStep3Persisted,
+  );
+  const compositionId = s3.compositionId;
   const { log, setLog, appendStream, appendImmediate, flushPending } =
     useRunScriptStreamLog();
   const [running, setRunning] = useState(false);
@@ -179,17 +208,17 @@ export default function ScriptsStep3Page() {
       <header className="border-b border-zinc-800/80 bg-zinc-950/60 px-4 py-3 sm:px-6">
         <Link
           href="/scripts"
-          className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-200"
+          className="inline-flex items-center gap-2.5 rounded-lg border border-zinc-700 bg-zinc-900/80 px-4 py-2.5 text-base font-medium text-zinc-200 hover:bg-zinc-800 hover:text-zinc-50"
         >
-          <ArrowLeft className="size-4" aria-hidden />
+          <ArrowLeft className="size-5 shrink-0" aria-hidden />
           返回步骤列表
         </Link>
-        <p className="mt-2 text-xs text-zinc-500">
-          STEP3：Remotion 渲染（需已完成 STEP2；输出在 output/video/）
+        <p className="mt-3 max-w-3xl text-sm leading-relaxed text-zinc-400">
+          STEP3：视频渲染
         </p>
       </header>
 
-      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-3xl space-y-6 px-4 py-8 pb-24 sm:px-6 sm:pb-20">
 
         <div className="space-y-2">
           <label
@@ -201,9 +230,11 @@ export default function ScriptsStep3Page() {
           <select
             id="step3-composition"
             value={compositionId}
-            onChange={(e) => setCompositionId(e.target.value)}
+            onChange={(e) =>
+              setS3((p) => ({ ...p, compositionId: e.target.value }))
+            }
             disabled={running}
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-red-500/70 disabled:opacity-50"
+            className="w-full rounded-xl border border-zinc-700 bg-zinc-900/90 px-3 py-2.5 text-sm text-zinc-100 outline-offset-2 focus:outline focus:outline-2 focus:outline-app-cta/65 disabled:opacity-50"
           >
             {REMOTION_RENDER_OPTIONS.map((o) => (
               <option key={o.id} value={o.id}>
@@ -221,7 +252,7 @@ export default function ScriptsStep3Page() {
             type="button"
             onClick={run}
             disabled={running || !compositionId.trim()}
-            className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-red-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-red-500 disabled:opacity-50"
+            className="inline-flex min-w-[120px] items-center justify-center gap-2 rounded-xl bg-app-cta px-4 py-2.5 text-sm font-medium text-app-cta-foreground hover:bg-app-cta-hover disabled:opacity-50"
           >
             {running ? (
               <>
@@ -302,6 +333,7 @@ export default function ScriptsStep3Page() {
           </pre>
         </div>
       </main>
+      <NextStepFab href="/scripts/step-4" />
     </div>
   );
 }

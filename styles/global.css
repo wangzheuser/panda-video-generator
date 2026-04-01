@@ -1,10 +1,20 @@
 @import "tailwindcss";
 
+/* Scale all rem-based typography (Tailwind text-* / spacing derived from root) */
+html {
+  font-size: 130%;
+}
+
 :root {
   --background: #fff;
   --foreground: #000;
   --unfocused-border-color: #eaeaea;
   --focused-border-color: #666;
+
+  /* Primary red — homepage hero CTA + wizard main actions (slightly vivid) */
+  --app-cta: oklch(0.747 0.268 22);
+  --app-cta-hover: oklch(0.625 0.105 22);
+  --app-cta-foreground: oklch(0.99 0.003 95);
 
   --button-disabled-color: #fafafa;
   --disabled-text-color: #999;
@@ -33,6 +43,10 @@
 }
 
 @theme {
+  --color-app-cta: var(--app-cta);
+  --color-app-cta-hover: var(--app-cta-hover);
+  --color-app-cta-foreground: var(--app-cta-foreground);
+
   --color-foreground: var(--foreground);
   --color-background: var(--background);
   --color-unfocused-border-color: var(--unfocused-border-color);
@@ -55,6 +69,7 @@
     0% {
       opacity: 1;
     }
+
     100% {
       opacity: 0.15;
     }
