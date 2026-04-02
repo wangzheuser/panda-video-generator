@@ -17,6 +17,7 @@
 
 - 官方网站：[https://panda.szhshp.org](https://panda.szhshp.org)
 
+
 ## ✨ 核心特性
 
 ### 🕷️ <mark>一键</mark>网页转文本
@@ -31,13 +32,28 @@
 ### 🧭 一个<mark>傻瓜式</mark>自动化向导 (有手就行)
 一个<mark>傻瓜式</mark> [自动化向导](#wizard-automation)，通过鼠标傻瓜式点击就能帮忙完成文稿、TTS、渲染、发布全流程。
 
----
+-------------
 
 ## 📖 简介
 
 Panda Video Generator `熊猫视频自动化引擎` 
 
 一站式全自动化的视频内容生成与发布引擎，支持从网页内容提取、文本转视频到多平台发布的完整工作流。通过 AI 驱动的文本转语音（TTS）技术和视频渲染引擎，帮助内容创作者快速生成高质量视频并一键发布到多个平台。
+
+
+
+## ❇️ 功能演示
+
+[![使用演示 · 点击在 bilibili 播放](./docs/assets/wizard_0.webp)](https://www.bilibili.com/video/BV141XfB3ELj/?vd_source=a7353d3395fdf5c1b78e0a2367800f20)
+
+
+## 🎉 产品展示
+
+> 点击图片可在新窗口播放.
+
+[![成品展示 · 点击在 bilibili 播放](./docs/assets/1.png)](https://www.bilibili.com/video/BV19Rw9zwEd4/)
+
+
 
 
 ## 📷 平台示例
@@ -53,26 +69,7 @@ Panda Video Generator `熊猫视频自动化引擎`
 
 ---
 
-## 🎉 产品展示
 
-> 点击图片可在新窗口播放.
-
-[![成品展示 · 点击在 bilibili 播放](./docs/assets/1.png)](https://www.bilibili.com/video/BV19Rw9zwEd4/)
-
-## 🛠️ 技术演示
-
-[![技术演示 · 点击在 bilibili 播放](./docs/assets/2.png)](https://www.bilibili.com/video/BV1v5XXBMEz9/)
-
-
--------
-
-## 自动化向导界面预览
-
-![向导 STEP1](./docs/assets/wizard_0.webp)
-![向导 STEP1 运行](./docs/assets/wizard_1.webp)
-![向导 STEP2 TTS](./docs/assets/wizard_2.webp)
-![向导 STEP3 渲染](./docs/assets/wizard_3.webp)
-![向导 STEP4 上传](./docs/assets/wizard_4.webp)
 
 
 ---
@@ -380,9 +377,13 @@ pnpm upload:all
 │   ├── ✅ YouTube 自动发布
 │   ├── ✅ 快手自动发布
 │   └── 🚧 And More...
-└── 🔧 开发工具
-    ├── ✅ 开发服务器
-    └── 🚧 Github Action 自动化视频生成
+├── 🔧 开发工具
+│   ├── ✅ 开发服务器
+│   └── 🚧 Github Action 自动化视频生成
+├── 🧩 Agent Skills
+├── 🦞 OpenClaw Integration
+└── ✨ And More...
+
 
 ```
 
