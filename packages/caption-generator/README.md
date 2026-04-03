@@ -7,7 +7,16 @@
 ## Requirements
 
 - Install from the **monorepo root**: `pnpm install`.
-- `DEEPSEEK_API_KEY` in the environment or in **repository root** `.env.local` (`DEEPSEEK_API_KEY=...`).
+- `DEEPSEEK_API_KEY` in the environment or in **repository root** `.env` (`DEEPSEEK_API_KEY=...`). The loader reads **`resolve(process.cwd(), '.env')`** when you run commands from the monorepo root.
+
+## Package exports (`package.json`)
+
+| Subpath | Purpose |
+|---------|---------|
+| `@panda-video-generator/caption-generator` | `generateVideoScriptText`, `generateVideoScript`, `generateVideoScriptFromFile`, `VideoScriptSourcePayload` |
+| `@panda-video-generator/caption-generator/pipeline` | `runCaptionAndVttFromSpiderJson` |
+| `@panda-video-generator/caption-generator/paths` | `getTtsInputFile`, `getSpiderOutputJsonPath`, etc. |
+| `@panda-video-generator/caption-generator/webvtt` | `scriptToEstimatedWebVtt` |
 
 ## API
 
@@ -27,7 +36,7 @@ Reads a JSON file (e.g. spider output with `title` / `content` / `answers` / opt
 
 ### `runCaptionAndVttFromSpiderJson(jsonFilePath, outputDir, options?)`
 
-Reads spider JSON → **`generateVideoScriptText`** (DeepSeek) → writes **script** and **estimated WebVTT** in `outputDir` (same timing rule as `webvtt-estimate`). Options: `scriptFilename` (default `input.txt`), `vttFilename` (default `captions.vtt`), `secPerChar`.
+Reads spider JSON → **`generateVideoScriptText`** (DeepSeek) → writes in **`outputDir`**: **script** (default `input.txt`), **estimated WebVTT** (default `captions.vtt`, same timing rule as `webvtt-estimate`), and **`title.json`** (`{ "title": string }`, fixed filename). Options: `scriptFilename`, `vttFilename`, `secPerChar` (default ~`0.12`).
 
 ### `scriptToEstimatedWebVtt(scriptText, secPerChar?)`
 
@@ -48,9 +57,9 @@ pnpm run caption:env
 | `CAPTION_OUTPUT_DIR` | no | Default `output/spider` |
 | `CAPTION_SCRIPT_FILENAME` | no | Default `input.txt` |
 | `CAPTION_VTT_FILENAME` | no | Default `captions.vtt` |
-| `CAPTION_SEC_PER_CHAR` | no | Seconds per character for VTT estimate |
+| `CAPTION_SEC_PER_CHAR` | no | Seconds per character for VTT estimate; CLI **must be a positive number** if set, or the process exits with an error |
 
-Still requires `DEEPSEEK_API_KEY` (or `.env.local`).
+Still requires `DEEPSEEK_API_KEY` (environment or repository root **`.env`**).
 
 ### Type export
 

@@ -1,6 +1,6 @@
 # hn-spider
 
-Hacker News → DeepSeek → WeChat Official Account HTML pipeline. Package name: `@panda-video-generator/hn-spider`. Mirrors `zhihu-to-weixin-mp-article.ts`: reads `DEEPSEEK_API_KEY` from the **monorepo root** `.env.local` (see root `.env.example`) or from the process environment; writes `weixin-mp-article.json` and `.html`.
+Hacker News → DeepSeek → WeChat Official Account HTML pipeline. Package name: `@panda-video-generator/hn-spider`. Mirrors `zhihu-to-weixin-mp-article.ts`: reads `DEEPSEEK_API_KEY` from the **monorepo root** `.env` (see root `.env.example`) or from the process environment; writes `weixin-mp-article.json` and `.html`.
 
 ## Setup
 
@@ -10,7 +10,7 @@ From the monorepo root:
 pnpm install
 ```
 
-Set `DEEPSEEK_API_KEY` in the repo root `.env.local` (not inside this package).
+Set `DEEPSEEK_API_KEY` in the repo root `.env` (not inside this package).
 
 ## Run
 

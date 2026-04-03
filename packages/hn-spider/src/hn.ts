@@ -6,7 +6,7 @@
  *   pnpm --filter @panda-video-generator/hn-spider hn:weixin-mp
  *   pnpm --filter @panda-video-generator/hn-spider hn:weixin-mp:dry
  *
- * DEEPSEEK_API_KEY: repo-root `.env.local` (monorepo root) or process env.
+ * DEEPSEEK_API_KEY: repo-root `.env` (monorepo root) or process env.
  * Config: hn-config.json next to this package. Output paths are relative to cwd.
  */
 
@@ -197,7 +197,7 @@ function loadDeepseekApiKeyFromRootEnvLocal(): void {
   if (!root) {
     return;
   }
-  const envPath = join(root, '.env.local');
+  const envPath = join(root, '.env');
   try {
     const envContent = readFileSync(envPath, 'utf-8');
     for (const line of envContent.split('\n')) {
@@ -369,7 +369,7 @@ async function generateWeixinMpRichTextFromHn(
   loadDeepseekApiKeyFromRootEnvLocal();
   if (!process.env.DEEPSEEK_API_KEY) {
     throw new Error(
-      'DEEPSEEK_API_KEY is not set. Add it to the monorepo root .env.local or export it in the shell.',
+      'DEEPSEEK_API_KEY is not set. Add it to the monorepo root .env or export it in the shell.',
     );
   }
 
