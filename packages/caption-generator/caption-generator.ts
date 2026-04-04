@@ -26,10 +26,10 @@ function normalizePayload(
 }
 
 /**
- * Load API key from .env.local file
+ * Load API key from .env file
  */
 function loadApiKey(): void {
-  const envPath = resolve(process.cwd(), '.env.local');
+  const envPath = resolve(process.cwd(), '.env');
   try {
     const envContent = readFileSync(envPath, 'utf-8');
     const lines = envContent.split('\n');
@@ -40,7 +40,7 @@ function loadApiKey(): void {
       }
     }
   } catch {
-    // Use system env if .env.local not found
+    // Use system env if .env not found
   }
 }
 
@@ -60,7 +60,7 @@ export async function generateVideoScriptText(
   }
 
   if (!process.env.DEEPSEEK_API_KEY) {
-    throw new Error('DEEPSEEK_API_KEY is not set. Please set it in .env.local file or environment variables.');
+    throw new Error('DEEPSEEK_API_KEY is not set. Please set it in .env file or environment variables.');
   }
 
   try {
@@ -109,7 +109,7 @@ ${contentForDeepSeek}
   } catch (error) {
     console.error('\n❌ Error generating video script with DeepSeek:', error);
     if (error instanceof Error && (error.message.includes('API key') || error.message.includes('DEEPSEEK_API_KEY'))) {
-      console.error('\n提示: 请在 .env.local 文件中设置 DEEPSEEK_API_KEY');
+      console.error('\n提示: 请在 .env 文件中设置 DEEPSEEK_API_KEY');
     }
     throw error;
   }
