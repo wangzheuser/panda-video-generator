@@ -15,30 +15,65 @@
 
 ---
 
-[官方网站](https://panda.szhshp.org)
-
+<div align="center" style="margin: 12px 0 20px;">
+  <a href="https://panda.szhshp.org" title="Panda Video Generator 官方网站" style="display: inline-block; padding: 12px 28px; border: 2px solid #0969da; border-radius: 8px; font-weight: 700; font-size: 1.05em; text-decoration: none; color: #0969da;">官方网站</a>
+</div>
 
 ## ✨ 核心特性
 
-### 🕷️ <mark>一键</mark>网页转文本
-一键抓取正文与标题（如知乎），输出结构化文件，少手工整理。
+<!-- GitHub.com strips most flex/gap inline styles; use a plain row table so 3 columns match on the website. -->
+<table cellspacing="20" cellpadding="0" border="0">
+  <tr valign="top">
+    <td width="34%" valign="top">
+      <h3>🕷️ <mark>一键</mark>网页转文本</h3>
+      <p>一键抓取正文与标题（如知乎），输出结构化文件，少手工整理。</p>
+    </td>
+    <td width="33%" valign="top">
+      <h3>🎬 <mark>一键</mark>文本转视频</h3>
+      <p>一键跑通口播链路：Edge TTS + VTT 字幕，Remotion 模板渲染成片。</p>
+    </td>
+    <td width="33%" valign="top">
+      <h3>🚀 <mark>一键</mark>多平台发布</h3>
+      <p>一键驱动浏览器自动化上传；B 站、抖音、视频号、YouTube、小红书、快手等共用相近流程。</p>
+    </td>
+  </tr>
+</table>
 
-### 🎬 <mark>一键</mark>文本转视频
-一键跑通口播链路：Edge TTS + VTT 字幕，Remotion 模板渲染成片。
+## 接入方式
 
-### 🚀 <mark>一键</mark>多平台发布
+<table cellspacing="20" cellpadding="0" border="0">
+  <tr valign="top">
+    <td width="34%" valign="top">
+      <h3>🤖 1. Agent Skills 方式</h3>
+      <ul>
+        <li>使用 AI Agent 编排视频生成与发布流程。</li>
+        <li>支持口播流水线、爬虫、TTS、渲染与发布等技能。</li>
+        <li>支持 Cursor、Claude Code、Copilot 等常用 AI Agent。</li>
+      </ul>
+      <p><a href="#agent-skills">查看更多 →</a></p>
+    </td>
+    <td width="33%" valign="top">
+      <h3>🧭 2. 网页端自动化向导方式</h3>
+      <ul>
+        <li>通过傻瓜式 <a href="#wizard-automation">自动化向导</a>，无需手写命令。</li>
+        <li>在浏览器中按步骤完成文稿、TTS 与成片渲染。</li>
+        <li>多平台发布为可选步骤，可按需执行。</li>
+      </ul>
+      <p><a href="#wizard-automation">查看更多 →</a></p>
+    </td>
+    <td width="33%" valign="top">
+      <h3>🔄 3. GitHub Actions</h3>
+      <ul>
+        <li>使用 GitHub Actions 在云端跑通抓取、TTS 与 Remotion 渲染。</li>
+        <li>无需在本地安装依赖或常驻服务。</li>
+        <li>Fork 后配置密钥与变量即可触发工作流，本地几乎不用折腾。</li>
+      </ul>
+      <p><a href="./.github/workflows/generate-video.yml">查看更多 →</a></p>
+    </td>
+  </tr>
+</table>
 
-一键驱动浏览器自动化上传；B 站、抖音、视频号、YouTube、小红书、快手等共用相近流程。
-
-### 🤖 <mark>一键</mark>调用 Agent Skills 完成视频生成
-
-使用 AI Agent 编排视频生成与发布流程，支持口播流水线、爬虫、TTS、渲染与发布等技能。
-
-### 🧭 一个<mark>傻瓜式</mark>自动化向导 (有手就行)
-一个傻瓜式 [自动化向导](#wizard-automation)，通过鼠标傻瓜式点击就能帮忙完成文稿、TTS、渲染、发布全流程。
-
-
--------------
+---
 
 ## 📖 简介
 
@@ -258,7 +293,7 @@ pnpm remotion
 │   └── 🚧 And More...
 ├── 🔧 开发工具
 │   ├── ✅ 开发服务器
-│   └── 🚧 GitHub Actions 自动化视频生成
+│   └── ✅ GitHub Actions 自动化视频生成（知乎链路至成片）
 ├── 🧩 AI Integration
 │   └── ✅ Agent Skills
 ├── 🦞 OpenClaw Integration
