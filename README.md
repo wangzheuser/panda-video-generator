@@ -50,14 +50,7 @@
         <li>支持口播流水线、爬虫、TTS、渲染与发布等技能。</li>
         <li>支持 Cursor、Claude Code、Copilot 等常用 AI Agent。</li>
       </ul>
-      <table width="50%" align="center" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td align="center">
-            <a href="#demo-agent">演示视频</a><br />
-            <a href="#agent-skills">查看更多 →</a>
-          </td>
-        </tr>
-      </table>
+      <p><a href="#demo-agent">演示视频</a> / <a href="#agent-skills">查看更多</a></p>
     </td>
     <td width="33%" valign="top">
       <h3>🧭 2. 网页端自动化向导方式</h3>
@@ -66,14 +59,7 @@
         <li>在浏览器中按步骤完成文稿、TTS 与成片渲染。</li>
         <li>多平台发布为可选步骤，可按需执行。</li>
       </ul>
-      <table width="50%" align="center" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td align="center">
-            <a href="#demo-wizard">演示视频</a><br />
-            <a href="#wizard-automation">查看更多 →</a>
-          </td>
-        </tr>
-      </table>
+      <p><a href="#demo-wizard">演示视频</a> / <a href="#wizard-automation">查看更多</a></p>
     </td>
     <td width="33%" valign="top">
       <h3>🔄 3. GitHub Actions</h3>
@@ -82,14 +68,7 @@
         <li>无需在本地安装依赖或常驻服务。</li>
         <li>Fork 后配置密钥与变量即可触发工作流，本地几乎不用折腾。</li>
       </ul>
-      <table width="50%" align="center" border="0" cellspacing="0" cellpadding="0">
-        <tr>
-          <td align="center">
-            <a href="#demo-github-actions">演示视频</a><br />
-            <a href="#github-actions">查看更多 →</a>
-          </td>
-        </tr>
-      </table>
+      <p><a href="#demo-github-actions">演示视频</a> / <a href="#github-actions">查看更多</a></p>
     </td>
   </tr>
 </table>
