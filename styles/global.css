@@ -74,4 +74,32 @@ html {
       opacity: 0.15;
     }
   }
+
+  /* Homepage — subtle motion for hero & ambient layers */
+  @keyframes hero-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes hero-orb {
+    0%,
+    100% {
+      opacity: 0.35;
+      transform: scale(1) translate(0, 0);
+    }
+
+    50% {
+      opacity: 0.55;
+      transform: scale(1.08) translate(2%, -2%);
+    }
+  }
+
+  --animate-hero-float: hero-float 6s ease-in-out infinite;
+  --animate-hero-orb: hero-orb 12s ease-in-out infinite;
 }
