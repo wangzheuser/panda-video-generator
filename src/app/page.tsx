@@ -29,8 +29,8 @@ const mediaFiles = [
   { id: "douyin", path: "/media/douyin.webp", label: "抖音 · 熊猫智研社" },
   { id: "weichat", path: "/media/weichat.webp", label: "微信视频号 · 熊猫智研社" },
   { id: "kuaishou", path: "/media/kuaishou.webp", label: "快手 · 熊猫智研社" },
-  { id: "rednote", path: "/media/rednote.webp", label: "小红书 · 熊猫智研社" },
   { id: "bilibili", path: "/media/bilibili.webp", label: "哔哩哔哩 · 熊猫智研社" },
+  { id: "rednote", path: "/media/rednote.webp", label: "小红书 · 熊猫智研社" },
 ];
 
 function SectionTitle({

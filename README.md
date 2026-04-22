@@ -150,9 +150,9 @@
   </tr>
   <tr>
     <td align="center" valign="top" colspan="3">
-      <img src="./public/media/rednote.webp" width="240" alt="小红书 · 熊猫智研社">
-      &emsp;&emsp;
       <img src="./public/media/bilibili.webp" width="240" alt="哔哩哔哩 · 熊猫智研社">
+      &emsp;&emsp;
+      <img src="./public/media/rednote.webp" width="240" alt="小红书 · 熊猫智研社">
     </td>
   </tr>
 </table>
