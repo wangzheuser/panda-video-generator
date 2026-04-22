@@ -110,6 +110,19 @@ export default function ScriptsHubPage() {
           })}
         </ul>
       </main>
+
+      <footer className="border-t border-zinc-800/80 bg-black/40">
+        <div className="container mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-12">
+          <h2 className="text-sm font-semibold text-zinc-300">免责声明</h2>
+          <p className="mt-3 text-xs leading-relaxed text-zinc-500 sm:text-sm">
+            本项目按「原样」提供，作者不对因使用本软件而产生的任何直接、间接或附带损失承担责任。你在使用爬虫、文本转语音、视频生成、浏览器自动化上传等功能时，须
+            <strong className="font-medium text-zinc-400">自行确保</strong>
+            符合适用法律法规、各内容/社交平台的服务条款、robots 规则及版权与隐私要求；请勿将本工具用于未经授权的抓取、侵权转载或垃圾信息传播。本仓库与第三方平台
+            <strong className="font-medium text-zinc-400">无任何隶属或合作关系</strong>
+            ；相关商标与产品名称归各自权利人所有。以上说明不构成法律意见；如有合规疑虑，请咨询专业人士。
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }
