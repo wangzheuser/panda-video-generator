@@ -14,6 +14,7 @@ import { UPLOAD_PATHS } from '../../types/paths';
  * 
  * Or override with environment variables:
  *   VIDEO_PATH=out/custom.mp4 VIDEO_TITLE="Custom Title" pnpm upload:bilibili
+ * Cover: output/video/cover.jpg (Cover-Static / PPT-Deck-Cover-Static share this path). Override with VIDEO_COVER.
  */
 
 interface UploadConfig {
@@ -33,11 +34,11 @@ function getVideoPath(): string {
 // Get title from JSON file or environment
 function getTitleFromJson(): string | null {
   const titleJsonPath = path.join(process.cwd(), UPLOAD_PATHS.DEFAULT_TITLE_JSON);
-  
+
   if (!existsSync(titleJsonPath)) {
     return null;
   }
-  
+
   try {
     const fs = require('fs');
     const titleData = JSON.parse(fs.readFileSync(titleJsonPath, 'utf-8'));
@@ -50,17 +51,17 @@ function getTitleFromJson(): string | null {
 // Get upload configuration from environment or defaults
 function getUploadConfig(): UploadConfig {
   const videoPath = getVideoPath();
-  
+
   if (!videoPath || !existsSync(videoPath)) {
     throw new Error(
       `Video file not found: ${videoPath}\n` +
       `Please ensure ${UPLOAD_PATHS.DEFAULT_VIDEO} exists or set VIDEO_PATH environment variable.`
     );
   }
-  
+
   // Try to get title from JSON file first, then environment variable
   let title = process.env.VIDEO_TITLE || getTitleFromJson();
-  
+
   if (!title) {
     throw new Error(
       'VIDEO_TITLE is required. Please set it:\n' +
@@ -68,13 +69,14 @@ function getUploadConfig(): UploadConfig {
       `Or ensure ${UPLOAD_PATHS.DEFAULT_TITLE_JSON} exists with a title field.`
     );
   }
-  
-  // Get cover path (default to generated cover.jpg)
+
   const defaultCoverPath = path.join(process.cwd(), UPLOAD_PATHS.DEFAULT_COVER);
-  const coverPath = process.env.VIDEO_COVER 
+  const coverPath = process.env.VIDEO_COVER
     ? path.resolve(process.env.VIDEO_COVER)
-    : (existsSync(defaultCoverPath) ? path.resolve(defaultCoverPath) : undefined);
-  
+    : existsSync(defaultCoverPath)
+      ? path.resolve(defaultCoverPath)
+      : undefined;
+
   const config: UploadConfig = {
     videoPath: path.resolve(videoPath),
     title,
@@ -82,7 +84,7 @@ function getUploadConfig(): UploadConfig {
     tags: process.env.VIDEO_TAGS ? process.env.VIDEO_TAGS.split(',').map(t => t.trim()) : [],
     coverPath,
   };
-  
+
   return config;
 }
 
@@ -101,16 +103,16 @@ test.describe.configure({ timeout: 5 * 60 * 1000 });
 test('upload video to bilibili', async ({ page }) => {
   // Set timeout for this specific test (5 minutes)
   test.setTimeout(5 * 60 * 1000);
-  
+
   const config = getUploadConfig();
-  
+
   console.log(`Upload: Bilibili - ${config.title}`);
-  
+
   // Step 1: Navigate to Bilibili upload page
   await page.goto('https://member.bilibili.com/platform/upload/video/frame');
   await page.waitForLoadState('domcontentloaded');
   await page.waitForTimeout(2000);
-  
+
   // Check if logged in
   const loginRequired = await page.locator('text=登录').first().isVisible().catch(() => false);
   if (loginRequired) {
@@ -119,17 +121,17 @@ test('upload video to bilibili', async ({ page }) => {
       '  pnpm login:bilibili'
     );
   }
-  
+
   // Step 2: Find the actual file input element
   await page.waitForTimeout(2000);
-  
+
   const fileInputSelectors = [
     'input[type="file"]',
     '.upload-area input[type="file"]',
     '[class*="upload"] input[type="file"]',
     'input[accept*="video"]',
   ];
-  
+
   let uploadInput = null;
   for (const selector of fileInputSelectors) {
     try {
@@ -146,13 +148,13 @@ test('upload video to bilibili', async ({ page }) => {
       // Continue
     }
   }
-  
+
   if (!uploadInput) {
     const uploadArea = page.locator('.upload-area').first();
     if (await uploadArea.isVisible({ timeout: 3000 })) {
       await uploadArea.click();
       await page.waitForTimeout(1000);
-      
+
       for (const selector of fileInputSelectors) {
         try {
           const input = page.locator(selector).first();
@@ -167,7 +169,7 @@ test('upload video to bilibili', async ({ page }) => {
       }
     }
   }
-  
+
   if (!uploadInput) {
     await page.evaluate(() => {
       const input = document.createElement('input');
@@ -179,7 +181,7 @@ test('upload video to bilibili', async ({ page }) => {
     });
     uploadInput = page.locator('#playwright-file-input');
   }
-  
+
   // Step 3: Upload video file
   try {
     await uploadInput.setInputFiles(config.videoPath);
@@ -195,14 +197,14 @@ test('upload video to bilibili', async ({ page }) => {
       throw new Error('Could not find upload area or file input');
     }
   }
-  
+
   await page.waitForTimeout(3000);
-  
+
   // Step 4: Fill in video information
   await page.waitForTimeout(5000);
   await page.evaluate(() => window.scrollTo(0, 500));
   await page.waitForTimeout(1000);
-  
+
   // Fill title
   const titleSelectors = [
     'input[placeholder*="标题"]',
@@ -214,7 +216,7 @@ test('upload video to bilibili', async ({ page }) => {
     '[class*="Title"] input',
     'input[maxlength]',
   ];
-  
+
   for (const selector of titleSelectors) {
     try {
       const titleInput = page.locator(selector).first();
@@ -232,7 +234,7 @@ test('upload video to bilibili', async ({ page }) => {
       // Continue
     }
   }
-  
+
   // Fill description if provided
   if (config.description) {
     const descSelectors = [
@@ -246,7 +248,7 @@ test('upload video to bilibili', async ({ page }) => {
       '[class*="Desc"] textarea',
       'textarea[maxlength]',
     ];
-    
+
     for (const selector of descSelectors) {
       try {
         const descInput = page.locator(selector).first();
@@ -264,9 +266,9 @@ test('upload video to bilibili', async ({ page }) => {
         // Continue
       }
     }
-    
+
   }
-  
+
   // Fill tags if provided
   if (config.tags && config.tags.length > 0) {
     const tagSelectors = [
@@ -277,7 +279,7 @@ test('upload video to bilibili', async ({ page }) => {
       '[class*="Tag"] input',
       'input[type="text"][placeholder*="标签"]',
     ];
-    
+
     for (const selector of tagSelectors) {
       try {
         const tagInput = page.locator(selector).first();
@@ -295,25 +297,25 @@ test('upload video to bilibili', async ({ page }) => {
         // Continue
       }
     }
-    
+
   }
-  
+
   // Step 5: Upload cover if provided
   if (config.coverPath && existsSync(config.coverPath)) {
     console.log(`Uploading cover: ${config.coverPath}`);
-    
+
     // Click on "封面设置" to open cover editor panel
     await page.locator('div').filter({ hasText: /^封面设置$/ }).nth(1).click();
     await page.waitForTimeout(2000);
-    
+
     // Wait for cover editor panel to appear
     await page.waitForSelector('.cover-editor-panel-select', { timeout: 5000 }).catch(() => {
       console.log('Cover editor panel not found, trying alternative approach');
     });
-    
+
     // Try multiple methods to upload cover
     let coverUploaded = false;
-    
+
     // Method 1: Find file input in cover upload area
     const coverInputSelectors = [
       '.cover-upload input[type="file"]',
@@ -323,7 +325,7 @@ test('upload video to bilibili', async ({ page }) => {
       'input[type="file"][accept*="image"]',
       '[class*="cover"] input[type="file"]',
     ];
-    
+
     for (const selector of coverInputSelectors) {
       try {
         const coverInput = page.locator(selector).first();
@@ -340,7 +342,7 @@ test('upload video to bilibili', async ({ page }) => {
         // Continue to next selector
       }
     }
-    
+
     // Method 2: Click upload area and use file chooser
     if (!coverUploaded) {
       try {
@@ -359,7 +361,7 @@ test('upload video to bilibili', async ({ page }) => {
         console.log('File chooser method failed:', e);
       }
     }
-    
+
     // Method 3: Try clicking upload area to reveal file input
     if (!coverUploaded) {
       try {
@@ -367,7 +369,7 @@ test('upload video to bilibili', async ({ page }) => {
         if (await uploadArea.isVisible({ timeout: 3000 })) {
           await uploadArea.click();
           await page.waitForTimeout(1000);
-          
+
           // After clicking, try to find the file input again
           const fileInput = page.locator('input[type="file"][accept*="image"]').first();
           if (await fileInput.isVisible({ timeout: 2000 })) {
@@ -381,34 +383,34 @@ test('upload video to bilibili', async ({ page }) => {
         console.log('Click upload area method failed:', e);
       }
     }
-    
+
     if (coverUploaded) {
 
-      
+
       // Wait for cover to be processed and selected
       // Check for cover preview or processing indicators
       try {
         // Wait for cover preview to appear (indicating upload success)
-        await page.waitForSelector('.cover-slider-image, [class*="cover"][class*="preview"], [class*="cover"][class*="image"]', { 
-          timeout: 10000 
+        await page.waitForSelector('.cover-slider-image, [class*="cover"][class*="preview"], [class*="cover"][class*="image"]', {
+          timeout: 10000
         }).catch(() => {
           console.log('Cover preview not found, but continuing...');
         });
-       
+
         page.once('dialog', dialog => {
           console.log(`Dialog message: ${dialog.message()}`);
-          dialog.dismiss().catch(() => {});
+          dialog.dismiss().catch(() => { });
         });
         await page.getByText('封面制作').click();
         page.once('dialog', dialog => {
           console.log(`Dialog message: ${dialog.message()}`);
-          dialog.dismiss().catch(() => {});
+          dialog.dismiss().catch(() => { });
         });
-        await page.getByText('封面制作').click(); 
+        await page.getByText('封面制作').click();
         // Wait a bit for cover processing to complete
         await page.locator('.bcc-checkbox-checkbox').first().click();
         await page.waitForTimeout(3000);
-        
+
         // Click "完成" button to confirm cover selection (only after cover is uploaded)
         const completeButton = page.getByText('完成', { exact: true });
         if (await completeButton.isVisible({ timeout: 5000 })) {
@@ -442,21 +444,21 @@ test('upload video to bilibili', async ({ page }) => {
   } else {
     console.log('No cover image found, skipping cover upload');
   }
-  
+
   // Step 6: Wait for video processing
   await page.waitForTimeout(10000);
 
-  
+
   // Step 7: Click submit button
   await page.waitForTimeout(2000);
-  
+
   // Scroll to bottom to ensure submit button is visible
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
   await page.waitForTimeout(1000);
-  
+
   // Try to find submit button
   let submitClicked = false;
-  
+
   // First, try using getByText for '立即投稿'
   try {
     const submitButton = page.getByText('立即投稿').first();
@@ -472,7 +474,7 @@ test('upload video to bilibili', async ({ page }) => {
   } catch (e) {
     // Continue to fallback selectors
   }
-  
+
   // Fallback to other selectors if not found
   if (!submitClicked) {
     const submitSelectors = [
@@ -488,7 +490,7 @@ test('upload video to bilibili', async ({ page }) => {
       '[data-v-*][class*="submit"]',
       '[data-v-*][class*="publish"]',
     ];
-    
+
     for (const selector of submitSelectors) {
       try {
         const submitButton = page.locator(selector).first();
@@ -507,18 +509,24 @@ test('upload video to bilibili', async ({ page }) => {
       }
     }
   }
-  
+
   if (!submitClicked) {
     await page.pause();
-  } else {
-    // Wait for submission to complete
-    await page.waitForTimeout(5000);
-    
-    // Assert that '稿件投递成功' text appears
-    const successMessage = page.getByText('稿件投递成功').first();
-    await successMessage.waitFor({ state: 'visible', timeout: 30000 });
-    await test.expect(successMessage).toBeVisible({ timeout: 30000 });
-    
-    console.log('Success: Bilibili');
+    return;
   }
+
+  const noLabelBtn = page.getByRole('button', { name: '内容无需标注' });
+  const isVisible = await noLabelBtn.isVisible({ timeout: 2000 }).catch(() => false);
+  if (isVisible) {
+    await noLabelBtn.click();
+  }
+  // Wait for submission to complete
+  await page.waitForTimeout(5000);
+
+  // Assert that '稿件投递成功' text appears
+  const successMessage = page.getByText('稿件投递成功').first();
+  await successMessage.waitFor({ state: 'visible', timeout: 30000 });
+  await test.expect(successMessage).toBeVisible({ timeout: 30000 });
+
+  console.log('Success: Bilibili');
 });

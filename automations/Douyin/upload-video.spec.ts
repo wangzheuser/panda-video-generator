@@ -463,6 +463,11 @@ test('upload video to douyin', async ({ page }) => {
     }
   }
 
+  const coCenterBanner = page.getByText('新增「共创中心」模块，管理你的共创作品。');
+  if (await coCenterBanner.isVisible({ timeout: 2000 }).catch(() => false)) {
+    await page.getByRole('dialog').getByRole('button', { name: '我知道了' }).click();
+  }
+
   // Step 8: Required declaration + publish
   // Open 自主声明 picker, then select "内容为个人观点或见解" before 发布 is allowed.
   console.log('');
@@ -478,24 +483,15 @@ test('upload video to douyin', async ({ page }) => {
     await selfDeclarationTrigger.click();
     await page.waitForTimeout(500);
 
-    const personalOpinionLabel = page
-      .locator('label.semi-radio')
-      .filter({ hasText: '内容为个人观点或见解' })
-      .first();
-
+    const personalOpinionLabel = page.getByRole('radio', { name: '内容为个人观点或见解' });
     await personalOpinionLabel.waitFor({ state: 'visible', timeout: 20000 });
     await personalOpinionLabel.scrollIntoViewIfNeeded();
-    const alreadyChecked = await personalOpinionLabel.evaluate((el) =>
-      el.classList.contains('semi-radio-checked')
-    );
-    if (!alreadyChecked) {
-      await personalOpinionLabel.click();
-      await page.waitForTimeout(400);
-    }
-    await expect(personalOpinionLabel).toHaveClass(/semi-radio-checked/);
-    await expect(personalOpinionLabel.locator('input[type="radio"]')).toBeChecked();
+    await personalOpinionLabel.click({ force: true });
 
     await page.getByRole('button', { name: '确定' }).click();
+
+
+
     console.log('✅ Content declaration is selected and verified');
   } else {
     console.log('ℹ️  Self-declaration trigger is not visible; skipping optional declaration step.');

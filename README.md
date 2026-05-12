@@ -130,7 +130,8 @@
 <a id="changelog"></a>
 ## 📅 更新日志
 
-
+- **V1.4.2** · 2026-05-12
+  - 优化多个平台的上传自动化流程
 - **V1.4.1** · 2026-04-12
   <a id="changelog-github-actions"></a>
   - 经过网友提醒, Github Actions 云端渲染视频可能存在违反 Action 服务条款的风险, 所以移除了 Github Actions 的示例, 但是你依然可以从 [4953884](https://github.com/szhshp/panda-video-generator/commit/4953884e978ccc96f8d1a7cebb1b7f88754d2de7) 这个 commit 中找到 Github Actions 的示例, 其中包含除了`自动化发布`之外的完整功能.
