@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       const proc = spawn(pnpmBin, pnpmArgs, {
         cwd,
         env: childEnv,
-        shell: false,
+        shell: process.platform === "win32",
       });
 
       const onClientAbort = () => {

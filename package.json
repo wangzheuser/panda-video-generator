@@ -1,6 +1,6 @@
 {
   "name": "panda-video-generator",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "private": true,
   "packageManager": "pnpm@10.32.1",
   "engines": {
@@ -26,6 +26,7 @@
     "@remotion/paths": "4.0.409",
     "@remotion/player": "4.0.409",
     "@remotion/shapes": "4.0.409",
+    "@remotion/studio": "^4.0.409",
     "@remotion/tailwind-v4": "4.0.409",
     "@vercel/analytics": "^2.0.1",
     "clsx": "2.1.1",

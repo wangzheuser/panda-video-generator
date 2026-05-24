@@ -130,6 +130,8 @@
 <a id="changelog"></a>
 ## 📅 更新日志
 
+- **V1.5.1** · 2026-05-25
+  - 修复 Windows 下自动化向导运行脚本时 `spawn EINVAL` 错误（`pnpm.cmd` 需 `shell: true`）
 - **V1.5.0** · 2026-05-24
   - 浏览器自动化底层切换为 [`@panda-video-automation/pva`](https://github.com/szhshp/panda-video-automations-publisher)，统一登录/上传命令为 `pva` CLI
   - 移除项目对 `playwright` / `@playwright/test` 的直接依赖
@@ -266,6 +268,31 @@ cd panda-video-generator
 ```bash
 pnpm remotion
 ```
+
+---
+
+<a id="qa"></a>
+## ❓ 常见问题
+
+### 渲染时卡在 Downloading Chrome Headless Shell 怎么办？
+
+Remotion 渲染视频时需要 Chrome Headless Shell（约 100 MB），首次运行会自动下载。如果下载慢或被代理工具拦截，可以按需选择以下命令：
+
+```bash
+# 无代理
+npx remotion browser ensure
+
+# Windows PowerShell（走代理）
+$env:HTTPS_PROXY="http://127.0.0.1:10902"; $env:HTTP_PROXY="http://127.0.0.1:10902"; npx remotion browser ensure
+
+# Windows CMD（走代理）
+set HTTPS_PROXY=http://127.0.0.1:10902&&set HTTP_PROXY=http://127.0.0.1:10902&&npx remotion browser ensure
+
+# macOS / Linux（走代理）
+HTTPS_PROXY=http://127.0.0.1:10902 HTTP_PROXY=http://127.0.0.1:10902 npx remotion browser ensure
+```
+
+完成后重新执行渲染命令即可。
 
 ---
 
