@@ -131,7 +131,7 @@
 ## 📅 更新日志
 
 - **V1.5.1** · 2026-05-25
-  - 修复 Windows 下自动化向导运行脚本时 `spawn EINVAL` 错误（`pnpm.cmd` 需 `shell: true`）
+  - 修复 Windows 下自动化向导运行脚本时 `spawn EINVAL` 错误
 - **V1.5.0** · 2026-05-24
   - 浏览器自动化底层切换为 [`@panda-video-automation/pva`](https://github.com/szhshp/panda-video-automations-publisher)，统一登录/上传命令为 `pva` CLI
   - 移除项目对 `playwright` / `@playwright/test` 的直接依赖

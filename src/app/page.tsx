@@ -7,11 +7,11 @@ export default function Home() {
     <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-100">
       {/* Ambient background */}
       <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(251,191,36,0.14),transparent_55%),radial-gradient(ellipse_80%_50%_at_100%_50%,rgba(34,211,238,0.08),transparent_50%),radial-gradient(ellipse_70%_60%_at_0%_80%,rgba(192,132,252,0.07),transparent_45%)]"
+        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%, rgba(251, 191, 36, 0.14), transparent_55%), radial-gradient(ellipse_80%_50%_at_100%_50%, rgba(34, 211, 238, 0.08), transparent_50%), radial-gradient(ellipse_70%_60%_at_0%_80%, rgba(192, 132, 252, 0.07), transparent_45%)]"
         aria-hidden
       />
       <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(rgba(255,255,255,0.028)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.028)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%,black_15%,transparent_70%)]"
+        className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(rgba(255, 255, 255, 0.028)_1px, transparent_1px), linear-gradient(90deg, rgba(255, 255, 255, 0.028)_1px, transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%, black_15%, transparent_70%)]"
         aria-hidden
       />
 
@@ -43,7 +43,7 @@ export default function Home() {
         {/* Cards fill most of the available height */}
         <div className="flex w-full max-w-5xl flex-1 flex-col gap-4 sm:flex-row sm:gap-6">
           {/* PandaVideoGenerator card */}
-          <div className="group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-amber-900/40 bg-gradient-to-b from-[#1a1710] to-[#0f0e0b] shadow-[0_0_0_1px_rgba(251,191,36,0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/30 before:to-transparent hover:border-amber-500/40 hover:shadow-[0_32px_100px_-24px_rgba(251,191,36,0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
+          <div className="group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-amber-900/40 bg-gradient-to-b from-[#1a1710] to-[#0f0e0b] shadow-[0_0_0_1px_rgba(251, 191, 36, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/30 before:to-transparent hover:border-amber-500/40 hover:shadow-[0_32px_100px_-24px_rgba(251, 191, 36, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
             <Link href="/landing" className="flex flex-1 flex-col items-center p-8 sm:p-0">
               {/* Decorative terminal lines */}
               <div className="absolute left-4 top-3 font-mono text-[0.6rem] text-zinc-700/50 sm:left-6 sm:top-4">
@@ -67,7 +67,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
-                最简单的使用方式：可视化开启，按步骤完成内容提取 → 配音 → 字幕 → 发布
+                最简单的使用方式: 傻瓜式可视化界面, 按步骤完成内容提取 → 配音 → 字幕 → 发布
               </p>
 
               <span className="mt-6 font-mono text-xs text-amber-600/70">
@@ -89,7 +89,7 @@ export default function Home() {
           </div>
 
           {/* publisher-cli card */}
-          <div className="group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-emerald-900/40 bg-gradient-to-b from-[#0f1a12] to-[#0b0f0c] shadow-[0_0_0_1px_rgba(16,185,129,0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/30 before:to-transparent hover:border-emerald-500/40 hover:shadow-[0_32px_100px_-24px_rgba(16,185,129,0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
+          <div className="group relative flex flex-1 flex-col overflow-hidden rounded-2xl border border-emerald-900/40 bg-gradient-to-b from-[#0f1a12] to-[#0b0f0c] shadow-[0_0_0_1px_rgba(16, 185, 129, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/30 before:to-transparent hover:border-emerald-500/40 hover:shadow-[0_32px_100px_-24px_rgba(16, 185, 129, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
             <Link href="/cli" className="flex flex-1 flex-col items-center p-8 sm:p-0">
               {/* Decorative terminal lines */}
               <div className="absolute left-4 top-3 font-mono text-[0.6rem] text-zinc-700/50 sm:left-6 sm:top-4">
@@ -112,7 +112,7 @@ export default function Home() {
               </div>
 
               <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
-                可编程流水线：无缝集成 CI/CD、cron 定时任务与自有自动化工具
+                可编程流水线: 无缝集成 CI/CD, cron 定时任务与自有自动化工具
               </p>
 
               <span className="mt-6 font-mono text-xs text-emerald-600/70">
