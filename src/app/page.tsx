@@ -1,6 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Compass, Terminal, Github, Podcast, Music, Lightbulb } from "lucide-react";
 import Footer from "../components/Footer";
+
+const mediaFiles = [
+  { id: "douyin", path: "/media/douyin.webp", label: "抖音 · 熊猫智研社" },
+  { id: "weichat", path: "/media/weichat.webp", label: "微信视频号 · 熊猫智研社" },
+  { id: "kuaishou", path: "/media/kuaishou.webp", label: "快手 · 熊猫智研社" },
+  { id: "bilibili", path: "/media/bilibili.webp", label: "哔哩哔哩 · 熊猫智研社" },
+];
 
 export default function Home() {
   return (
@@ -245,6 +253,51 @@ export default function Home() {
         </div>
 
       </main>
+
+      {/* Platform Screenshots */}
+      <section className="container mx-auto px-4 py-14 sm:px-6 sm:py-20">
+        <div
+          className="mb-10 h-px w-full bg-gradient-to-r from-transparent via-zinc-600/80 to-transparent sm:mb-12"
+          aria-hidden
+        />
+        <div className="text-center px-2">
+          <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-wide text-amber-500/90 sm:text-xs">
+            平台矩阵
+          </p>
+          <h2 className="font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl md:text-5xl">
+            平台示例
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl font-mono text-sm leading-relaxed text-zinc-400 sm:text-base">
+            看看开发者上传的几百个视频成品吧~
+          </p>
+        </div>
+        <div className="mt-12 grid grid-cols-1 gap-4 sm:mt-16 sm:grid-cols-2 sm:gap-6 md:grid-cols-4">
+          {mediaFiles.map((file) => (
+            <div
+              key={file.id}
+              className="group overflow-hidden rounded-2xl border border-white/[0.06] bg-zinc-950/60 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-amber-500/20 hover:shadow-[0_28px_70px_-28px_rgba(251,191,36,0.18)] motion-reduce:transform-none"
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 bg-zinc-950/60 px-3 py-1.5">
+                <span className="max-w-[52%] truncate font-mono text-xs text-zinc-600">
+                  {file.id}
+                </span>
+              </div>
+              <div className="relative w-full h-[280px] sm:h-[320px] overflow-hidden bg-zinc-950">
+                <Image
+                  src={file.path}
+                  alt={file.label}
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  className="object-contain p-2"
+                />
+              </div>
+              <div className="border-t border-zinc-800/80 bg-zinc-950/40 px-3 py-3 text-center sm:px-4 sm:py-4">
+                <p className="text-sm font-medium text-zinc-100">{file.label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
 
       <Footer />
     </div>
