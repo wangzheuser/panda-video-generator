@@ -83,18 +83,18 @@ export default function Home() {
                 超级简单的傻瓜式视频生成器
               </p>
             </Link>
-            <div className="flex flex-col mx-4 mb-4 sm:mx-0 sm:mb-0">
+            <div className="flex flex-col gap-2 mx-4 mb-4 sm:mx-0 sm:mb-0 mt-4 sm:mt-6">
               <Link
                 href="/landing"
-                className="flex w-full items-center justify-center gap-2 rounded-t-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all group-hover:bg-white/[0.12] group-hover:text-white"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 font-mono text-xs font-semibold text-amber-300 transition-all hover:bg-amber-500/20 hover:text-amber-200"
               >
-                点击查看 →
+                🚀 功能介绍 →
               </Link>
               <a
                 href="https://github.com/szhshp/panda-video-generator"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-b-lg border border-t-0 border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
               >
                 <Github size={15} />
                 szhshp/panda-video-generator
@@ -129,18 +129,18 @@ export default function Home() {
                 视频自动化发布CLI
               </p>
             </Link>
-            <div className="flex flex-col mx-4 mb-4 sm:mx-0 sm:mb-0">
+            <div className="flex flex-col gap-2 mx-4 mb-4 sm:mx-0 sm:mb-0 mt-4 sm:mt-6">
               <Link
                 href="/cli"
-                className="flex w-full items-center justify-center gap-2 rounded-t-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all group-hover:bg-white/[0.12] group-hover:text-white"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 hover:text-emerald-200"
               >
-                点击查看 →
+                📖 使用说明 →
               </Link>
               <a
                 href="https://github.com/szhshp/panda-video-automations-publisher"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-b-lg border border-t-0 border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
               >
                 <Github size={15} />
                 szhshp/panda-video-automations-publisher
