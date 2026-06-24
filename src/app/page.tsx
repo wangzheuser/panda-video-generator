@@ -41,7 +41,7 @@ export default function Home() {
           <h1 className="font-mono text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl md:text-4xl">
             <span className="text-amber-400">Panda</span>
             <span className="text-zinc-300">Video</span>
-            <span className="text-zinc-500">Automations</span>
+            <span className="text-yellow-200">Automations</span>
           </h1>
           <p className="mt-2 font-mono text-sm text-zinc-600 sm:text-base">
             熊猫视频自动化引擎
@@ -53,20 +53,20 @@ export default function Home() {
           {/* PandaVideoGenerator card */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-amber-900/40 bg-gradient-to-b from-[#2a1f0f] to-[#1a140e] shadow-[0_0_0_1px_rgba(251, 191, 36, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/30 before:to-transparent hover:border-amber-500/40 hover:shadow-[0_32px_100px_-24px_rgba(251, 191, 36, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
             <Link href="/landing" className="flex flex-1 flex-col items-center p-8 sm:p-0">
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.5rem] text-zinc-600 sm:text-[0.6rem]">
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#傻瓜式</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#自动化向导</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#Web</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#Remotion</span>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#傻瓜式</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#视频生成</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#自动化向导</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#Agent</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#Web</span>
               </div>
               <div className="mb-5 inline-flex size-16 items-center justify-center rounded-xl bg-amber-500/10 text-amber-300/90 ring-1 ring-amber-500/20 sm:size-20">
                 <Compass className="size-8 sm:size-10" strokeWidth={1.5} />
               </div>
 
               <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-amber-400">Panda</span>
-                <span className="text-zinc-300">Video</span>
-                <span className="text-zinc-500">Generator</span>
+                <span className="text-zinc-400">PVA</span>
+                <span className="text-amber-300">-Generator</span>
               </h2>
 
               <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
@@ -105,18 +105,18 @@ export default function Home() {
           {/* publisher-cli card */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-emerald-900/40 bg-gradient-to-b from-[#142918] to-[#0f1a12] shadow-[0_0_0_1px_rgba(16, 185, 129, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/30 before:to-transparent hover:border-emerald-500/40 hover:shadow-[0_32px_100px_-24px_rgba(16, 185, 129, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
             <Link href="/cli" className="flex flex-1 flex-col items-center p-8 sm:p-0">
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.5rem] text-zinc-600 sm:text-[0.6rem]">
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#CLI 工具</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#浏览器自动化</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#支持多自媒体平台</span>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#CLI 工具</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#浏览器自动化</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#支持多自媒体平台</span>
               </div>
               <div className="mb-5 inline-flex size-16 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-300/90 ring-1 ring-emerald-500/20 sm:size-20">
                 <Terminal className="size-8 sm:size-10" strokeWidth={1.5} />
               </div>
 
               <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-emerald-400">PVA</span>
-                <span className="text-zinc-500">-CLI</span>
+                <span className="text-zinc-400">PVA</span>
+                <span className="text-emerald-500">-CLI</span>
               </h2>
 
               <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
@@ -152,10 +152,10 @@ export default function Home() {
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-purple-900/40 bg-gradient-to-b from-[#22182e] to-[#150f1a] shadow-[0_0_0_1px_rgba(168, 85, 247, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-purple-400/30 before:to-transparent hover:border-purple-500/40 hover:shadow-[0_32px_100px_-24px_rgba(168, 85, 247, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
             <div className="flex flex-1 flex-col items-center p-8 sm:p-0">
 
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.5rem] text-zinc-600 sm:text-[0.6rem]">
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#NotebookLM</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#PPT</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#视频讲解</span>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#NotebookLM</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#PPT</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#视频讲解</span>
               </div>
               <div className="mb-5 inline-flex size-16 items-center justify-center rounded-xl bg-purple-500/10 text-purple-300/90 ring-1 ring-purple-500/20 sm:size-20">
                 <Podcast className="size-8 sm:size-10" strokeWidth={1.5} />
@@ -194,39 +194,39 @@ export default function Home() {
           </div>
 
           {/* Suno card */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-rose-900/40 bg-gradient-to-b from-[#2a1518] to-[#1a0f12] shadow-[0_0_0_1px_rgba(244, 63, 94, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-rose-400/30 before:to-transparent hover:border-rose-500/40 hover:shadow-[0_32px_100px_-24px_rgba(244, 63, 94, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none brightness-[0.65]">
+          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-b from-[#18181b] to-[#131315] shadow-[0_0_0_1px_rgba(113, 113, 122, 0.04)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-zinc-600/20 before:to-transparent hover:border-zinc-600/40 hover:shadow-[0_32px_100px_-24px_rgba(113, 113, 122, 0.12)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none brightness-[0.8] saturate-[0.45]">
             <div className="flex flex-1 flex-col items-center p-8 sm:p-0">
               {/* Under development badge */}
-              <div className="absolute right-3 top-3 rounded-full border border-rose-800/30 bg-rose-950/60 px-2.5 py-0.5 font-mono text-[0.6rem] text-rose-400/80 sm:right-4 sm:top-4">
+              <div className="absolute right-3 top-3 rounded-full border border-zinc-700/30 bg-zinc-900/60 px-2.5 py-0.5 font-mono text-[0.6rem] text-zinc-500/80 sm:right-4 sm:top-4">
                 开发中
               </div>
 
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.5rem] text-zinc-600 sm:text-[0.6rem]">
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#music</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#ai</span>
-                <span className="rounded bg-zinc-900 px-1.5 py-0.5">#开发中</span>
+              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#AI 音乐</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#Suno</span>
+                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#生成式</span>
               </div>
-              <div className="mb-5 inline-flex size-16 items-center justify-center rounded-xl bg-rose-500/10 text-rose-300/90 ring-1 ring-rose-500/20 sm:size-20">
+              <div className="mb-5 inline-flex size-16 items-center justify-center rounded-xl bg-zinc-500/10 text-zinc-500/90 ring-1 ring-zinc-500/15 sm:size-20">
                 <Music className="size-8 sm:size-10" strokeWidth={1.5} />
               </div>
 
               <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-zinc-400">PVA-</span>
-                <span className="text-rose-400">Suno</span>
+                <span className="text-zinc-500">PVA-</span>
+                <span className="text-zinc-400">Suno</span>
               </h2>
 
               <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
-                <span className="rounded-l bg-rose-900/40 px-1.5 py-0.5 text-rose-300">① 生成</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="rounded-r bg-emerald-900/40 px-1.5 py-0.5 text-emerald-300">② 发布</span>
+                <span className="rounded-l bg-zinc-800/60 px-1.5 py-0.5 text-zinc-400">① 生成</span>
+                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-700">→</span>
+                <span className="rounded-r bg-zinc-800/60 px-1.5 py-0.5 text-zinc-400">② 发布</span>
               </div>
 
-              <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
+              <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-600 sm:text-sm">
                 AI 音乐创作: 通过文字描述生成完整曲目, 灵感即刻成曲
               </p>
 
               <div className="grow min-h-3" />
-              <span className="mt-2 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-xs font-semibold text-zinc-600 transition-all">
+              <span className="mt-2 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-xs font-semibold text-zinc-700 transition-all">
                 即将推出 →
               </span>
             </div>
