@@ -157,18 +157,16 @@
 
 <table>
   <tr>
-    <td align="center" valign="top" width="33%">
+    <td align="center" valign="top" width="25%">
       <img src="./public/media/douyin.webp" width="240" alt="抖音 · 熊猫智研社">
     </td>
-    <td align="center" valign="top" width="33%">
+    <td align="center" valign="top" width="25%">
       <img src="./public/media/weichat.webp" width="240" alt="微信视频号 · 熊猫智研社">
     </td>
-    <td align="center" valign="top" width="33%">
+    <td align="center" valign="top" width="25%">
       <img src="./public/media/kuaishou.webp" width="240" alt="快手 · 熊猫智研社">
     </td>
-  </tr>
-  <tr>
-    <td align="center" valign="top" colspan="3">
+    <td align="center" valign="top" width="25%">
       <img src="./public/media/bilibili.webp" width="240" alt="哔哩哔哩 · 熊猫智研社">
     </td>
   </tr>

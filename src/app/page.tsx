@@ -38,7 +38,7 @@ export default function Home() {
       <main className="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:py-12">
         {/* Page title */}
         <div className="mb-8 text-center sm:mb-10">
-          <h1 className="font-mono text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl md:text-4xl">
+          <h1 className="px-1 font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-3xl md:text-4xl">
             <span className="text-amber-400">Panda</span>
             <span className="text-zinc-300">Video</span>
             <span className="text-yellow-200">Automations</span>
@@ -52,7 +52,7 @@ export default function Home() {
         <div className="grid w-full max-w-5xl flex-1 grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
           {/* PandaVideoGenerator card */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-amber-900/40 bg-gradient-to-b from-[#2a1f0f] to-[#1a140e] shadow-[0_0_0_1px_rgba(251, 191, 36, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/30 before:to-transparent hover:border-amber-500/40 hover:shadow-[0_32px_100px_-24px_rgba(251, 191, 36, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
-            <Link href="/landing" className="flex flex-1 flex-col items-center p-8 sm:p-0">
+            <Link href="/landing" className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
               <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
                 <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#傻瓜式</span>
                 <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#视频生成</span>
@@ -69,7 +69,7 @@ export default function Home() {
                 <span className="text-amber-300">-Generator</span>
               </h2>
 
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
+              <div className="mt-4 flex flex-nowrap items-center justify-center gap-0 overflow-x-auto font-mono text-[0.6rem] sm:text-xs">
                 <span className="rounded-l bg-amber-900/40 px-1.5 py-0.5 text-amber-300">① 抓取</span>
                 <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
                 <span className="bg-amber-900/40 px-1.5 py-0.5 text-amber-300">② 脚本</span>
@@ -104,7 +104,7 @@ export default function Home() {
 
           {/* publisher-cli card */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-emerald-900/40 bg-gradient-to-b from-[#142918] to-[#0f1a12] shadow-[0_0_0_1px_rgba(16, 185, 129, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/30 before:to-transparent hover:border-emerald-500/40 hover:shadow-[0_32px_100px_-24px_rgba(16, 185, 129, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
-            <Link href="/cli" className="flex flex-1 flex-col items-center p-8 sm:p-0">
+            <Link href="/cli" className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
               <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
                 <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#CLI 工具</span>
                 <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#浏览器自动化</span>
@@ -150,7 +150,7 @@ export default function Home() {
 
           {/* NotebookLM card */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-purple-900/40 bg-gradient-to-b from-[#22182e] to-[#150f1a] shadow-[0_0_0_1px_rgba(168, 85, 247, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-purple-400/30 before:to-transparent hover:border-purple-500/40 hover:shadow-[0_32px_100px_-24px_rgba(168, 85, 247, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
-            <div className="flex flex-1 flex-col items-center p-8 sm:p-0">
+            <div className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
 
               <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
                 <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#NotebookLM</span>
@@ -195,7 +195,7 @@ export default function Home() {
 
           {/* Suno card */}
           <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-b from-[#18181b] to-[#131315] shadow-[0_0_0_1px_rgba(113, 113, 122, 0.04)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-zinc-600/20 before:to-transparent hover:border-zinc-600/40 hover:shadow-[0_32px_100px_-24px_rgba(113, 113, 122, 0.12)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none brightness-[0.8] saturate-[0.45]">
-            <div className="flex flex-1 flex-col items-center p-8 sm:p-0">
+            <div className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
               {/* Under development badge */}
               <div className="absolute right-3 top-3 rounded-full border border-zinc-700/30 bg-zinc-900/60 px-2.5 py-0.5 font-mono text-[0.6rem] text-zinc-500/80 sm:right-4 sm:top-4">
                 开发中
