@@ -1,15 +1,7 @@
-import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowLeft,
   Terminal,
-  LogIn,
-  Upload,
-  Globe,
-  Shield,
-  BookOpen,
-  Newspaper,
-  Play,
 } from "lucide-react";
 import Footer from "../../components/Footer";
 
@@ -108,25 +100,19 @@ export default function CliPage() {
               title="功能演示"
               subtitle="CLI 跨平台视频上传操作演示"
             />
-            <a
-              href="https://www.bilibili.com/video/BV15ZG766E4g/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative mt-12 block overflow-hidden rounded-xl"
-            >
-              <Image
-                src="/media/5.png"
-                alt="CLI 功能演示"
-                width={1768}
-                height={998}
-                className="w-full transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30 transition-colors group-hover:bg-black/40">
-                <div className="flex size-16 items-center justify-center rounded-full bg-emerald-500/80 shadow-lg transition-transform group-hover:scale-110">
-                  <Play size={28} className="ml-1 text-white" fill="white" />
-                </div>
+            <div className="relative mt-12 overflow-hidden rounded-2xl bg-gradient-to-b from-white/[0.14] via-white/[0.06] to-white/[0.03] p-px shadow-[0_0_80px_-20px_rgba(251,191,36,0.15)]">
+              <div className="relative aspect-video w-full overflow-hidden rounded-[0.9rem] border border-zinc-800/90 bg-black shadow-inner shadow-black/60">
+                <iframe
+                  title="CLI 功能演示"
+                  src="https://player.bilibili.com/player.html?bvid=BV15ZG766E4g&autoplay=0&danmaku=0"
+                  className="absolute inset-0 w-full h-full border-0"
+                  scrolling="no"
+                  allow="fullscreen; encrypted-media; picture-in-picture"
+                  sandbox="allow-scripts allow-same-origin allow-presentation"
+                  allowFullScreen
+                />
               </div>
-            </a>
+            </div>
             <p className="mt-3 text-center text-xs text-zinc-500">
               <a
                 href="https://www.bilibili.com/video/BV15ZG766E4g/"
@@ -134,7 +120,7 @@ export default function CliPage() {
                 rel="noopener noreferrer"
                 className="text-emerald-400 hover:text-emerald-300 hover:underline"
               >
-                在 Bilibili 观看完整视频
+                在外部页面观看完整视频
               </a>
             </p>
           </section>
