@@ -1,40 +1,47 @@
 import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowDown,
+  Clapperboard,
+  NotebookPen,
+  Search,
+  Sparkles,
+  Send,
+} from "lucide-react";
 import Footer from "../../components/Footer";
+import SectionTitle from "../../components/SectionTitle";
+import Steps from "../../components/Steps";
 
-function SectionTitle({
-  eyebrow,
-  title,
-  subtitle,
-  className = "",
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  className?: string;
-}) {
-  return (
-    <div className={`text-center px-2 ${className}`}>
-      <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-wide text-amber-500/90 sm:text-xs">
-        {eyebrow}
-      </p>
-      <h2 className="font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl md:text-5xl">
-        {title}
-      </h2>
-      {subtitle ? (
-        <p className="mx-auto mt-4 max-w-xl font-mono text-sm leading-relaxed text-zinc-400 sm:text-base">
-          {subtitle}
-        </p>
-      ) : null}
-    </div>
-  );
-}
+/* This page's own flow, matching the demo copy below: 笔记本 → 研究 → 视频 → 发布. */
+const RESEARCH_STEPS = [
+  {
+    title: "建笔记本",
+    description: "把资料、链接和文档丢进一个 NotebookLM 笔记本。",
+    icon: NotebookPen,
+    tags: ["资料归集", "笔记本"],
+  },
+  {
+    title: "深度研究",
+    description: "让 NotebookLM 读完全部资料，产出带引用的研究结论。",
+    icon: Search,
+    tags: ["深度研究", "引用来源"],
+  },
+  {
+    title: "生成视频",
+    description: "把研究结论交给渲染引擎，直接出片。",
+    icon: Clapperboard,
+    tags: ["视频生成", "配音与字幕"],
+  },
+  {
+    title: "多平台发布",
+    description: "成片自动登录上传，分发到各个平台。",
+    icon: Send,
+    tags: ["多平台发布", "自动化上传"],
+  },
+] as const;
 
 const codeBlockClass =
   "mt-4 rounded-xl bg-zinc-950 p-4 font-mono text-sm text-zinc-300 border border-white/[0.05]";
-
-const accent =
-  "text-violet-300 border-violet-600/40 bg-violet-600/10 hover:bg-violet-600/20";
 
 export default function NotebookLmPage() {
   return (
@@ -49,7 +56,13 @@ export default function NotebookLmPage() {
         aria-hidden
       />
 
-      <div className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
+      {/*
+       * Column width matches the landing page's `shell` (max-w-5xl + px-5/px-8),
+       * so every card on this page lines up with the card grids there. The
+       * Tailwind `container` class is deliberately not used — it caps by
+       * breakpoint, which is narrower than the shell between md and 2xl.
+       */}
+      <div className="scroll-smooth px-5 py-12 sm:px-8 sm:py-16">
         <Link
           href="/"
           className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-50 transition-colors"
@@ -58,48 +71,76 @@ export default function NotebookLmPage() {
           返回首页
         </Link>
 
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto w-full max-w-5xl">
           {/* Hero */}
           <div className="mb-8 inline-flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/10 text-violet-200/90 shadow-inner ring-1 ring-white/10">
             <Sparkles className="size-7" strokeWidth={1.75} />
           </div>
 
-          <h1 className="font-mono text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl md:text-4xl">
-            Panda Video Automation NotebookLM
+          {/*
+           * Wordmark, matching the home page: spans flush, <wbr> at each colour
+           * boundary so the long product name wraps instead of overflowing.
+           */}
+          <h1 className="text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-[2.25rem] md:text-[2.5rem] lg:text-[3rem]">
+            {/* Brand wordmark — muted grey, no spaces inside it; <wbr> keeps a break point without one */}
+            <span className="text-neutral-400">
+              Panda<wbr />Video<wbr />Automation
+            </span>{" "}
+            {/* Product name — accent colour, one space after the wordmark */}
+            <span className="text-amber-400">NotebookLM</span>
           </h1>
-          <p className="mt-2 font-mono text-base text-violet-400">
-            From research notes to published video in one command.
+          {/*
+           * Slogan — mirrors the home page: three parallel promises split by
+           * hairline separators, so the repeated 一键 reads as a rhythm instead
+           * of running on. Separators are row-only; on mobile the three stack.
+           */}
+          <p className="mt-6 flex flex-col items-start gap-y-1.5 text-xl font-semibold text-neutral-50 sm:mt-7 sm:flex-row sm:items-center sm:gap-x-5 sm:text-3xl lg:text-4xl">
+            <span>一键研究</span>
+            <span aria-hidden className="hidden h-6 w-px bg-amber-400/50 sm:block lg:h-8" />
+            <span>一键成片</span>
+            <span aria-hidden className="hidden h-6 w-px bg-amber-400/50 sm:block lg:h-8" />
+            <span>一键发布</span>
           </p>
-          <p className="mt-4 text-lg text-zinc-400">
+          <p className="mt-4 max-w-2xl text-balance text-sm leading-relaxed text-neutral-400 sm:text-base">
             把 NotebookLM 里的研究成果一键变成视频，再自动发布到 B 站、抖音、视频号、快手——一条指令全搞定。
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
+            {/* Primary action: jump straight to the quick-start steps further down */}
+            <a
+              href="#quick-start"
+              className="inline-flex items-center gap-2 rounded-xl border border-transparent bg-amber-400 px-5 py-2.5 text-sm font-semibold text-zinc-950 shadow-[0_0_32px_-8px_rgba(251,191,36,0.45)] hover:bg-amber-300 transition-colors"
+            >
+              快速开始
+              <ArrowDown size={16} className="shrink-0" />
+            </a>
             <Link
               href="https://github.com/szhshp/panda-video-automation-notebooklm"
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-2 rounded-xl border px-5 py-2.5 text-sm font-medium transition-colors ${accent}`}
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-100 hover:border-white/25 hover:bg-white/[0.08] transition-colors"
             >
               查看 GitHub 仓库
-            </Link>
-            <Link
-              href="https://pypi.org/project/notebooklm-mcp-cli/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-cyan-600/40 bg-cyan-600/10 px-5 py-2.5 text-sm font-medium text-cyan-300 hover:bg-cyan-600/20 transition-colors"
-            >
-              查看 PyPI 包
             </Link>
             <Link
               href="https://panda.szhshp.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-amber-600/40 bg-amber-600/10 px-5 py-2.5 text-sm font-medium text-amber-300 hover:bg-amber-600/20 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-100 hover:border-white/25 hover:bg-white/[0.08] transition-colors"
             >
               项目主页
             </Link>
           </div>
+
+          {/* Workflow — research to published video, in order */}
+          <section className="py-14 sm:py-20">
+            <SectionTitle
+              eyebrow="工作流程"
+              title="从资料到成片"
+              subtitle="笔记本、深度研究、视频生成、多平台发布，一条流水线跑完。"
+            />
+            <Steps steps={RESEARCH_STEPS} />
+          </section>
 
           {/* Demo Video */}
           <section className="py-14 sm:py-20">
@@ -205,7 +246,7 @@ export default function NotebookLmPage() {
           </section>
 
           {/* Quick Start */}
-          <section className="py-14 sm:py-20">
+          <section id="quick-start" className="scroll-mt-8 py-14 sm:py-20">
             <SectionTitle
               eyebrow="快速上手"
               title="快速开始"

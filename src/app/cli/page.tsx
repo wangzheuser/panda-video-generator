@@ -1,40 +1,52 @@
 import Link from "next/link";
 import {
   ArrowLeft,
+  ArrowDown,
+  LogIn,
   Terminal,
+  Upload,
+  Send,
 } from "lucide-react";
 import Footer from "../../components/Footer";
+import SectionTitle from "../../components/SectionTitle";
+import Steps from "../../components/Steps";
 
-function SectionTitle({
-  eyebrow,
-  title,
-  subtitle,
-  className = "",
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  className?: string;
-}) {
-  return (
-    <div className={`text-center px-2 ${className}`}>
-      <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-wide text-amber-500/90 sm:text-xs">
-        {eyebrow}
-      </p>
-      <h2 className="font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl md:text-5xl">
-        {title}
-      </h2>
-      {subtitle ? (
-        <p className="mx-auto mt-4 max-w-xl font-mono text-sm leading-relaxed text-zinc-400 sm:text-base">
-          {subtitle}
-        </p>
-      ) : null}
-    </div>
-  );
-}
+/* This page's own flow — the CLI does the whole thing in three commands. */
+const PUBLISH_STEPS = [
+  {
+    title: "登录账号",
+    description: "一条命令拉起浏览器，扫码登录要发布的平台。",
+    icon: LogIn,
+    tags: ["账号登录", "Cookie 复用"],
+  },
+  {
+    title: "上传视频",
+    description: "指定视频与封面文件，工具负责转码与断点续传。",
+    icon: Upload,
+    tags: ["视频文件", "封面与标题"],
+  },
+  {
+    title: "发布到多平台",
+    description: "一次提交，按各平台规则分别填写并发布。",
+    icon: Send,
+    tags: ["多平台发布", "批量提交"],
+  },
+] as const;
 
 const codeBlockClass =
   "mt-4 rounded-xl bg-zinc-950 p-4 font-mono text-sm text-zinc-300 border border-white/[0.05]";
+
+/*
+ * Panel surface, matching the flat cards on the landing page: solid fill, solid
+ * border, no gradient. The panels used to be graded fills fading into the page
+ * background, which left their edges reading as a blur instead of a boundary.
+ * No hover state — these are static content blocks.
+ */
+const panelClass = "mt-12 rounded-2xl border border-white/20 bg-zinc-900 p-6 sm:p-8";
+
+/* Same surface, amber edge — this one is a callout, not just a section body. */
+const noticePanelClass =
+  "mt-12 rounded-2xl border border-amber-500/40 bg-zinc-900 p-6 sm:p-8";
 
 export default function CliPage() {
   return (
@@ -49,7 +61,13 @@ export default function CliPage() {
         aria-hidden
       />
 
-      <div className="container mx-auto px-4 py-12 sm:px-6 sm:py-16">
+      {/*
+       * Column width matches the landing page's `shell` (max-w-5xl + px-5/px-8),
+       * so every card on this page lines up with the card grids there. The
+       * Tailwind `container` class is deliberately not used — it caps by
+       * breakpoint, which is narrower than the shell between md and 2xl.
+       */}
+      <div className="scroll-smooth px-5 py-12 sm:px-8 sm:py-16">
         <Link
           href="/"
           className="mb-8 inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-zinc-50 transition-colors"
@@ -58,28 +76,54 @@ export default function CliPage() {
           返回首页
         </Link>
 
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto w-full max-w-5xl">
           {/* Hero */}
-          <div className="mb-8 inline-flex size-14 items-center justify-center rounded-2xl bg-gradient-to-br from-emerald-500/20 to-cyan-500/10 text-emerald-200/90 shadow-inner ring-1 ring-white/10">
+          <div className="mb-8 inline-flex size-14 items-center justify-center rounded-2xl bg-white/[0.06] text-amber-300 ring-1 ring-white/10">
             <Terminal className="size-7" strokeWidth={1.75} />
           </div>
 
-          <h1 className="font-mono text-2xl font-bold tracking-tight text-zinc-50 sm:text-3xl md:text-4xl">
-            Panda Video Automation Publisher
+          {/*
+           * Wordmark, matching the home page: spans flush, <wbr> at each colour
+           * boundary so the long product name wraps instead of overflowing.
+           */}
+          <h1 className="text-[1.75rem] font-bold leading-[1.15] tracking-tight sm:text-[2.25rem] md:text-[2.5rem] lg:text-[3rem]">
+            {/* Brand wordmark — muted grey, no spaces inside it; <wbr> keeps a break point without one */}
+            <span className="text-neutral-400">
+              Panda<wbr />Video<wbr />Automation
+            </span>{" "}
+            {/* Product name — accent colour, one space after the wordmark */}
+            <span className="text-amber-400">Publisher</span>
           </h1>
-          <p className="mt-2 font-mono text-base text-emerald-400">
-            One CLI to publish everywhere.
+          {/*
+           * Slogan — mirrors the home page: three parallel promises split by
+           * hairline separators, so the repeated 一键 reads as a rhythm instead
+           * of running on. Separators are row-only; on mobile the three stack.
+           */}
+          <p className="mt-6 flex flex-col items-start gap-y-1.5 text-xl font-semibold text-neutral-50 sm:mt-7 sm:flex-row sm:items-center sm:gap-x-5 sm:text-3xl lg:text-4xl">
+            <span>一键登录</span>
+            <span aria-hidden className="hidden h-6 w-px bg-amber-400/50 sm:block lg:h-8" />
+            <span>一键上传</span>
+            <span aria-hidden className="hidden h-6 w-px bg-amber-400/50 sm:block lg:h-8" />
+            <span>一键发布</span>
           </p>
-          <p className="mt-4 text-lg text-zinc-400">
+          <p className="mt-4 max-w-2xl text-balance text-sm leading-relaxed text-neutral-400 sm:text-base">
             跨平台视频上传自动化工具，支持 Bilibili、抖音、快手、微信视频号、YouTube。
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
+            {/* Primary action: jump straight to the install commands further down */}
+            <a
+              href="#quick-start"
+              className="inline-flex items-center gap-2 rounded-xl border border-transparent bg-amber-400 px-5 py-2.5 text-sm font-semibold text-zinc-950 shadow-[0_0_32px_-8px_rgba(251,191,36,0.45)] hover:bg-amber-300 transition-colors"
+            >
+              快速开始
+              <ArrowDown size={16} className="shrink-0" />
+            </a>
             <Link
               href="https://github.com/szhshp/panda-video-automations-publisher"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-emerald-600/40 bg-emerald-600/10 px-5 py-2.5 text-sm font-medium text-emerald-300 hover:bg-emerald-600/20 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-100 hover:border-white/25 hover:bg-white/[0.08] transition-colors"
             >
               查看 GitHub 仓库
             </Link>
@@ -87,11 +131,21 @@ export default function CliPage() {
               href="https://www.npmjs.com/package/@panda-video-automation/pva"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-xl border border-red-600/40 bg-red-600/10 px-5 py-2.5 text-sm font-medium text-red-300 hover:bg-red-600/20 transition-colors"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/[0.04] px-5 py-2.5 text-sm font-medium text-zinc-100 hover:border-white/25 hover:bg-white/[0.08] transition-colors"
             >
               查看 npm 包
             </Link>
           </div>
+
+          {/* Workflow — three commands, in order */}
+          <section className="py-14 sm:py-20">
+            <SectionTitle
+              eyebrow="工作流程"
+              title="登录、上传、发布"
+              subtitle="三条命令跑完一次跨平台发布。"
+            />
+            <Steps steps={PUBLISH_STEPS} />
+          </section>
 
           {/* Demo Video */}
           <section className="py-14 sm:py-20">
@@ -131,7 +185,7 @@ export default function CliPage() {
               eyebrow="产品概览"
               title="独立 CLI 工具"
             />
-            <div className="mt-12 rounded-2xl border border-amber-600/30 bg-gradient-to-b from-amber-900/20 to-zinc-950/95 p-6 sm:p-8">
+            <div className={noticePanelClass}>
               <p className="text-sm text-zinc-400 leading-relaxed">
                 本 CLI 是 <strong className="text-zinc-200">独立发布的 npm 包</strong>，可在任意项目中单独使用，无需依赖 Panda Video Generator 主项目。
               </p>
@@ -152,12 +206,12 @@ export default function CliPage() {
           </section>
 
           {/* Quick Install */}
-          <section className="py-14 sm:py-20">
+          <section id="quick-start" className="scroll-mt-8 py-14 sm:py-20">
             <SectionTitle
               eyebrow="快速上手"
               title="快速开始"
             />
-            <div className="mt-12 rounded-2xl border border-white/[0.07] bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 sm:p-8">
+            <div className={panelClass}>
               <div className={codeBlockClass}>
                 <p className="text-zinc-500"># 全局安装（推荐）</p>
                 <p className="text-zinc-100">npm install -g @panda-video-automation/pva</p>
@@ -179,7 +233,7 @@ export default function CliPage() {
               title="1. 登录"
               subtitle="每个平台只需登录一次"
             />
-            <div className="mt-12 rounded-2xl border border-white/[0.07] bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 sm:p-8">
+            <div className={panelClass}>
               <div className={codeBlockClass}>
                 <p className="text-zinc-500"># 语法</p>
                 <p className="text-zinc-100">pva {'<'}平台{'>'} login</p>
@@ -201,7 +255,7 @@ export default function CliPage() {
               eyebrow="操作步骤"
               title="2. 上传视频"
             />
-            <div className="mt-12 rounded-2xl border border-white/[0.07] bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 sm:p-8">
+            <div className={panelClass}>
               <div className={codeBlockClass}>
                 <p className="text-zinc-500"># 语法</p>
                 <p className="text-zinc-100">pva {'<'}平台{'>'} upload --video {'<'}路径{'>'} [options]</p>
@@ -234,7 +288,7 @@ export default function CliPage() {
               eyebrow="命令参考"
               title="CLI 参考"
             />
-            <div className="mt-12 rounded-2xl border border-white/[0.07] bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 sm:p-8">
+            <div className={panelClass}>
               <p className="font-mono text-sm text-zinc-400">
                 pva &lt;platform&gt; &lt;action&gt; [options]
               </p>
@@ -348,7 +402,7 @@ export default function CliPage() {
               eyebrow="平台差异"
               title="平台限制"
             />
-            <div className="mt-12 rounded-2xl border border-white/[0.07] bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 sm:p-8">
+            <div className={panelClass}>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
                   <thead>

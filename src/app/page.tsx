@@ -1,365 +1,462 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Github, Lightbulb } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Github,
+  Lightbulb,
+  Music2,
+} from "lucide-react";
 import Footer from "../components/Footer";
 
-const mediaFiles = [
-  { id: "douyin", path: "/media/douyin.webp", label: "抖音 · 熊猫智研社" },
-  { id: "weichat", path: "/media/weichat.webp", label: "微信视频号 · 熊猫智研社" },
-  { id: "kuaishou", path: "/media/kuaishou.webp", label: "快手 · 熊猫智研社" },
-  { id: "bilibili", path: "/media/bilibili.webp", label: "哔哩哔哩 · 熊猫智研社" },
+/**
+ * Home page — product index for the PVA suite.
+ * Restraint rules: neutral greyscale chrome, one accent (amber) reserved for
+ * keyboard focus and the pipeline's terminal node. Product identity comes from
+ * the logo artwork, never from the UI shell.
+ */
+
+const GITHUB_REPO = "https://github.com/szhshp/panda-video-generator";
+
+/** The pipeline is a real sequence, so it gets the rail diagram. */
+const pipeline = [
+  { id: "capture", label: "抓取素材", note: "网页 / 视频 / 文档" },
+  { id: "script", label: "生成脚本", note: "AI 整理与改写" },
+  { id: "render", label: "渲染成片", note: "字幕 + 配音 + 合成" },
+  { id: "publish", label: "多平台发布", note: "抖音 / 视频号 / 快手 / B站" },
 ];
+
+/**
+ * One hue per product, and only one. Each card's gradient runs between two
+ * shades of a single hue family — never two different hues.
+ */
+const tones = {
+  amber: {
+    card: "border-amber-600/40 bg-gradient-to-b from-[#452f0d] to-[#221807] hover:border-amber-500/60 hover:shadow-[0_24px_80px_-32px_rgba(251,191,36,0.4)]",
+    title: "text-amber-200",
+    cta: "border-amber-500/30 bg-amber-500/15 text-amber-100 group-hover:border-amber-400/50 group-hover:bg-amber-500/25",
+  },
+  emerald: {
+    card: "border-emerald-600/40 bg-gradient-to-b from-[#0f3524] to-[#081a11] hover:border-emerald-500/60 hover:shadow-[0_24px_80px_-32px_rgba(52,211,153,0.35)]",
+    title: "text-emerald-200",
+    cta: "border-emerald-500/30 bg-emerald-500/15 text-emerald-100 group-hover:border-emerald-400/50 group-hover:bg-emerald-500/25",
+  },
+  purple: {
+    card: "border-purple-600/40 bg-gradient-to-b from-[#2f1d47] to-[#170e24] hover:border-purple-500/60 hover:shadow-[0_24px_80px_-32px_rgba(192,132,252,0.35)]",
+    title: "text-purple-200",
+    cta: "border-purple-500/30 bg-purple-500/15 text-purple-100 group-hover:border-purple-400/50 group-hover:bg-purple-500/25",
+  },
+  neutral: {
+    card: "border-white/[0.10] bg-gradient-to-b from-[#1d1d20] to-[#141416]",
+    title: "text-neutral-400",
+    cta: "border-white/[0.10] text-neutral-600",
+  },
+} as const;
+
+type Product = {
+  id: string;
+  name: string;
+  description: string;
+  tone: keyof typeof tones;
+  /** Omitted while a product has no artwork yet — falls back to an icon tile. */
+  logo?: string;
+  docsHref?: string;
+  repoHref?: string;
+  inDevelopment?: boolean;
+};
+
+const products: Product[] = [
+  {
+    id: "generator",
+    name: "PVA-Generator",
+    description:
+      "输入一个主题,自动完成素材抓取、脚本撰写与成片渲染,全程不需要人工干预。",
+    tone: "amber",
+    logo: "/logo/logo.png",
+    docsHref: "/landing",
+    repoHref: "https://github.com/szhshp/panda-video-generator",
+  },
+  {
+    id: "cli",
+    name: "PVA-CLI",
+    description:
+      "基于浏览器自动化的发布工具,一条命令把成片分发到抖音、视频号、快手与哔哩哔哩。",
+    tone: "emerald",
+    logo: "/logo/pva-cli.png",
+    docsHref: "/cli",
+    repoHref: "https://github.com/szhshp/panda-video-automations-publisher",
+  },
+  {
+    id: "notebooklm",
+    name: "PVA-NotebookLM",
+    description:
+      "输入一个主题,输出包含课件、讲解音频与合成视频的完整课程。",
+    tone: "purple",
+    logo: "/logo/pva-notebooklm.png",
+    docsHref: "/notebooklm",
+    repoHref: "https://github.com/szhshp/panda-video-automation-notebooklm",
+  },
+  {
+    id: "suno",
+    name: "PVA-Suno",
+    description: "用文字描述生成完整曲目,为视频补齐配乐。",
+    tone: "neutral",
+    inDevelopment: true,
+  },
+];
+
+/**
+ * GitHub button label — the repository's own name. The owner prefix is dropped
+ * so the longest repo name still fits the button on a 390px viewport; the full
+ * owner/name lives in the button's title attribute.
+ */
+const repoLabel = (href: string) =>
+  href.replace("https://github.com/", "").split("/").pop() ?? href;
+
+/** Platform QR cards. Light artwork, so each keeps its own light mat. */
+const platformCards = [
+  { id: "douyin", path: "/media/douyin.webp", platform: "抖音" },
+  { id: "weichat", path: "/media/weichat.webp", platform: "微信视频号" },
+  { id: "kuaishou", path: "/media/kuaishou.webp", platform: "快手" },
+  { id: "bilibili", path: "/media/bilibili.webp", platform: "哔哩哔哩" },
+];
+
+const focusRing =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400/70 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-950";
+
+const shell = "mx-auto w-full max-w-5xl px-5 sm:px-8";
+
+const sectionTitle =
+  "text-center text-[1.5rem] font-semibold tracking-tight text-neutral-50 sm:text-[2rem]";
+
+const sectionLead =
+  "mx-auto mt-3 max-w-2xl text-balance text-sm leading-relaxed text-neutral-400";
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-zinc-950 text-zinc-100">
-      {/* Ambient background */}
-      <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%, rgba(251, 191, 36, 0.14), transparent_55%), radial-gradient(ellipse_80%_50%_at_100%_50%, rgba(34, 211, 238, 0.08), transparent_50%), radial-gradient(ellipse_70%_60%_at_0%_80%, rgba(192, 132, 252, 0.07), transparent_45%)]"
-        aria-hidden
-      />
-      <div
-        className="pointer-events-none fixed inset-0 -z-10 bg-[linear-gradient(rgba(255, 255, 255, 0.028)_1px, transparent_1px), linear-gradient(90deg, rgba(255, 255, 255, 0.028)_1px, transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(ellipse_75%_65%_at_50%_35%, black_15%, transparent_70%)]"
-        aria-hidden
-      />
+    <div className="flex min-h-screen flex-col bg-neutral-950 text-neutral-100">
+      <header className="sticky top-0 z-50 border-b border-white/[0.08] bg-neutral-950/80 backdrop-blur-xl backdrop-saturate-150">
+        <div className={`${shell} flex h-16 items-center justify-between gap-4`}>
+          <Link
+            href="/"
+            className={`flex items-center gap-2.5 rounded-md ${focusRing}`}
+          >
+            <Image
+              src="/logo/logo.png"
+              alt=""
+              width={32}
+              height={32}
+              className="size-8 shrink-0 rounded-md bg-white object-contain ring-1 ring-white/10"
+            />
+            <span className="hidden text-[0.9375rem] font-semibold tracking-tight text-neutral-50 sm:inline sm:text-base">
+              Panda Video Automation
+            </span>
+          </Link>
 
-      {/* Terminal-style header */}
-      <header className="border-b border-white/[0.06] bg-zinc-950/75 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center gap-2 px-4 py-3 sm:px-6">
-          <span className="text-emerald-400 font-mono text-sm">❯</span>
-          <span className="font-mono text-sm tracking-tight text-zinc-300">
-            PandaVideoAutomations
-          </span>
-          <span className="hidden h-5 w-0.5 animate-cursor-blink bg-zinc-400 sm:inline-block" />
+          <nav className="flex items-center gap-1 text-sm">
+            <a
+              href="#products"
+              className={`hidden rounded-md px-3 py-1.5 text-neutral-400 transition-colors hover:text-neutral-100 sm:block ${focusRing}`}
+            >
+              产品
+            </a>
+            <a
+              href="#platforms"
+              className={`hidden rounded-md px-3 py-1.5 text-neutral-400 transition-colors hover:text-neutral-100 sm:block ${focusRing}`}
+            >
+              示例
+            </a>
+            <a
+              href={GITHUB_REPO}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`ml-1 inline-flex items-center gap-1.5 rounded-md border border-white/[0.12] px-3 py-1.5 text-neutral-200 transition-colors hover:border-white/25 hover:bg-white/[0.06] ${focusRing}`}
+            >
+              <Github size={16} aria-hidden />
+              <span className="hidden sm:inline">GitHub</span>
+            </a>
+          </nav>
         </div>
       </header>
 
-      {/* Main content — fill remaining viewport */}
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-8 sm:py-12">
-        {/* Page title */}
-        <div className="mb-8 text-center sm:mb-10">
-          <h1 className="px-1 font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-3xl md:text-4xl">
+      <main className="flex-1">
+        {/* Hero — the wordmark is the page's focal point */}
+        <section className={`${shell} pt-16 pb-16 text-center sm:pt-24 sm:pb-20`}>
+          {/*
+           * One wordmark, not three words. The spans sit flush so the coloured
+           * segments read as a single mark — do not reintroduce whitespace
+           * between them. <wbr> gives a break opportunity at each colour
+           * boundary, so the mark wraps on narrow screens instead of
+           * overflowing, and still renders with no space.
+           */}
+          <h1 className="text-[2rem] font-bold leading-[1.1] tracking-tight sm:text-[2.5rem] md:text-[2.75rem] lg:text-[3.25rem]">
             <span className="text-amber-400">Panda</span>
-            <span className="text-zinc-300">Video</span>
+            <wbr />
+            <span className="text-neutral-300">Video</span>
+            <wbr />
             <span className="text-yellow-200">Automations</span>
           </h1>
-          <p className="mt-2 font-mono text-sm text-zinc-600 sm:text-base">
+          <p className="mt-4 text-base font-medium tracking-wide text-neutral-300 sm:text-lg">
             熊猫视频自动化引擎
           </p>
-        </div>
 
-        {/* Cards fill most of the available height */}
-        <div className="grid w-full max-w-5xl flex-1 grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6">
-          {/* PandaVideoGenerator card */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-amber-900/40 bg-gradient-to-b from-[#2a1f0f] to-[#1a140e] shadow-[0_0_0_1px_rgba(251, 191, 36, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/30 before:to-transparent hover:border-amber-500/40 hover:shadow-[0_32px_100px_-24px_rgba(251, 191, 36, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
-            <Link href="/landing" className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#傻瓜式</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#视频生成</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#自动化向导</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#Agent</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#Web</span>
-              </div>
-              <div className="relative my-3">
-                <div
-                  className="pointer-events-none absolute inset-[-28%] rounded-[2rem] bg-gradient-to-tr from-amber-500/35 via-cyan-500/22 to-fuchsia-500/28 blur-3xl motion-reduce:opacity-50"
-                  aria-hidden
-                />
-                <div className="relative rounded-2xl bg-zinc-100 p-3 shadow-md shadow-black/40 ring-1 ring-zinc-300/90 motion-safe:animate-hero-float sm:p-4 motion-reduce:animate-none">
-                  <Image
-                    src="/logo/logo.png"
-                    alt="Panda Video Generator Logo"
-                    width={200}
-                    height={200}
-                    className="size-[5.25rem] object-contain sm:size-[8.25rem] md:size-[9rem]"
-                  />
-                </div>
-              </div>
+          {/*
+           * Slogan — three parallel promises, the page's second-strongest beat.
+           * Rendered as three discrete items rather than one comma-joined
+           * string, so the repetition in 一键 reads as a rhythm instead of
+           * running on. Separators are row-only; on mobile the three stack.
+           */}
+          <p className="mt-7 flex flex-col items-center gap-y-1.5 text-xl font-semibold text-neutral-50 sm:mt-8 sm:flex-row sm:justify-center sm:gap-x-5 sm:text-3xl lg:text-4xl">
+            <span>一键抓取</span>
+            <span aria-hidden className="hidden h-6 w-px bg-amber-400/50 sm:block lg:h-8" />
+            <span>一键成片</span>
+            <span aria-hidden className="hidden h-6 w-px bg-amber-400/50 sm:block lg:h-8" />
+            <span>一键发布</span>
+          </p>
 
-              <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-zinc-400">PVA</span>
-                <span className="text-amber-300">-Generator</span>
-              </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-balance text-sm leading-relaxed text-neutral-400 sm:text-base">
+            从素材抓取、脚本生成、渲染成片到多平台分发。每个环节都能单独使用,也可以串成一条完整的流水线。
+          </p>
 
-              <div className="mt-4 flex flex-nowrap items-center justify-center gap-0 overflow-x-auto font-mono text-[0.6rem] sm:text-xs">
-                <span className="rounded-l bg-amber-900/40 px-1.5 py-0.5 text-amber-300">① 抓取</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="bg-amber-900/40 px-1.5 py-0.5 text-amber-300">② 脚本</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="bg-amber-900/40 px-1.5 py-0.5 text-amber-300">③ 渲染</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="rounded-r bg-emerald-900/40 px-1.5 py-0.5 text-emerald-300">④ 发布</span>
-              </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3 sm:mt-10">
+            <a
+              href="#products"
+              className={`inline-flex items-center gap-2 rounded-lg bg-neutral-100 px-5 py-2.5 text-sm font-semibold text-neutral-950 transition-colors hover:bg-white ${focusRing}`}
+            >
+              查看产品
+              <ArrowRight size={16} aria-hidden />
+            </a>
 
-              <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
-                超级简单的傻瓜式视频生成器
-              </p>
-            </Link>
-            <div className="flex flex-col gap-2 mx-4 mb-4 sm:mx-0 sm:mb-0 mt-4 sm:mt-6">
-              <Link
-                href="/landing"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 font-mono text-xs font-semibold text-amber-300 transition-all hover:bg-amber-500/20 hover:text-amber-200"
-              >
-                🚀 功能介绍 →
-              </Link>
-              <a
-                href="https://github.com/szhshp/panda-video-generator"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
-              >
-                <Github size={15} />
-                szhshp/panda-video-generator
-              </a>
-            </div>
           </div>
 
-          {/* publisher-cli card */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-emerald-900/40 bg-gradient-to-b from-[#142918] to-[#0f1a12] shadow-[0_0_0_1px_rgba(16, 185, 129, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-emerald-400/30 before:to-transparent hover:border-emerald-500/40 hover:shadow-[0_32px_100px_-24px_rgba(16, 185, 129, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
-            <Link href="/cli" className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#CLI 工具</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#浏览器自动化</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#支持多自媒体平台</span>
-              </div>
-              <div className="relative my-3">
-                <div
-                  className="pointer-events-none absolute inset-[-28%] rounded-[2rem] bg-gradient-to-tr from-amber-500/35 via-cyan-500/22 to-fuchsia-500/28 blur-3xl motion-reduce:opacity-50"
-                  aria-hidden
-                />
-                <div className="relative rounded-2xl bg-zinc-100 p-3 shadow-md shadow-black/40 ring-1 ring-zinc-300/90 motion-safe:animate-hero-float sm:p-4 motion-reduce:animate-none">
-                  <Image
-                    src="/logo/pva-cli.png"
-                    alt="Panda Video Automation Publisher Logo"
-                    width={200}
-                    height={200}
-                    className="size-[5.25rem] object-contain sm:size-[8.25rem] md:size-[9rem]"
-                  />
-                </div>
-              </div>
-
-              <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-zinc-400">PVA</span>
-                <span className="text-emerald-500">-CLI</span>
-              </h2>
-
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
-                <span className="rounded-l bg-emerald-900/40 px-1.5 py-0.5 text-emerald-300">① 任意前置步骤</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="rounded-r bg-emerald-900/40 px-1.5 py-0.5 text-emerald-300">② 发布</span>
-              </div>
-
-              <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
-                视频自动化发布CLI
-              </p>
-            </Link>
-            <div className="flex flex-col gap-2 mx-4 mb-4 sm:mx-0 sm:mb-0 mt-4 sm:mt-6">
-              <Link
-                href="/cli"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 font-mono text-xs font-semibold text-emerald-300 transition-all hover:bg-emerald-500/20 hover:text-emerald-200"
-              >
-                📖 使用说明 →
-              </Link>
-              <a
-                href="https://github.com/szhshp/panda-video-automations-publisher"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
-              >
-                <Github size={15} />
-                szhshp/panda-video-automations-publisher
-              </a>
-            </div>
+          {/* Pipeline rail — the one structural device on the page */}
+          <div className="relative mt-16 sm:mt-20">
+            <span
+              aria-hidden
+              className="absolute left-1/4 right-1/4 top-[3.5px] hidden h-px bg-white/[0.12] sm:block sm:left-[12.5%] sm:right-[12.5%]"
+            />
+            <ol className="relative grid grid-cols-2 gap-x-4 gap-y-10 sm:grid-cols-4">
+              {pipeline.map((step, index) => {
+                const isLast = index === pipeline.length - 1;
+                return (
+                  <li
+                    key={step.id}
+                    className="flex flex-col items-center text-center"
+                  >
+                    <span
+                      aria-hidden
+                      className={`size-[7px] rounded-full ring-4 ring-neutral-950 ${isLast ? "bg-amber-400" : "bg-neutral-600"
+                        }`}
+                    />
+                    <p className="mt-4 text-sm font-medium text-neutral-100">
+                      {step.label}
+                    </p>
+                    <p className="mt-1 max-w-[14rem] text-balance text-xs leading-relaxed text-neutral-500">
+                      {step.note}
+                    </p>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
+        </section>
 
-          {/* NotebookLM card */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-purple-900/40 bg-gradient-to-b from-[#22182e] to-[#150f1a] shadow-[0_0_0_1px_rgba(168, 85, 247, 0.06)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-purple-400/30 before:to-transparent hover:border-purple-500/40 hover:shadow-[0_32px_100px_-24px_rgba(168, 85, 247, 0.25)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none">
-            <div className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
+        {/* Product index */}
+        <section id="products" className={`${shell} scroll-mt-20 pb-16 sm:pb-24`}>
+          <h2 className={sectionTitle}>产品</h2>
+          <p className={sectionLead}>
+            四个独立工具。可以只挑一个用,也可以用 PVA 把它们串成一条流水线。
+          </p>
 
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#NotebookLM</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#PPT</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#视频讲解</span>
-              </div>
-              <div className="relative my-3">
-                <div
-                  className="pointer-events-none absolute inset-[-28%] rounded-[2rem] bg-gradient-to-tr from-amber-500/35 via-cyan-500/22 to-fuchsia-500/28 blur-3xl motion-reduce:opacity-50"
-                  aria-hidden
-                />
-                <div className="relative rounded-2xl bg-zinc-100 p-3 shadow-md shadow-black/40 ring-1 ring-zinc-300/90 motion-safe:animate-hero-float sm:p-4 motion-reduce:animate-none">
-                  <Image
-                    src="/logo/pva-notebooklm.png"
-                    alt="Panda Video Automation NotebookLM Logo"
-                    width={200}
-                    height={200}
-                    className="size-[5.25rem] object-contain sm:size-[8.25rem] md:size-[9rem]"
-                  />
-                </div>
-              </div>
-
-              <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-zinc-400">PVA-</span>
-                <span className="text-purple-300">NotebookLM</span>
-              </h2>
-
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
-                <span className="rounded-l bg-purple-900/40 px-1.5 py-0.5 text-purple-300">① 主题</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="bg-purple-900/40 px-1.5 py-0.5 text-purple-300">② 研究</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="bg-purple-900/40 px-1.5 py-0.5 text-purple-300">③ 生成讲解视频</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-600">→</span>
-                <span className="rounded-r bg-emerald-900/40 px-1.5 py-0.5 text-emerald-300">④ 发布</span>
-              </div>
-
-              <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
-                AI PPT 讲解视频生成器: 输入主题, 输出包含 PPT 和讲解视频的完整课程
-              </p>
-
-              <div className="grow min-h-3" />
-              <div className="flex w-full flex-col gap-2 mt-4 sm:mt-6">
-                <Link
-                  href="/notebooklm"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-purple-500/30 bg-purple-500/10 px-4 py-2 font-mono text-xs font-semibold text-purple-300 transition-all hover:bg-purple-500/20 hover:text-purple-200"
+          {/*
+           * One column until lg (1024), two above. At md the split card comes
+           * out narrower than the single-column phone card, so the split waits
+           * for lg where two cards clear the comfortable measure.
+           *
+           * The single column is capped at 2xl so it stops widening before it
+           * stretches to the full shell — at 1023 the card is 873px with a
+           * narrow margin either side rather than a near-empty 940px.
+           */}
+          <ul className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-5 sm:gap-6 lg:max-w-none lg:grid-cols-2">
+            {products.map((product, index) => {
+              const interactive = Boolean(product.docsHref);
+              const tone = tones[product.tone];
+              return (
+                <li
+                  key={product.id}
+                  className={`group relative flex flex-col rounded-2xl border p-6 transition-[background-color,border-color,box-shadow] duration-300 sm:p-8 ${tone.card}`}
                 >
-                  📖 使用说明 →
-                </Link>
-                <a
-                  href="https://github.com/szhshp/panda-video-automation-notebooklm"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all hover:bg-white/[0.12] hover:text-white"
-                >
-                  <Github size={15} />
-                  szhshp/panda-video-automation-notebooklm
-                </a>
-              </div>
-            </div>
-          </div>
+                  {/*
+                   * Whole-card target. The content wrapper is pointer-events-none so
+                   * clicks on the logo, name and copy fall through to this link; the
+                   * GitHub anchor opts back in with pointer-events-auto.
+                   */}
+                  {product.docsHref ? (
+                    <Link
+                      href={product.docsHref}
+                      aria-label={`${product.name} 使用说明`}
+                      className="absolute inset-0 z-0 rounded-2xl"
+                    />
+                  ) : null}
 
-          {/* Suno card */}
-          <div className="group relative flex flex-col overflow-hidden rounded-2xl border border-zinc-800/50 bg-gradient-to-b from-[#18181b] to-[#131315] shadow-[0_0_0_1px_rgba(113, 113, 122, 0.04)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-zinc-600/20 before:to-transparent hover:border-zinc-600/40 hover:shadow-[0_32px_100px_-24px_rgba(113, 113, 122, 0.12)] sm:p-12 motion-reduce:transform-none motion-reduce:hover:transform-none brightness-[0.8] saturate-[0.45]">
-            <div className="flex flex-1 flex-col items-center px-1 py-4 sm:p-0">
-              {/* Under development badge */}
-              <div className="absolute right-3 top-3 rounded-full border border-zinc-700/30 bg-zinc-900/60 px-2.5 py-0.5 font-mono text-[0.6rem] text-zinc-500/80 sm:right-4 sm:top-4">
-                开发中
-              </div>
+                  <div className="pointer-events-none relative z-10 flex flex-1 flex-col">
+                    {/*
+                     * Logo sits centred above the copy and drifts on a slow loop.
+                     * The stagger keeps the four cards from bobbing in lockstep.
+                     */}
+                    {product.logo ? (
+                      <Image
+                        src={product.logo}
+                        alt=""
+                        width={320}
+                        height={320}
+                        style={{ animationDelay: `${index * 0.7}s` }}
+                        className="mx-auto size-28 shrink-0 rounded-2xl bg-white object-contain ring-1 ring-white/10 motion-safe:animate-hero-float motion-reduce:animate-none sm:size-32"
+                      />
+                    ) : (
+                      <span
+                        aria-hidden
+                        style={{ animationDelay: `${index * 0.7}s` }}
+                        className="mx-auto inline-flex size-28 shrink-0 items-center justify-center rounded-2xl bg-white/[0.04] text-neutral-500 ring-1 ring-white/[0.08] motion-safe:animate-hero-float motion-reduce:animate-none sm:size-32"
+                      >
+                        <Music2 className="size-10 sm:size-12" strokeWidth={1.5} />
+                      </span>
+                    )}
 
-              <div className="mb-3 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6rem] text-zinc-600 sm:text-[0.7rem]">
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#AI 音乐</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#Suno</span>
-                <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-zinc-300">#生成式</span>
-              </div>
-              <div className="relative my-3">
-                <div
-                  className="pointer-events-none absolute inset-[-28%] rounded-[2rem] bg-gradient-to-tr from-zinc-500/25 via-zinc-400/10 to-zinc-500/25 blur-3xl motion-reduce:opacity-50"
-                  aria-hidden
-                />
-                <div className="relative rounded-2xl bg-zinc-600/30 p-3 shadow-md shadow-black/40 ring-1 ring-zinc-500/30 motion-safe:animate-hero-float sm:p-4 motion-reduce:animate-none">
-                  <Image
-                    src="/logo/pva-suno-gray.png"
-                    alt="Panda Video Automation Suno Logo"
-                    width={200}
-                    height={200}
-                    className="size-[5.25rem] object-contain sm:size-[8.25rem] md:size-[9rem]"
-                  />
-                </div>
-              </div>
+                    <div className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2">
+                      <h3
+                        className={`text-xl font-semibold tracking-tight sm:text-2xl ${tone.title}`}
+                      >
+                        {product.name}
+                      </h3>
+                      {product.inDevelopment ? (
+                        <span className="rounded-full border border-white/[0.12] px-2.5 py-0.5 text-xs text-neutral-500">
+                          开发中
+                        </span>
+                      ) : null}
+                    </div>
 
-              <h2 className="mb-1 font-mono text-xl font-bold tracking-tight text-zinc-50 sm:text-2xl md:text-3xl">
-                <span className="text-zinc-500">PVA-</span>
-                <span className="text-zinc-400">Suno</span>
-              </h2>
+                    <p className="mt-2.5 text-sm leading-relaxed text-neutral-400">
+                      {product.description}
+                    </p>
 
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-0 font-mono text-[0.6rem] sm:text-xs">
-                <span className="rounded-l bg-zinc-800/60 px-1.5 py-0.5 text-zinc-400">① 生成</span>
-                <span className="bg-zinc-900/80 px-1 py-0.5 text-zinc-700">→</span>
-                <span className="rounded-r bg-zinc-800/60 px-1.5 py-0.5 text-zinc-400">② 发布</span>
-              </div>
+                    {/* Two full-width actions, one per row */}
+                    <div className="mt-6 flex flex-col gap-2.5 pt-0 sm:mt-auto sm:pt-8">
+                      {interactive ? (
+                        <span
+                          className={`flex w-full items-center justify-center gap-1.5 rounded-lg border px-4 py-2.5 text-sm font-medium transition-colors ${tone.cta}`}
+                        >
+                          使用说明
+                          <ArrowRight
+                            size={15}
+                            aria-hidden
+                            className="transition-transform group-hover:translate-x-0.5 motion-reduce:transition-none motion-reduce:group-hover:translate-x-0"
+                          />
+                        </span>
+                      ) : (
+                        <span
+                          className={`flex w-full items-center justify-center rounded-lg border px-4 py-2.5 text-sm ${tone.cta}`}
+                        >
+                          尚未发布
+                        </span>
+                      )}
 
-              <p className="mt-4 max-w-xs text-center font-mono text-xs leading-relaxed text-zinc-600 sm:text-sm">
-                AI 音乐创作: 通过文字描述生成完整曲目, 灵感即刻成曲
-              </p>
+                      {product.repoHref ? (
+                        <a
+                          href={product.repoHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={`${product.name} GitHub 仓库`}
+                          title={product.repoHref.replace("https://github.com/", "")}
+                          className={`pointer-events-auto flex w-full items-center justify-center gap-2 rounded-lg border border-white/[0.12] px-4 py-2.5 text-sm font-medium text-neutral-300 transition-colors hover:border-white/25 hover:bg-white/[0.08] hover:text-neutral-50 ${focusRing}`}
+                        >
+                          <Github size={15} aria-hidden className="shrink-0" />
+                          {/*
+                           * Wraps at the hyphens rather than truncating — the longest
+                           * repo name cannot fit a 390px card at a legible size.
+                           */}
+                          <span className="min-w-0">{repoLabel(product.repoHref)}</span>
+                        </a>
+                      ) : null}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
 
-              <div className="grow min-h-3" />
-              <span className="mt-2 flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 font-mono text-xs font-semibold text-zinc-700 transition-all">
-                即将推出 →
-              </span>
-            </div>
-          </div>
-
-          {/* Submit idea card */}
+          {/* Issue prompt — a quiet strip below the grid */}
           <a
-            href="https://github.com/szhshp/panda-video-generator/issues"
+            href={`${GITHUB_REPO}/issues`}
             target="_blank"
             rel="noopener noreferrer"
-            className="group relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-sky-900/30 bg-gradient-to-b from-[#0f172a] to-[#0a0f1a] shadow-[0_0_0_1px_rgba(14, 165, 233, 0.05)_inset] transition-all duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-sky-400/20 before:to-transparent hover:border-sky-500/30 hover:shadow-[0_32px_100px_-24px_rgba(14, 165, 233, 0.2)] sm:p-12 lg:col-span-2 motion-reduce:transform-none motion-reduce:hover:transform-none"
+            className={`group mt-6 flex flex-col gap-4 rounded-2xl border border-dashed border-white/25 px-6 py-6 transition-colors hover:border-white/45 hover:bg-white/[0.04] sm:flex-row sm:items-center sm:gap-5 sm:px-8 ${focusRing}`}
           >
-            <div className="flex flex-col items-center p-8 sm:flex-row sm:gap-6 sm:p-0">
-              <div className="mb-4 inline-flex size-14 items-center justify-center rounded-xl bg-sky-500/10 text-sky-300/80 ring-1 ring-sky-500/15 sm:mb-0 sm:size-16">
-                <Lightbulb className="size-7 sm:size-8" strokeWidth={1.5} />
-              </div>
-              <div className="text-center sm:text-left">
-                <h2 className="font-mono text-lg font-bold tracking-tight text-zinc-50 sm:text-xl">
-                  <span className="text-sky-400">新的想法?</span>
-                </h2>
-                <p className="mt-1 font-mono text-xs leading-relaxed text-zinc-500 sm:text-sm">
-                  有新功能的想法? 遇到了什么痛点? 来提个 Issue, 反正开发者生无所恋并且闲得蛋疼, 不如来搞点好玩儿的东西吧 :D
-                </p>
-              </div>
-              <span className="mt-4 flex shrink-0 items-center gap-2 rounded-lg border border-white/15 bg-white/[0.06] px-4 py-2 font-mono text-xs font-semibold text-zinc-300 transition-all group-hover:bg-white/[0.12] group-hover:text-white sm:ml-auto sm:mt-0">
-                提交 Issue →
-              </span>
-            </div>
-          </a>
-        </div>
-
-      </main>
-
-      {/* Platform Screenshots */}
-      <section className="container mx-auto px-8 py-14 sm:px-6 sm:py-20">
-        <div
-          className="mb-10 h-px w-full bg-gradient-to-r from-transparent via-zinc-600/80 to-transparent sm:mb-12"
-          aria-hidden
-        />
-        <div className="text-center px-2">
-          <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-wide text-amber-500/90 sm:text-xs">
-            平台矩阵
-          </p>
-          <h2 className="font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl md:text-5xl">
-            平台示例
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl font-mono text-sm leading-relaxed text-zinc-400 sm:text-base">
-            看看开发者上传的几百个视频成品吧~
-          </p>
-        </div>
-        <div className="mt-12 grid grid-cols-1 gap-4 sm:mt-16 sm:grid-cols-2 sm:gap-6 md:grid-cols-4">
-          {mediaFiles.map((file) => (
-            <div
-              key={file.id}
-              className="group overflow-hidden rounded-2xl border border-white/20 bg-zinc-900/60 shadow-[0_0_0_1px_rgba(255,255,255,0.08)_inset] transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-1 hover:border-amber-500/30 hover:shadow-[0_28px_70px_-28px_rgba(251,191,36,0.18)] motion-reduce:transform-none"
+            <span
+              aria-hidden
+              className="inline-flex size-11 shrink-0 items-center justify-center rounded-lg bg-white/[0.06] text-neutral-300 ring-1 ring-white/15"
             >
-              <div className="flex items-center justify-between gap-2 border-b border-zinc-800/80 bg-zinc-950/60 px-3 py-1.5">
-                <span className="max-w-[52%] truncate font-mono text-xs text-zinc-600">
-                  {file.id}
-                </span>
-              </div>
-              <div className="relative w-full h-[280px] sm:h-[320px] overflow-hidden bg-zinc-950">
-                <Image
-                  src={file.path}
-                  alt={file.label}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  className="object-contain"
-                />
-              </div>
-              <div className="border-t border-zinc-800/80 bg-zinc-950/40 px-3 py-3 text-center sm:px-4 sm:py-4">
-                <p className="text-sm font-medium text-zinc-100">{file.label}</p>
-              </div>
+              <Lightbulb size={20} strokeWidth={1.75} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h3 className="text-sm font-semibold text-neutral-100">
+                缺一个你需要的功能?
+              </h3>
+              <p className="mt-1 text-sm leading-relaxed text-neutral-400">
+                说说你卡在哪一步,或者想要个什么工具,开个 Issue 就行。
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-neutral-300 transition-colors group-hover:text-neutral-50">
+              提交 Issue
+              <ArrowUpRight
+                size={16}
+                aria-hidden
+                className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5 motion-reduce:transition-none"
+              />
+            </span>
+          </a>
+        </section>
+
+        {/* Platform index — the light QR mats are the only source of colour on the page */}
+        <section id="platforms" className={`${shell} scroll-mt-20 pb-16 sm:pb-24`}>
+          <h2 className={sectionTitle}>平台示例</h2>
+          <p className={sectionLead}>
+            「熊猫智研社」的内容会同步发到下面四个平台。
+          </p>
+
+          {/*
+           * Same 1 / 2 escalation as the product grid, then 4 across at lg.
+           *
+           * The single- and two-column stages are capped at three quarters of
+           * the width they would otherwise take, so a QR card stays a readable
+           * size on a phone and a tablet instead of scaling with the viewport.
+           * The four-column stage is uncapped: by then the cards are small
+           * enough that filling the shell is what looks right, and a cap there
+           * only reintroduces a gutter either side.
+           *
+           * Caps are rem because the root font-size is 130%: 18rem is 374px and
+           * 30rem is 624px, not 288 and 480.
+           */}
+          <div className="mx-auto mt-12 grid max-w-[18rem] grid-cols-1 gap-4 sm:gap-5 min-[900px]:max-w-[30rem] min-[900px]:grid-cols-2 lg:max-w-none lg:grid-cols-4">
+            {platformCards.map((card) => (
+              <figure key={card.id} className="flex flex-col">
+                <div className="relative aspect-[2/3] w-full overflow-hidden rounded-xl bg-neutral-100 ring-1 ring-white/[0.08]">
+                  <Image
+                    src={card.path}
+                    alt={`${card.platform} 熊猫智研社 二维码`}
+                    fill
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    className="object-contain"
+                  />
+                </div>
+                <figcaption className="mt-3 text-sm text-neutral-400">
+                  {card.platform}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+      </main>
 
       <Footer />
     </div>

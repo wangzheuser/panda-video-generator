@@ -7,6 +7,7 @@ import {
   Compass,
   Github,
   Globe,
+  Headphones,
   Terminal,
   Video,
   Upload,
@@ -15,50 +16,64 @@ import {
 import { defaultMyCompProps } from "../../../types/constants";
 import { useState } from "react";
 import Footer from "../../components/Footer";
+import SectionTitle from "../../components/SectionTitle";
+import Steps from "../../components/Steps";
 
-// Emoji labels aligned with README (Unicode escapes keep the file encoding-safe)
-const readmeEmoji = {
-  spider: "\u{1F577}️",
-  clapper: "\u{1F3AC}",
-  rocket: "\u{1F680}",
-  robot: "\u{1F916}",
-  compass: "\u{1F9ED}",
-  cli: "\u{1F4BB}",
-} as const;
+/*
+ * The card grids sit in the same content column as the home page, so on wide
+ * screens they keep a gutter instead of stretching to the viewport edge.
+ */
+const shell = "mx-auto w-full max-w-5xl px-5 sm:px-8";
 
-function SectionTitle({
-  eyebrow,
-  title,
-  subtitle,
-  className = "",
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  className?: string;
-}) {
-  return (
-    <div className={`text-center px-2 ${className}`}>
-      <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-wide text-amber-500/90 sm:text-xs">
-        {eyebrow}
-      </p>
-      <h2 className="font-mono text-3xl font-bold tracking-tight text-zinc-50 sm:text-4xl md:text-5xl">
-        {title}
-      </h2>
-      {subtitle ? (
-        <p className="mx-auto mt-4 max-w-xl font-mono text-sm leading-relaxed text-zinc-400 sm:text-base">
-          {subtitle}
-        </p>
-      ) : null}
-    </div>
-  );
-}
+/* This page's own pipeline — the same four stages the /scripts walkthrough follows. */
+const PIPELINE_STEPS = [
+  {
+    title: "文稿准备",
+    description: "抓取网页内容，整理成可以直接朗读的脚本。",
+    icon: Globe,
+    tags: ["文稿", "网页提取"],
+  },
+  {
+    title: "配音与字幕",
+    description: "文本转语音生成配音，同时切出对齐的字幕。",
+    icon: Headphones,
+    tags: ["TTS", "配音与字幕"],
+  },
+  {
+    title: "渲染成片",
+    description: "按模板把素材合成为视频，输出成片。",
+    icon: Video,
+    tags: ["视频素材", "渲染与合成"],
+  },
+  {
+    title: "多平台发布",
+    description: "登录各平台账号，自动上传并填写发布信息。",
+    icon: Upload,
+    tags: ["多平台发布", "自动化上传"],
+  },
+] as const;
 
-const featureCardClass =
-  "group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-zinc-900/80 to-zinc-950/95 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] transition-[transform,box-shadow,border-color] duration-500 before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-px before:bg-gradient-to-r before:from-transparent before:via-amber-400/40 before:to-transparent hover:-translate-y-1 hover:border-amber-500/20 hover:shadow-[0_24px_80px_-20px_rgba(251,191,36,0.22),0_0_60px_-24px_rgba(34,211,238,0.12)] sm:p-7 motion-reduce:transform-none motion-reduce:hover:transform-none";
+/*
+ * Flat cards, shared by 核心特性 and 接入方式: one solid fill, one solid
+ * border, no gradient wash and no gradient hairline along the top edge. Both
+ * used to be graded fills with a coloured gradient line across the top, which
+ * made the edges read as a soft blur rather than a boundary.
+ *
+ * No hover state either — these are <article>s, not links, so there is nothing
+ * for a lift or a glow to promise.
+ */
+const cardClass =
+  "relative flex h-full flex-col rounded-2xl border border-white/20 bg-zinc-900 p-6 sm:p-7";
 
-const pathCardClass =
-  "relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/[0.07] bg-zinc-950/50 p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] backdrop-blur-sm transition-[transform,box-shadow,border-color] duration-500 before:pointer-events-none before:absolute before:inset-x-4 before:top-0 before:h-px before:bg-gradient-to-r before:from-cyan-500/0 before:via-cyan-400/35 before:to-fuchsia-500/0 hover:-translate-y-0.5 hover:border-cyan-500/25 hover:shadow-[0_20px_60px_-24px_rgba(34,211,238,0.2)] sm:p-7 motion-reduce:transform-none";
+/* Icon tile and tag pill — shared so both grids stay in step. */
+const iconTileClass =
+  "mb-5 inline-flex size-11 shrink-0 items-center justify-center rounded-xl bg-white/[0.06] text-amber-300 ring-1 ring-white/10";
+
+const tagPillClass =
+  "rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300";
+
+const cardTitleClass =
+  "text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl";
 
 const videoFrameClass =
   "relative overflow-hidden rounded-2xl bg-gradient-to-b from-white/[0.14] via-white/[0.06] to-white/[0.03] p-px shadow-[0_0_80px_-20px_rgba(251,191,36,0.15)]";
@@ -164,22 +179,28 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-        <p className="mb-3 font-mono text-[0.7rem] font-medium tracking-wide text-amber-500/90 sm:text-xs">
+        <p className="mb-4 text-[0.7rem] font-medium tracking-wide text-amber-400/90 sm:text-xs">
           端到端 · 视频自动化
         </p>
-        <h1 className="mx-auto max-w-4xl min-w-0 px-1 font-mono text-3xl font-bold leading-[1.15] tracking-tight break-words sm:px-4 sm:text-4xl sm:leading-[1.12] md:text-5xl lg:text-6xl">
+        {/*
+         * Wordmark, matching the home page: the spans sit flush so the coloured
+         * segments read as one mark. Keep the whitespace out and let <wbr> do the
+         * wrapping at each colour boundary.
+         */}
+        <h1 className="mx-auto max-w-4xl min-w-0 px-1 text-[1.75rem] font-bold leading-[1.15] tracking-tight break-words sm:px-4 sm:text-[2.25rem] md:text-[2.5rem] lg:text-[3rem]">
           <span className="text-amber-400">Panda</span>
-          <span className="text-zinc-400">Video</span>
-          <span className="text-zinc-50">Generator</span>
+          <wbr />
+          <span className="text-neutral-300">Video</span>
+          <wbr />
+          <span className="text-yellow-200">Generator</span>
         </h1>
-        <p className="mt-4 font-mono text-lg font-medium text-zinc-400 sm:text-xl md:text-2xl">
+        <p className="mt-4 text-base font-medium tracking-wide text-amber-300/90 sm:text-lg">
           熊猫视频自动化引擎
         </p>
-        <p className="mx-auto mt-3 max-w-2xl px-2 font-mono text-sm italic text-zinc-500 sm:text-base md:text-lg">
-          <span className="text-zinc-500 not-italic">&gt; </span>
+        <p className="mx-auto mt-3 max-w-2xl text-balance px-2 text-sm italic text-neutral-500 sm:text-base">
           Developer-first video automation engine.
         </p>
-        <p className="mx-auto mt-6 max-w-3xl px-2 text-sm leading-relaxed text-zinc-400 sm:text-base md:text-lg">
+        <p className="mx-auto mt-6 max-w-2xl text-balance px-2 text-sm leading-relaxed text-neutral-400 sm:text-base">
           一站式全自动化的视频内容生成与发布引擎，支持从网页内容提取、文本转视频到多平台发布的完整工作流。通过
           AI 驱动的文本转语音（TTS）技术和视频渲染引擎，帮助内容创作者快速生成高质量视频并一键发布到多个平台。
         </p>
@@ -188,7 +209,7 @@ export default function LandingPage() {
             href="https://github.com/szhshp/panda-video-generator?tab=readme-ov-file#-%E6%A0%B8%E5%BF%83%E7%89%B9%E6%80%A7"
             target="_blank"
             rel="noopener noreferrer"
-            className="min-h-11 rounded-xl bg-app-cta px-6 py-2.5 text-sm font-semibold text-app-cta-foreground shadow-[0_0_40px_-8px_rgba(239,68,68,0.55)] transition-[transform,filter] hover:scale-[1.03] hover:bg-app-cta-hover hover:shadow-[0_0_52px_-6px_rgba(239,68,68,0.65)] sm:min-h-12 sm:px-7 sm:py-3 sm:text-base motion-reduce:hover:scale-100"
+            className="min-h-11 rounded-xl bg-amber-400 px-6 py-2.5 text-sm font-semibold text-zinc-950 shadow-[0_0_40px_-8px_rgba(251,191,36,0.45)] transition-[transform,filter] hover:scale-[1.03] hover:bg-amber-300 hover:shadow-[0_0_52px_-6px_rgba(251,191,36,0.55)] sm:min-h-12 sm:px-7 sm:py-3 sm:text-base motion-reduce:hover:scale-100"
           >
             开始使用
           </Link>
@@ -197,7 +218,7 @@ export default function LandingPage() {
               href="https://github.com/szhshp/panda-video-generator"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-[#0969da] bg-[#0969da]/10 px-6 py-2.5 text-sm font-bold text-sky-300 shadow-[0_0_32px_-8px_rgba(9,105,218,0.55)] transition-[transform,box-shadow,background-color] hover:scale-[1.03] hover:bg-[#0969da]/20 hover:shadow-[0_0_48px_-6px_rgba(9,105,218,0.65)] sm:min-h-12 sm:px-7 sm:py-3 sm:text-base motion-reduce:hover:scale-100"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-white/15 bg-white/[0.04] px-6 py-2.5 text-sm font-semibold text-zinc-100 transition-[transform,box-shadow,background-color] hover:scale-[1.03] hover:border-white/25 hover:bg-white/[0.08] hover:shadow-[0_0_32px_-8px_rgba(255,255,255,0.18)] sm:min-h-12 sm:px-7 sm:py-3 sm:text-base motion-reduce:hover:scale-100"
               title="在 GitHub 打开仓库"
             >
               <Github size={18} className="shrink-0 sm:size-5" />
@@ -205,7 +226,7 @@ export default function LandingPage() {
             </Link>
             <Link
               href="/cli"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-emerald-600 bg-emerald-600/10 px-6 py-2.5 text-sm font-bold text-emerald-300 shadow-[0_0_32px_-8px_rgba(16,185,129,0.55)] transition-[transform,box-shadow,background-color] hover:scale-[1.03] hover:bg-emerald-600/20 hover:shadow-[0_0_48px_-6px_rgba(16,185,129,0.65)] sm:min-h-12 sm:px-7 sm:py-3 sm:text-base motion-reduce:hover:scale-100"
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border-2 border-white/15 bg-white/[0.04] px-6 py-2.5 text-sm font-semibold text-zinc-100 transition-[transform,box-shadow,background-color] hover:scale-[1.03] hover:border-white/25 hover:bg-white/[0.08] hover:shadow-[0_0_32px_-8px_rgba(255,255,255,0.18)] sm:min-h-12 sm:px-7 sm:py-3 sm:text-base motion-reduce:hover:scale-100"
               title="CLI 工具使用说明"
             >
               <Terminal size={18} className="shrink-0 sm:size-5" />
@@ -215,6 +236,16 @@ export default function LandingPage() {
         </div>
       </section>
 
+
+      {/* Workflow — the four stages the engine runs, in order */}
+      <section className={`${shell} py-14 sm:py-20`}>
+        <SectionTitle
+          eyebrow="工作流程"
+          title="四步跑完一条流水线"
+          subtitle="每一段都能单独跑，也可以从头到尾串起来。"
+        />
+        <Steps steps={PIPELINE_STEPS} />
+      </section>
 
       {/* Feature demos — aligned with README: Agent + wizard（CLI 无单独演示视频，见文档） */}
       <section className="container mx-auto px-4 py-14 sm:px-6 sm:py-20">
@@ -290,132 +321,83 @@ export default function LandingPage() {
       </section>
 
       {/* Features — distinct product cards (not pipeline / mono spec style) */}
-      <section className="container mx-auto px-4 py-14 sm:px-6 sm:py-20">
+      <section className={`${shell} py-14 sm:py-20`}>
         <SectionTitle eyebrow="产品亮点" title="核心特性" />
-        <div className="mt-12 grid gap-5 sm:gap-6 md:mt-16 md:grid-cols-3">
-          <article className={featureCardClass}>
-            <span
-              className="pointer-events-none absolute -right-1 -top-6 text-[5.5rem] font-black leading-none tabular-nums text-white/[0.035] transition-colors duration-300 group-hover:text-white/[0.055] sm:text-[6.25rem]"
-              aria-hidden
-            >
-              1
-            </span>
-            <div
-              className="mb-5 inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 text-amber-200/90 shadow-inner ring-1 ring-white/10"
-              aria-hidden
-            >
+        {/*
+         * Same width design as the home page's product grid: one column until
+         * lg, capped at max-w-2xl so a single card doesn't stretch across a
+         * tablet, then the cap releases and it goes multi-column. This is what
+         * keeps the Chinese copy off the mid-phrase line breaks at 768px.
+         */}
+        <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-5 sm:gap-6 md:mt-16 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
+          <article className={cardClass}>
+            <div className={iconTileClass} aria-hidden>
               <Globe className="size-5" strokeWidth={1.75} />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
-              {readmeEmoji.spider}{" "}
-              <span className="text-yellow-400 font-bold">一键</span>
-              网页转文本
-            </h3>
+            <h3 className={cardTitleClass}>一键网页转文本</h3>
             <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">
-              一键抓取正文与标题（如知乎），输出结构化文件，少手工整理。
+              抓取正文与标题（如知乎），输出结构化文件，少手工整理。
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                网页提取
-              </span>
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                结构化输出
-              </span>
-            </div>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              <li className={tagPillClass}>网页提取</li>
+              <li className={tagPillClass}>结构化输出</li>
+            </ul>
           </article>
 
-          <article className={featureCardClass}>
-            <span
-              className="pointer-events-none absolute -right-1 -top-6 text-[5.5rem] font-black leading-none tabular-nums text-white/[0.035] transition-colors duration-300 group-hover:text-white/[0.055] sm:text-[6.25rem]"
-              aria-hidden
-            >
-              2
-            </span>
-            <div
-              className="mb-5 inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 text-amber-200/90 shadow-inner ring-1 ring-white/10"
-              aria-hidden
-            >
+          <article className={cardClass}>
+            <div className={iconTileClass} aria-hidden>
               <Video className="size-5" strokeWidth={1.75} />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
-              {readmeEmoji.clapper}{" "}
-              <span className="text-yellow-400 font-bold">一键</span>
-              文本转视频
-            </h3>
+            <h3 className={cardTitleClass}>一键文本转视频</h3>
             <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">
-              一键跑通口播链路：Edge TTS + VTT 字幕，Remotion 模板渲染成片。
+              跑通口播链路：Edge TTS + VTT 字幕，Remotion 模板渲染成片。
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                Edge TTS
-              </span>
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                Remotion
-              </span>
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                字幕 VTT
-              </span>
-            </div>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              <li className={tagPillClass}>Edge TTS</li>
+              <li className={tagPillClass}>Remotion</li>
+              <li className={tagPillClass}>字幕 VTT</li>
+            </ul>
           </article>
 
-          <article className={featureCardClass}>
-            <span
-              className="pointer-events-none absolute -right-1 -top-6 text-[5.5rem] font-black leading-none tabular-nums text-white/[0.035] transition-colors duration-300 group-hover:text-white/[0.055] sm:text-[6.25rem]"
-              aria-hidden
-            >
-              3
-            </span>
-            <div
-              className="mb-5 inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/15 to-cyan-500/10 text-amber-200/90 shadow-inner ring-1 ring-white/10"
-              aria-hidden
-            >
+          <article className={cardClass}>
+            <div className={iconTileClass} aria-hidden>
               <Upload className="size-5" strokeWidth={1.75} />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
-              {readmeEmoji.rocket}{" "}
-              <span className="text-yellow-400 font-bold">一键</span>
-              多平台发布
-            </h3>
+            <h3 className={cardTitleClass}>一键多平台发布</h3>
             <p className="mt-3 grow text-sm leading-relaxed text-zinc-400">
-              一键驱动浏览器自动化上传；B
-              站、抖音、视频号、YouTube、快手等共用相近流程。
+              驱动浏览器自动化上传；B 站、抖音、视频号、YouTube、快手等共用相近流程。
             </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                Playwright
-              </span>
-              <span className="rounded-full border border-white/5 bg-white/[0.04] px-3 py-1 text-xs font-medium text-zinc-300">
-                网页端上传
-              </span>
-            </div>
+            <ul className="mt-6 flex flex-wrap gap-2">
+              <li className={tagPillClass}>Playwright</li>
+              <li className={tagPillClass}>网页端上传</li>
+            </ul>
           </article>
         </div>
       </section>
 
       {/* Onboarding paths — matches README「接入方式」 */}
-      <section className="container mx-auto px-4 py-14 sm:px-6 sm:py-20">
+      <section className={`${shell} py-14 sm:py-20`}>
         <SectionTitle
           eyebrow="三种路径"
           title="接入方式"
           subtitle="任选 Agent、浏览器向导或 CLI，同一套能力不同上手姿势。"
         />
-        <div className="mt-12 grid gap-5 sm:gap-6 md:mt-16 md:grid-cols-3">
-          <article className={pathCardClass}>
-            <div
-              className="mb-4 inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500/20 to-cyan-500/10 text-fuchsia-200/90 shadow-inner ring-1 ring-white/10"
-              aria-hidden
-            >
+        {/*
+         * Same width design as 核心特性 and as the home page's product grid.
+         * These cards carry bullet lists, so they need the extra measure most.
+         */}
+        <div className="mx-auto mt-12 grid max-w-2xl grid-cols-1 gap-5 sm:gap-6 md:mt-16 lg:max-w-none lg:grid-cols-2 xl:grid-cols-3">
+          <article className={cardClass}>
+            <div className={iconTileClass} aria-hidden>
               <Bot className="size-5" strokeWidth={1.75} />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
-              {readmeEmoji.robot} 1. Agent Skills 方式
-            </h3>
+            <h3 className={cardTitleClass}>Agent Skills 方式</h3>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-zinc-400">
               <li>使用 AI Agent 编排视频生成与发布流程。</li>
               <li>支持口播流水线、爬虫、TTS、渲染与发布等技能。</li>
               <li>支持 Cursor、Claude Code、Copilot 等常用 AI Agent。</li>
             </ul>
-            <p className="mt-4 text-sm text-zinc-300">
+            <p className="mt-auto pt-5 text-sm text-zinc-300">
               <a href="#demo-agent" className="text-amber-400/95 hover:text-amber-300 hover:underline">
                 演示视频
               </a>
@@ -431,16 +413,11 @@ export default function LandingPage() {
             </p>
           </article>
 
-          <article className={pathCardClass}>
-            <div
-              className="mb-4 inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-emerald-500/10 text-amber-200/90 shadow-inner ring-1 ring-white/10"
-              aria-hidden
-            >
+          <article className={cardClass}>
+            <div className={iconTileClass} aria-hidden>
               <Compass className="size-5" strokeWidth={1.75} />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
-              {readmeEmoji.compass} 2. 网页端自动化向导方式
-            </h3>
+            <h3 className={cardTitleClass}>网页端自动化向导方式</h3>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-zinc-400">
               <li>
                 通过傻瓜式{" "}
@@ -457,7 +434,7 @@ export default function LandingPage() {
               <li>在浏览器中按步骤完成文稿、TTS 与成片渲染。</li>
               <li>多平台发布为可选步骤，可按需执行。</li>
             </ul>
-            <p className="mt-4 text-sm text-zinc-300">
+            <p className="mt-auto pt-5 text-sm text-zinc-300">
               <a href="#demo-wizard" className="text-amber-400/95 hover:text-amber-300 hover:underline">
                 演示视频
               </a>
@@ -473,16 +450,11 @@ export default function LandingPage() {
             </p>
           </article>
 
-          <article className={pathCardClass}>
-            <div
-              className="mb-4 inline-flex size-12 items-center justify-center rounded-2xl bg-gradient-to-br from-amber-500/20 to-orange-600/10 text-amber-200/90 shadow-inner ring-1 ring-white/10"
-              aria-hidden
-            >
+          <article className={cardClass}>
+            <div className={iconTileClass} aria-hidden>
               <Terminal className="size-5" strokeWidth={1.75} />
             </div>
-            <h3 className="text-lg font-semibold tracking-tight text-zinc-50 sm:text-xl">
-              {readmeEmoji.cli} 3. CLI 命令行
-            </h3>
+            <h3 className={cardTitleClass}>CLI 命令行</h3>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-relaxed text-zinc-400">
               <li>与向导共用同一套 pnpm 脚本：爬虫、TTS、Remotion 渲染与发布。</li>
               <li>适合终端操作、自有 CI 或与 shell、cron 等自动化对接。</li>
@@ -499,7 +471,7 @@ export default function LandingPage() {
                 。
               </li>
             </ul>
-            <p className="mt-4 text-sm text-zinc-300">
+            <p className="mt-auto pt-5 text-sm text-zinc-300">
               <a
                 href="https://github.com/szhshp/panda-video-generator#cli-usage-guide"
                 target="_blank"

@@ -92,3 +92,6 @@ output.del/video/cover.png
 output.del/video/ppt-deck-cover.jpg
 output.del/video/ppt-deck-cover.png
 output.del/video/video.mp4
+
+# promo — standalone promotional copy (not part of the project source)
+/promo/
