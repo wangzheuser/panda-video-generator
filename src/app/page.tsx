@@ -70,7 +70,7 @@ const products: Product[] = [
     id: "generator",
     name: "PVA-Generator",
     description:
-      "输入一个主题,自动完成素材抓取、脚本撰写与成片渲染,全程不需要人工干预。",
+      "输入一个主题, 自动完成素材抓取, 脚本撰写与成片渲染, 全程不需要人工干预.",
     tone: "amber",
     logo: "/logo/logo.png",
     docsHref: "/landing",
@@ -80,7 +80,7 @@ const products: Product[] = [
     id: "cli",
     name: "PVA-CLI",
     description:
-      "基于浏览器自动化的发布工具,一条命令把成片分发到抖音、视频号、快手与哔哩哔哩。",
+      "基于浏览器自动化的发布工具, 一条命令把成片分发到抖音, 视频号, 快手与哔哩哔哩.",
     tone: "emerald",
     logo: "/logo/pva-cli.png",
     docsHref: "/cli",
@@ -90,7 +90,7 @@ const products: Product[] = [
     id: "notebooklm",
     name: "PVA-NotebookLM",
     description:
-      "输入一个主题,输出包含课件、讲解音频与合成视频的完整课程。",
+      "输入一个主题, 输出包含课件, 讲解音频与合成视频的完整课程.",
     tone: "purple",
     logo: "/logo/pva-notebooklm.png",
     docsHref: "/notebooklm",
@@ -99,7 +99,7 @@ const products: Product[] = [
   {
     id: "suno",
     name: "PVA-Suno",
-    description: "用文字描述生成完整曲目,为视频补齐配乐。",
+    description: "用文字描述生成完整曲目, 为视频补齐配乐.",
     tone: "neutral",
     inDevelopment: true,
   },
